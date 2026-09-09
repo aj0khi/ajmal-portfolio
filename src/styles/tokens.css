@@ -1,0 +1,14 @@
+:root {
+  --paper: #f3efe6;
+  --paper-deep: #e9e3d7;
+  --ink: #1b1a17;
+  --ink-soft: #625e55;
+  --line: rgba(27, 26, 23, 0.22);
+  --accent: #d76122;
+  --accent-soft: #f0b05b;
+  --serif: 'Fraunces', Georgia, serif;
+  --mono: 'IBM Plex Mono', 'Courier New', monospace;
+  --shell: min(100% - 3rem, 80rem);
+  --section-space: clamp(7rem, 16vw, 14rem);
+  --hairline: 1px solid var(--line);
+}

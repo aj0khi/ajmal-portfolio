@@ -1,0 +1,65 @@
+---
+const joints = [
+  { id: 'base_yaw', label: 'BASE_YAW', x: 92, y: 176 },
+  { id: 'shoulder', label: 'SHOULDER', x: 166, y: 122 },
+  { id: 'elbow', label: 'ELBOW', x: 248, y: 150 },
+  { id: 'wrist_roll', label: 'WRIST_ROLL', x: 330, y: 92 }
+];
+---
+
+<div class="waybionic-diagram" data-waybionic>
+  <div class="diagram-canvas">
+    <svg viewBox="0 0 420 230" role="img" aria-labelledby="waybionic-title waybionic-description">
+      <title id="waybionic-title">WayBionic simulated joint map</title>
+      <desc id="waybionic-description">Four joints in a line diagram of the arm: base yaw, shoulder, elbow, and wrist roll.</desc>
+      <path class="diagram-arm" d="M92 176 166 122 248 150 330 92" />
+      <path class="diagram-baseline" d="M44 200h320" />
+      {joints.map((joint) => (
+        <g
+          class="diagram-joint"
+          data-joint={joint.id}
+          tabindex="0"
+          role="button"
+          aria-label={`${joint.label}: simulated, pending confirmation`}
+        >
+          <circle class="diagram-hit-area" cx={joint.x} cy={joint.y} r="22" />
+          <circle class="diagram-node" cx={joint.x} cy={joint.y} r="6" />
+          <text x={joint.x} y={joint.y - 18}>{joint.label}</text>
+        </g>
+      ))}
+    </svg>
+  </div>
+  <div class="diagram-readout" aria-live="polite">
+    <p class="mono">JOINT STATUS / SIMULATION ONLY</p>
+    <strong data-joint-name>BASE_YAW</strong>
+    <p data-joint-status>Real joint names, limits, and units pending team confirmation.</p>
+  </div>
+</div>
+
+<script>
+  const diagram = document.querySelector('[data-waybionic]');
+
+  if (diagram) {
+    const joints = diagram.querySelectorAll<SVGGElement>('[data-joint]');
+    const name = diagram.querySelector('[data-joint-name]');
+    const status = diagram.querySelector('[data-joint-status]');
+
+    const activateJoint = (joint: SVGGElement) => {
+      joints.forEach((item) => item.classList.toggle('is-active', item === joint));
+      if (name) name.textContent = joint.dataset.joint?.replace('_', ' ').toUpperCase() ?? '';
+      if (status) status.textContent = 'Real joint names, limits, and units pending team confirmation.';
+    };
+
+    joints.forEach((joint) => {
+      joint.addEventListener('mouseenter', () => activateJoint(joint));
+      joint.addEventListener('focus', () => activateJoint(joint));
+      joint.addEventListener('click', () => activateJoint(joint));
+      joint.addEventListener('keydown', (event: KeyboardEvent) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          activateJoint(joint);
+        }
+      });
+    });
+  }
+</script>

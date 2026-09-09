@@ -1,0 +1,208 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ProjectEntry from '../components/ProjectEntry.astro';
+import WayBionicDiagram from '../components/WayBionicDiagram.astro';
+
+const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+---
+
+<BaseLayout>
+  <header class="site-header shell">
+    <a class="wordmark" href="/" aria-label="Ajmal home">AJ / BUILD LOG</a>
+    <nav aria-label="Primary navigation">
+      <a href="#build-log">Log</a>
+      <a href="#experience">Experience</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="signal shell" id="signal" aria-labelledby="signal-title" data-reveal="signal">
+      <div class="signal-meta mono">FIELD NOTE / 001</div>
+      <div class="signal-grid">
+        <p class="signal-kicker mono">COMPUTER SCIENCE / UNIVERSITY OF CALGARY</p>
+        <h1 id="signal-title">Building systems<br /><em>that move.</em></h1>
+        <p class="signal-copy">From HVAC compressors to a ROS2-controlled surgical arm.</p>
+      </div>
+      <div class="signal-footer mono">
+        <span>STATUS: OPEN</span>
+        <span>LAST UPDATED: 2026</span>
+      </div>
+    </section>
+
+    <section class="log-section shell" id="build-log" aria-labelledby="log-title" data-reveal="advance">
+      <div class="section-heading">
+        <p class="eyebrow mono">01 / WHAT I BUILD</p>
+        <h2 id="log-title">Working systems,<br /><em>in the open.</em></h2>
+      </div>
+
+      <div class="project-list">
+        {projects.map((project, projectIndex) => (
+          <ProjectEntry
+            index={String(projectIndex + 1).padStart(2, '0')}
+            title={project.data.title}
+            status={project.data.status}
+            stack={project.data.stack}
+            summary={project.data.summary}
+            problem={project.data.problem}
+            system={project.data.system}
+            decision={project.data.decision}
+            next={project.data.next}
+            link={project.data.link}
+            linkLabel={project.data.linkLabel}
+          />
+        ))}
+      </div>
+    </section>
+
+    <section class="diagram-section shell" aria-labelledby="diagram-title" data-reveal="advance">
+      <div class="section-heading">
+        <p class="eyebrow mono">WAYBIONIC / SYSTEM MAP</p>
+        <h2 id="diagram-title">The arm is<br /><em>not ready yet.</em></h2>
+      </div>
+      <div class="diagram-intro">
+        <p>Motion tests stay in RViz until the complete arm asset package arrives and the team confirms the real actuated joints and units.</p>
+      </div>
+      <WayBionicDiagram />
+      <div class="monitor-evidence">
+        <figure>
+          <img src="/assets/waybionic/engineer-monitor-normal.png" alt="WayBionic Engineering Monitor showing a mock normal state in RViz." loading="lazy" />
+          <figcaption class="mono">ENGINEERING MONITOR / MOCK NORMAL</figcaption>
+        </figure>
+        <figure>
+          <img src="/assets/waybionic/engineer-monitor-fault.png" alt="WayBionic Engineering Monitor showing a mock fault state with alerts in RViz." loading="lazy" />
+          <figcaption class="mono">ENGINEERING MONITOR / MOCK FAULT</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="decision-section shell" id="how-i-think" aria-labelledby="decision-title" data-reveal="advance">
+      <div class="section-heading">
+        <p class="eyebrow mono">02 / HOW I THINK</p>
+        <h2 id="decision-title">Keep the hardware<br /><em>in the loop.</em></h2>
+      </div>
+      <div class="decision-grid">
+        <p class="decision-label mono">WAYBIONIC / ENGINEERING DECISION</p>
+        <div>
+          <p class="decision-lead">The movement test stays simulated and RViz-only until the system is genuinely ready for direct hardware control.</p>
+          <p class="decision-copy">CAD-exported joint names and limits are not treated as final until the team confirms the actual actuated joints and units. The current ground station publishes commands to a simulated joint-state driver.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="experience-section shell" id="experience" aria-labelledby="experience-title" data-reveal="advance">
+      <div class="section-heading">
+        <p class="eyebrow mono">03 / WHAT I HAVE DONE</p>
+        <h2 id="experience-title">Work that has<br /><em>to keep running.</em></h2>
+      </div>
+      <div class="experience-list">
+        <article class="experience-entry">
+          <p class="experience-meta mono">HVAC EXPRESS / TECHNICAL LEAD + DIRECT SALES</p>
+          <h3>Site, infrastructure, and the work of owning both the build and the conversation.</h3>
+          <p>A family-run Calgary heating and cooling company. Aj owns the technical side and does direct sales.</p>
+        </article>
+        <article class="experience-entry">
+          <p class="experience-meta mono">CHINOOK CLEAN / OWNER</p>
+          <h3>A power-washing business run from the ground up.</h3>
+          <p>A compact record of ownership and entrepreneurship.</p>
+        </article>
+        <article class="experience-entry">
+          <p class="experience-meta mono">WAYBIONIC ROBOTICS / UCalgary CLUB</p>
+          <h3>A ROS2 ground station for a remote-teleoperated surgical arm.</h3>
+          <p>Visibility, simulated motion tests, and a careful path toward the real arm model.</p>
+        </article>
+        <article class="experience-entry">
+          <p class="experience-meta mono">MOUNT ROYAL UNIVERSITY / LEARNING PEER</p>
+          <h3>One-on-one academic support for technical coursework.</h3>
+          <p>Developed materials to help students understand technical coursework.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="roadmap-section shell" id="roadmap" aria-labelledby="roadmap-title" data-reveal="advance">
+      <div class="section-heading">
+        <p class="eyebrow mono">04 / WHERE I AM HEADED</p>
+        <h2 id="roadmap-title">A sequence,<br /><em>not a shortcut.</em></h2>
+      </div>
+      <div class="roadmap-grid">
+        <p class="roadmap-copy">Aiming toward a top-tier robotics company and currently searching for robotics-related internships across Canada and the US, alongside a Computer Science degree at the University of Calgary, expected April 2030 after transferring from Mount Royal University.</p>
+        <ol class="roadmap-list">
+          <li><span class="mono">01</span> Hugging Face LeRobot in MuJoCo simulation</li>
+          <li><span class="mono">02</span> NVIDIA Isaac Lab for reinforcement-learning locomotion</li>
+          <li><span class="mono">03</span> ROS2 Nav2 and SLAM</li>
+          <li><span class="mono">04</span> SmolVLA fine-tuning <em> / stretch goal</em></li>
+        </ol>
+      </div>
+      <div class="certification-line mono">CERTIFICATIONS / CISCO INTRODUCTION TO CYBERSECURITY / GOOGLE INTRODUCTION TO GENERATIVE AI / GOOGLE INTRODUCTION TO LARGE LANGUAGE MODELS / JULY 2026</div>
+    </section>
+
+    <section class="skills-section shell" id="skills" aria-labelledby="skills-title" data-reveal="advance">
+      <div class="section-heading">
+        <p class="eyebrow mono">05 / CURRENT TOOLSET</p>
+        <h2 id="skills-title">Tools for the<br /><em>next iteration.</em></h2>
+      </div>
+      <div class="skills-list">
+        <div class="skill-group">
+          <p class="skill-label mono">LANGUAGES</p>
+          <p>Java, Python, JavaScript / Node.js, HTML / CSS</p>
+        </div>
+        <div class="skill-group">
+          <p class="skill-label mono">ROBOTICS + SYSTEMS</p>
+          <p>ROS2, RViz, URDF, MuJoCo, NVIDIA Isaac Lab, SLAM / Nav2</p>
+        </div>
+        <div class="skill-group">
+          <p class="skill-label mono">ENGINEERING CONCEPTS</p>
+          <p>OOP + inheritance, data structures, file I/O, event-driven programming, hardware integration</p>
+        </div>
+        <div class="skill-group">
+          <p class="skill-label mono">TOOLS + PLATFORMS</p>
+          <p>Git / GitHub, Java Swing, Phidgets SDK, IntelliJ IDEA, WordPress / PHP</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="recognition-section shell" id="recognition" aria-labelledby="recognition-title" data-reveal="advance">
+      <div class="section-heading">
+        <p class="eyebrow mono">06 / RECOGNITION</p>
+        <h2 id="recognition-title">Evidence of<br /><em>the work behind it.</em></h2>
+      </div>
+      <div class="recognition-list">
+        <div class="recognition-entry">
+          <p class="mono">ACADEMICS</p>
+          <p>Dean's List at the University of Calgary and Mount Royal University.</p>
+        </div>
+        <div class="recognition-entry">
+          <p class="mono">SUPPORT</p>
+          <p>$10,000+ in scholarships and grants.</p>
+        </div>
+        <div class="recognition-entry">
+          <p class="mono">MATHEMATICS</p>
+          <p>Gauss Mathematics Contest Excellence Award from the University of Waterloo.</p>
+        </div>
+        <div class="recognition-entry">
+          <p class="mono">COMMUNITY</p>
+          <p>Community Service Recognition Award.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="contact-section shell" id="contact" aria-labelledby="contact-title" data-reveal="advance">
+      <p class="eyebrow mono">07 / GET IN TOUCH</p>
+      <div>
+        <h2 id="contact-title">Open to the next<br /><em>system to build.</em></h2>
+        <div class="contact-links">
+          <a class="contact-link mono" href="/resume/Ajmal_Khidri_Software_Internship.docx" download>DOWNLOAD RESUME / DOCX</a>
+          <a class="contact-link mono" href="mailto:khidri.ajmal@gmail.com">EMAIL / KHIDRI.AJMAL@GMAIL.COM</a>
+          <a class="contact-link mono" href="https://github.com/aj0khi" target="_blank" rel="noreferrer">GITHUB / AJ0KHI</a>
+          <a class="contact-link mono" href="https://www.linkedin.com/in/ajmal-khidri/" target="_blank" rel="noreferrer">LINKEDIN / AJMAL KHIDRI</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer shell mono">
+    <span>AJ / BUILD LOG</span>
+    <span>STATIC FOUNDATION / V0.1</span>
+  </footer>
+</BaseLayout>

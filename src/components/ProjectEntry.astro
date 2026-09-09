@@ -1,0 +1,45 @@
+---
+interface Props {
+  index: string;
+  title: string;
+  status: 'ACTIVE' | 'IN PROGRESS' | 'SHIPPED';
+  stack: string;
+  summary: string;
+  problem?: string;
+  system?: string;
+  decision?: string;
+  next?: string;
+  link?: string;
+  linkLabel?: string;
+}
+
+const { index, title, status, stack, summary, problem, system, decision, next, link, linkLabel } = Astro.props;
+const statusClass = status.toLowerCase().replace(' ', '-');
+---
+
+<article class="project-entry">
+  <div class="project-index mono">{index}</div>
+  <div class="project-body">
+    <div class="project-heading">
+      <h3>{title}</h3>
+      <span class={`status status-${statusClass}`}>{status}</span>
+    </div>
+    <p class="project-stack mono">{stack}</p>
+    <p class="project-summary">{summary}</p>
+    {problem || system || decision || next ? (
+      <details class="project-details">
+        <summary class="mono">OPEN LOG DETAILS</summary>
+        <dl>
+          {problem ? <><dt class="mono">PROBLEM</dt><dd>{problem}</dd></> : null}
+          {system ? <><dt class="mono">SYSTEM</dt><dd>{system}</dd></> : null}
+          {decision ? <><dt class="mono">DECISION</dt><dd>{decision}</dd></> : null}
+          {next ? <><dt class="mono">WHAT'S NEXT</dt><dd>{next}</dd></> : null}
+        </dl>
+      </details>
+    ) : null}
+    {link ? (
+      <a class="project-link mono" href={link} target="_blank" rel="noreferrer">{linkLabel ?? 'VIEW PROJECT'}</a>
+    ) : null}
+  </div>
+  <span class="project-arrow" aria-hidden="true">↗</span>
+</article>
