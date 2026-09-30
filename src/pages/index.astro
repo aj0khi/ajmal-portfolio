@@ -188,7 +188,7 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
               <form data-browser-form><input data-browser-input value="https://github.com/aj0khi" placeholder="Search or enter address" aria-label="Browser address or search" /><button type="submit">GO</button></form><button type="button" data-browser-external aria-label="Open current page in a new tab">↗</button>
             </div>
             <div class="browser-home" data-browser-home><p class="window-kicker mono">AJMAL BROWSER / QUICK LINKS</p><h2>Open a useful<br /><em>window to the web.</em></h2><div class="browser-links"><button type="button" data-browser-link="https://github.com/aj0khi">GitHub / aj0khi</button><button type="button" data-browser-link="https://calgaryhvacexpress.ca/">HVAC Express</button><button type="button" data-browser-link="https://www.linkedin.com/in/ajmal-khidri/">LinkedIn</button></div><p class="window-note mono">Searches and external pages open in a real browser tab when a site blocks embedded viewing.</p></div>
-            <div class="browser-result" data-browser-result hidden><p class="window-kicker mono">EXTERNAL PAGE / READY</p><h2 data-browser-result-title>Page opened in a new tab.</h2><p class="window-copy">This site protects itself from embedded browsing. The destination is still ready in the real browser tab.</p><a class="resume-download" data-browser-result-link href="#" target="_blank" rel="noreferrer">OPEN CURRENT PAGE ↗</a></div>
+            <div class="browser-result" data-browser-result hidden><p class="window-kicker mono">LOCAL BROWSER SHELL / READY</p><h2 data-browser-result-title>Destination ready.</h2><p class="window-copy">The destination stays inside this browser window. Use the explicit link only when you want to open the real page externally.</p><a class="resume-download" data-browser-result-link href="#" target="_blank" rel="noreferrer">OPEN EXTERNALLY ↗</a></div>
             <iframe data-browser-frame title="Embedded browser" sandbox="allow-forms allow-modals allow-popups allow-presentation allow-scripts" hidden></iframe>
           </DesktopWindow>
 
@@ -388,7 +388,7 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
       if (value.includes(' ') || !value.includes('.')) return `https://www.google.com/search?q=${encodeURIComponent(value)}`;
       return `https://${value}`;
     };
-    const loadBrowserUrl = (input: string, addHistory = true, openExternally = true) => {
+    const loadBrowserUrl = (input: string, addHistory = true, openExternally = false) => {
       const url = resolveBrowserInput(input);
       if (addHistory) {
         browserHistory.splice(browserIndex + 1);
@@ -402,7 +402,7 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
       }
       if (browserHome) browserHome.hidden = true;
       if (browserResult) browserResult.hidden = false;
-      if (browserResultTitle) browserResultTitle.textContent = url.includes('google.com/search') ? 'Search opened in a new tab.' : 'Page opened in a new tab.';
+      if (browserResultTitle) browserResultTitle.textContent = url.includes('google.com/search') ? 'Search destination ready.' : 'Page destination ready.';
       if (browserResultLink) browserResultLink.href = url;
       if (openExternally) window.open(url, '_blank', 'noopener,noreferrer');
     };
