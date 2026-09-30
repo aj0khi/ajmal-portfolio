@@ -390,6 +390,7 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
     };
     const loadBrowserUrl = (input: string, addHistory = true, openExternally = false) => {
       const url = resolveBrowserInput(input);
+      const blockedHost = /(^|\.)google\.[^/]+|(^|\.)youtube\.com|(^|\.)linkedin\.com/i.test(url);
       if (addHistory) {
         browserHistory.splice(browserIndex + 1);
         browserHistory.push(url);
@@ -397,12 +398,12 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
       }
       if (browserInput) browserInput.value = url;
       if (browserFrame) {
-        browserFrame.hidden = false;
+        browserFrame.hidden = blockedHost;
         browserFrame.src = url;
       }
       if (browserHome) browserHome.hidden = true;
-      if (browserResult) browserResult.hidden = true;
-      if (browserResultTitle) browserResultTitle.textContent = url.includes('google.com/search') ? 'Search destination ready.' : 'Page destination ready.';
+      if (browserResult) browserResult.hidden = !blockedHost;
+      if (browserResultTitle) browserResultTitle.textContent = url.includes('google.com/search') ? 'Google search ready.' : 'Page ready to open externally.';
       if (browserResultLink) browserResultLink.href = url;
       if (openExternally) window.open(url, '_blank', 'noopener,noreferrer');
     };

@@ -1971,7 +1971,7 @@ body::before {
   height: 2.55rem;
   padding: 0.2rem;
   border-top: 2px solid #e5e6df;
-  border-radius: 0 0 0.8rem 0.8rem;
+  border-radius: 0.65rem;
   background: #b9bcc3;
 }
 
