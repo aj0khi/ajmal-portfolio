@@ -37,6 +37,9 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
             <OsIcon window="work" icon="▥" label="Work History" src="/icons/resume.svg" />
             <OsIcon window="skills" icon="⌘" label="Skills" src="/icons/waybionic.svg" />
             <OsIcon window="research" icon="◉" label="Research" src="/icons/research.svg" />
+            <OsIcon window="notes" icon="▤" label="Build Notes" src="/icons/notes.svg" />
+            <OsIcon window="terminal" icon=">_" label="Terminal" src="/icons/terminal.svg" />
+            <OsIcon window="media" icon="▶" label="Media" src="/icons/media.svg" />
           </div>
 
           <DesktopWindow id="portfolio" title="MY WORK / FILE EXPLORER" icon="▣" open class="window-portfolio">
@@ -148,6 +151,23 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
             <div class="window-note mono">PERSONAL RESEARCH / NOT A PRODUCT CLAIM</div>
           </DesktopWindow>
 
+          <DesktopWindow id="notes" title="BUILD NOTES / CURRENT" icon="▤" class="window-notes">
+            <div class="window-kicker mono">LOCAL NOTES / PUBLIC-SAFE SUMMARY</div>
+            <h2>What is being<br /><em>built next.</em></h2>
+            <div class="notes-list"><div><time>ACTIVE</time><strong>WayBionic</strong><span>Move from controlled simulation toward the fully working arm and the physical Arduino bridge.</span></div><div><time>IN PROGRESS</time><strong>Robotics roadmap</strong><span>MuJoCo imitation learning → Isaac Lab locomotion → ROS2 Nav2 and SLAM.</span></div><div><time>SHIPPED</time><strong>Portfolio OS</strong><span>Desktop archive, project diagrams, recruiter view, resume, and evidence windows.</span></div></div>
+          </DesktopWindow>
+
+          <DesktopWindow id="terminal" title="TERMINAL / AJMALOS" icon=">_" class="window-terminal">
+            <div class="terminal-screen"><p>AJMALOS TERMINAL v1.0</p><p>Last login: local archive</p><p><span>ajmal@workstation:~$</span> npm run check</p><p class="terminal-ok">0 errors · 0 warnings · 0 hints</p><p><span>ajmal@workstation:~$</span> npm run build</p><p class="terminal-ok">static output generated in dist/</p><p><span>ajmal@workstation:~$</span> status</p><p>projects: 04 · systems: moving · next: keep building</p><b>_</b></div>
+          </DesktopWindow>
+
+          <DesktopWindow id="media" title="MEDIA PLAYER / WAYBIONIC" icon="▶" class="window-media">
+            <div class="window-kicker mono">MEDIA ARCHIVE / EXTERNAL VIDEO</div>
+            <h2>The arm<br /><em>actually moves.</em></h2>
+            <div class="media-placeholder"><span>▶</span><strong>WAYBIONIC ARM / LATEST DEMO</strong><small>Video opens in a new tab because Drive does not allow reliable embedded playback here.</small></div>
+            <div class="window-actions"><a href="https://drive.google.com/file/d/1WWgNoo82JjGdWspCLcINrK6-YqnF9omR/view?usp=sharing" target="_blank" rel="noreferrer">OPEN ARM VIDEO ↗</a></div>
+          </DesktopWindow>
+
           <DesktopWindow id="recycle" title="RECYCLE BIN" icon="♻" class="window-recycle">
             <div class="window-kicker mono">SYSTEM UTILITY</div>
             <h2>Nothing deleted<br /><em>yet.</em></h2>
@@ -178,6 +198,8 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
             <button type="button" data-window-open="resume">▧ &nbsp; Resume</button>
             <button type="button" data-window-open="system">ⓘ &nbsp; System Info</button>
             <button type="button" data-window-open="work">▥ &nbsp; Work History</button>
+            <button type="button" data-window-open="notes">▤ &nbsp; Build Notes</button>
+            <button type="button" data-window-open="terminal">&gt;_ &nbsp; Terminal</button>
             <button type="button" data-window-open="about">★ &nbsp; About Aj</button>
             <a href="mailto:khidri.ajmal@gmail.com">✉ &nbsp; Email Ajmal</a>
           </div>
