@@ -147,7 +147,7 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
           <DesktopWindow id="browser" title="AJMAL BROWSER" icon="⌕" class="window-browser">
             <div class="browser-toolbar">
               <button type="button" data-browser-back aria-label="Back">◀</button><button type="button" data-browser-forward aria-label="Forward">▶</button><button type="button" data-browser-refresh aria-label="Refresh">↻</button>
-              <form data-browser-form><input data-browser-input value="https://github.com/aj0khi" aria-label="Browser address" /><button type="submit">GO</button></form>
+              <form data-browser-form><input data-browser-input value="https://github.com/aj0khi" placeholder="Search or enter address" aria-label="Browser address or search" /><button type="submit">GO</button></form><button type="button" data-browser-external aria-label="Open current page in a new tab">↗</button>
             </div>
             <div class="browser-home" data-browser-home><p class="window-kicker mono">AJMAL BROWSER / QUICK LINKS</p><h2>Open a useful<br /><em>window to the web.</em></h2><div class="browser-links"><button type="button" data-browser-link="https://github.com/aj0khi">GitHub / aj0khi</button><button type="button" data-browser-link="https://calgaryhvacexpress.ca/">HVAC Express</button><button type="button" data-browser-link="https://www.linkedin.com/in/ajmal-khidri/">LinkedIn</button></div><p class="window-note mono">Some external sites block embedded viewing. Use the address bar or open the link in a new tab.</p></div>
             <iframe data-browser-frame title="Embedded browser" sandbox="allow-forms allow-modals allow-popups allow-presentation allow-scripts" hidden></iframe>
@@ -338,8 +338,14 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
     const browserHome = desktop.querySelector<HTMLElement>('[data-browser-home]');
     const browserHistory: string[] = [];
     let browserIndex = -1;
-    const loadBrowserUrl = (url: string, addHistory = true) => {
-      if (!/^https?:\/\//i.test(url)) url = `https://${url}`;
+    const resolveBrowserInput = (input: string) => {
+      const value = input.trim();
+      if (/^https?:\/\//i.test(value)) return value;
+      if (value.includes(' ') || !value.includes('.')) return `https://www.google.com/search?q=${encodeURIComponent(value)}`;
+      return `https://${value}`;
+    };
+    const loadBrowserUrl = (input: string, addHistory = true, openSearchExternally = false) => {
+      const url = resolveBrowserInput(input);
       if (addHistory) {
         browserHistory.splice(browserIndex + 1);
         browserHistory.push(url);
@@ -351,14 +357,16 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
         browserFrame.src = url;
       }
       if (browserHome) browserHome.hidden = true;
+      if (openSearchExternally && url.includes('google.com/search')) window.open(url, '_blank', 'noopener,noreferrer');
     };
     browserForm?.addEventListener('submit', (event) => {
       event.preventDefault();
-      if (browserInput?.value) loadBrowserUrl(browserInput.value);
+      if (browserInput?.value) loadBrowserUrl(browserInput.value, true, !/^https?:\/\//i.test(browserInput.value.trim()));
     });
     desktop.querySelectorAll<HTMLButtonElement>('[data-browser-link]').forEach((link) => link.addEventListener('click', () => loadBrowserUrl(link.dataset.browserLink ?? '')));
     desktop.querySelector('[data-browser-back]')?.addEventListener('click', () => { if (browserIndex > 0) { browserIndex -= 1; loadBrowserUrl(browserHistory[browserIndex], false); } });
     desktop.querySelector('[data-browser-forward]')?.addEventListener('click', () => { if (browserIndex < browserHistory.length - 1) { browserIndex += 1; loadBrowserUrl(browserHistory[browserIndex], false); } });
     desktop.querySelector('[data-browser-refresh]')?.addEventListener('click', () => { if (browserFrame?.src) browserFrame.src = browserFrame.src; });
+    desktop.querySelector('[data-browser-external]')?.addEventListener('click', () => { if (browserInput?.value) window.open(resolveBrowserInput(browserInput.value), '_blank', 'noopener,noreferrer'); });
   }
 </script>

@@ -1574,6 +1574,14 @@ body::before {
   cursor: pointer;
 }
 
+.browser-toolbar > button:hover,
+.browser-toolbar > button:focus-visible,
+.browser-toolbar form button:hover,
+.browser-toolbar form button:focus-visible {
+  color: white;
+  background: #315b98;
+}
+
 .browser-toolbar form {
   display: flex;
   flex: 1;
