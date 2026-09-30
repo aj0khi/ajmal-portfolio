@@ -861,8 +861,8 @@ body::before {
 
 .monitor-bezel {
   position: relative;
-  width: min(96vw, 1180px);
-  height: min(88svh, 820px);
+  width: min(97vw, 1240px);
+  height: min(91svh, 820px);
   padding: clamp(1.2rem, 3vw, 2.8rem) clamp(1rem, 2.8vw, 2.5rem) clamp(2.5rem, 5vw, 4.5rem);
   border: 2px solid #b4a997;
   border-radius: 2.5% 2.5% 4% 4%;
