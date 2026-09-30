@@ -1199,6 +1199,22 @@ body::before {
   font: 0.9rem/1.4 Georgia, serif;
 }
 
+.file-card .file-contribution {
+  margin-top: 0.8rem;
+  padding-top: 0.7rem;
+  border-top: 1px dashed #c2bfb3;
+  color: #3f4e63;
+  font: 0.8rem/1.4 Georgia, serif;
+}
+
+.file-contribution strong {
+  display: block;
+  margin-bottom: 0.3rem;
+  color: #9a3e32;
+  font: 700 0.55rem var(--mono);
+  letter-spacing: 0.08em;
+}
+
 .file-card a,
 .window-actions a,
 .resume-download {
@@ -1244,6 +1260,24 @@ body::before {
   top: 16%;
   left: 25%;
   width: min(55%, 650px);
+}
+
+.window-system {
+  top: 12%;
+  left: 24%;
+  width: min(62%, 720px);
+}
+
+.window-work {
+  top: 15%;
+  left: 20%;
+  width: min(64%, 740px);
+}
+
+.window-skills {
+  top: 18%;
+  left: 31%;
+  width: min(55%, 660px);
 }
 
 .window-games {
@@ -1388,6 +1422,67 @@ body::before {
   color: #596272;
   font: 700 0.68rem var(--mono);
   line-height: 1.5;
+}
+
+.system-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.system-grid div,
+.skills-explorer div {
+  display: grid;
+  gap: 0.4rem;
+  padding: 0.8rem;
+  border: 1px solid #b7b8ab;
+  background: #f8f6ed;
+}
+
+.system-grid strong,
+.skills-explorer strong,
+.timeline time {
+  color: #9a3e32;
+  font: 700 0.58rem var(--mono);
+  letter-spacing: 0.07em;
+}
+
+.system-grid span,
+.skills-explorer span,
+.timeline span {
+  color: #596272;
+  font: 0.88rem/1.4 Georgia, serif;
+}
+
+.timeline {
+  display: grid;
+  gap: 0;
+  margin-top: 1.5rem;
+  border-top: 1px solid #b7b8ab;
+}
+
+.timeline div {
+  display: grid;
+  grid-template-columns: 11rem 1fr;
+  gap: 0.3rem 1rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid #b7b8ab;
+}
+
+.timeline strong {
+  color: #182d4f;
+  font: 700 1rem Georgia, serif;
+}
+
+.timeline span {
+  grid-column: 2;
+}
+
+.skills-explorer {
+  display: grid;
+  gap: 0.7rem;
+  margin-top: 1.5rem;
 }
 
 .resume-small {
@@ -1702,7 +1797,10 @@ body::before {
   .window-games,
   .window-recycle,
   .window-calculator,
-  .window-browser {
+  .window-browser,
+  .window-system,
+  .window-work,
+  .window-skills {
     top: 16%;
     left: 5%;
     width: 90%;
@@ -1737,6 +1835,18 @@ body::before {
   .games-list div {
     grid-template-columns: 1fr;
     gap: 0.35rem;
+  }
+
+  .system-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .timeline div {
+    grid-template-columns: 1fr;
+  }
+
+  .timeline span {
+    grid-column: auto;
   }
 
   .window-waybionic .diagram-readout {

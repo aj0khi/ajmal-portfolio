@@ -8,6 +8,7 @@ const projects = defineCollection({
     status: z.enum(['ACTIVE', 'IN PROGRESS', 'SHIPPED']),
     stack: z.string(),
     summary: z.string(),
+    contribution: z.string().optional(),
     problem: z.string().optional(),
     system: z.string().optional(),
     decision: z.string().optional(),

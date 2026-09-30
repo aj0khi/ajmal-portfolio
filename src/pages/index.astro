@@ -31,6 +31,9 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
             <OsIcon window="calculator" icon="⊞" label="Calculator" />
             <OsIcon window="recycle" icon="♻" label="Recycle Bin" />
             <OsIcon window="games" icon="✣" label="Games" />
+            <OsIcon window="system" icon="ⓘ" label="System Info" />
+            <OsIcon window="work" icon="▥" label="Work History" />
+            <OsIcon window="skills" icon="⌘" label="Skills" />
           </div>
 
           <DesktopWindow id="portfolio" title="MY WORK / FILE EXPLORER" icon="▣" open class="window-portfolio">
@@ -46,6 +49,7 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
                   <div class="file-card-top mono"><span>{String(projectIndex + 1).padStart(2, '0')}</span><span>{project.data.status}</span></div>
                   <h2>{project.data.title}</h2>
                   <p>{project.data.summary}</p>
+                  {project.data.contribution ? <p class="file-contribution"><strong>MY CONTRIBUTION</strong>{project.data.contribution}</p> : null}
                   <div class="file-tags mono">{project.data.stack}</div>
                   {project.data.link ? <a href={project.data.link} target="_blank" rel="noreferrer">OPEN SOURCE ↗</a> : null}
                 </article>
@@ -107,6 +111,25 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
             <div class="games-list"><div><strong>VALORANT</strong><span>Rounds, reads, and clean utility.</span></div><div><strong>GEOMETRY DASH</strong><span>Timing, repetition, and stubbornness.</span></div><div><strong>BRAWL STARS</strong><span>Fast matches and chaotic decisions.</span></div><div><strong>BANFF TRAILS</strong><span>Johnston Canyon / Big Beehive / Sarail Ridge.</span></div></div>
           </DesktopWindow>
 
+          <DesktopWindow id="system" title="SYSTEM INFO / AJMAL KHIDRI" icon="ⓘ" class="window-system">
+            <div class="window-kicker mono">PUBLIC PROFILE / RECRUITER VIEW</div>
+            <h2>Ajmal Khidri<br /><em>Computer Science student.</em></h2>
+            <div class="system-grid"><div><strong>LOCATION</strong><span>Calgary, Alberta</span></div><div><strong>EDUCATION</strong><span>University of Calgary / B.Sc. Computer Science / Expected 2029</span></div><div><strong>FOCUS</strong><span>Robotics, software systems, hardware integration</span></div><div><strong>STATUS</strong><span>Open to software and robotics internships</span></div></div>
+            <div class="window-actions"><a href="mailto:khidri.ajmal@gmail.com">EMAIL AJMAL ↗</a><a href="https://www.linkedin.com/in/ajmal-khidri/" target="_blank" rel="noreferrer">LINKEDIN ↗</a></div>
+          </DesktopWindow>
+
+          <DesktopWindow id="work" title="WORK HISTORY / TIMELINE" icon="▥" class="window-work">
+            <div class="window-kicker mono">EXPERIENCE LOG / VERIFIED ENTRIES</div>
+            <h2>Work that has<br /><em>to keep running.</em></h2>
+            <div class="timeline"><div><time>MAR 2024 — PRESENT</time><strong>HVAC Express</strong><span>Technical Lead + Sales Associate · website, hosting, lead-generation systems, direct client sales.</span></div><div><time>AUG 2026 — PRESENT</time><strong>WayBionic Robotics</strong><span>Member · ROS2-based remote-teleoperation surgical arm project.</span></div><div><time>FEB — MAY 2026</time><strong>Mount Royal University</strong><span>Learning Peer / Tutor · one-on-one academic support in technical coursework.</span></div></div>
+          </DesktopWindow>
+
+          <DesktopWindow id="skills" title="SKILLS / TOOLBOX" icon="⌘" class="window-skills">
+            <div class="window-kicker mono">CURRENT TOOLSET / NOT A BADGE WALL</div>
+            <h2>Tools for the<br /><em>next iteration.</em></h2>
+            <div class="skills-explorer"><div><strong>LANGUAGES</strong><span>Java · Python · JavaScript · HTML/CSS</span></div><div><strong>ROBOTICS + SYSTEMS</strong><span>ROS2 · RViz · URDF · MuJoCo · Isaac Lab · Nav2/SLAM</span></div><div><strong>CONCEPTS</strong><span>OOP + inheritance · Stack/Queue/LinkedList · File I/O · event-driven programming · hardware integration</span></div><div><strong>TOOLS</strong><span>Git/GitHub · Java Swing · Phidgets SDK · IntelliJ IDEA · WordPress/PHP</span></div></div>
+          </DesktopWindow>
+
           <DesktopWindow id="recycle" title="RECYCLE BIN" icon="♻" class="window-recycle">
             <div class="window-kicker mono">SYSTEM UTILITY</div>
             <h2>Nothing deleted<br /><em>yet.</em></h2>
@@ -134,6 +157,8 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
             <div class="start-heading"><strong>AJMAL</strong><span>OS</span></div>
             <button type="button" data-window-open="portfolio">▣ &nbsp; My Work</button>
             <button type="button" data-window-open="resume">▧ &nbsp; Resume</button>
+            <button type="button" data-window-open="system">ⓘ &nbsp; System Info</button>
+            <button type="button" data-window-open="work">▥ &nbsp; Work History</button>
             <button type="button" data-window-open="about">★ &nbsp; About Aj</button>
             <a href="mailto:khidri.ajmal@gmail.com">✉ &nbsp; Email Ajmal</a>
           </div>
