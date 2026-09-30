@@ -1347,6 +1347,12 @@ body::before {
   line-height: 1.5;
 }
 
+.resume-small {
+  margin-top: 1.25rem;
+  color: #596272;
+  font: 0.82rem/1.45 Georgia, serif;
+}
+
 .resume-download {
   padding: 0.7rem 0.8rem;
   border: 1px solid #9a3e32;
