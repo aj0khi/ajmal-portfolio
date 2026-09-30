@@ -1954,6 +1954,10 @@ body::before {
   background: #fff;
 }
 
+.window-browser iframe[hidden] {
+  display: none;
+}
+
 .resume-download {
   padding: 0.7rem 0.8rem;
   border: 1px solid #9a3e32;
