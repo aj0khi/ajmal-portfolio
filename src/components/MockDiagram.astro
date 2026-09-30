@@ -1,0 +1,41 @@
+---
+interface Props {
+  kind: 'waybionic' | 'blackbox' | 'rover' | 'hvac';
+  title: string;
+}
+
+const { kind, title } = Astro.props;
+---
+
+<div class={`mock-diagram mock-${kind}`} aria-label={`${title} conceptual diagram`}>
+  <div class="mock-diagram-head"><span class="mono">CONCEPTUAL / MOCK DIAGRAM</span><span class="diagram-signal">● SIGNAL PATH</span></div>
+  {kind === 'waybionic' ? (
+    <div class="diagram-flow diagram-flow-wide">
+      <div class="diagram-node"><strong>OPERATOR</strong><span>RUN / HOME / STOP</span></div><b>→</b>
+      <div class="diagram-node diagram-node-accent"><strong>GROUND STATION</strong><span>ROS2 COMMAND</span></div><b>→</b>
+      <div class="diagram-node"><strong>JOINT DRIVER</strong><span>SIMULATED STATE</span></div>
+      <div class="diagram-branch"><i></i><div class="diagram-node diagram-node-alert"><strong>DIAGNOSTICS</strong><span>AGE / STALE / FUTURE</span></div><i></i></div>
+      <div class="diagram-node"><strong>RVIZ</strong><span>MONITOR + MODEL</span></div>
+    </div>
+  ) : null}
+  {kind === 'blackbox' ? (
+    <div class="diagram-stack">
+      <div class="diagram-node"><strong>PHYSICAL SYSTEM</strong><span>COMMANDS / SENSORS / POWER</span></div><b>↓</b>
+      <div class="diagram-node diagram-node-accent"><strong>CAPTURE LAYER</strong><span>CANONICAL RECORDS + HASH CHAIN</span></div><b>↓</b>
+      <div class="diagram-split"><div class="diagram-node"><strong>LOCAL VAULT</strong><span>SEALED EVIDENCE</span></div><div class="diagram-node"><strong>VERIFIER</strong><span>OFFLINE REVIEW</span></div></div>
+    </div>
+  ) : null}
+  {kind === 'rover' ? (
+    <div class="diagram-rover-grid">
+      <div class="diagram-node"><strong>SONAR</strong><span>DISTANCE INPUT</span></div><b>→</b><div class="diagram-node diagram-node-accent"><strong>CONTROL LOGIC</strong><span>OBSTACLE DECISION</span></div><b>→</b><div class="diagram-motors"><div class="diagram-node"><strong>LEFT DC</strong><span>MOTOR</span></div><div class="diagram-node"><strong>RIGHT DC</strong><span>MOTOR</span></div></div>
+    </div>
+  ) : null}
+  {kind === 'hvac' ? (
+    <div class="diagram-stack">
+      <div class="diagram-node"><strong>CALGARY CUSTOMER</strong><span>SEARCH / CONTACT / BOOKING</span></div><b>↓</b>
+      <div class="diagram-node diagram-node-accent"><strong>HVAC EXPRESS SITE</strong><span>WORDPRESS / PHP / HTML + CSS</span></div><b>↓</b>
+      <div class="diagram-split"><div class="diagram-node"><strong>HOSTINGER</strong><span>DOMAIN + INFRASTRUCTURE</span></div><div class="diagram-node"><strong>LEAD SYSTEM</strong><span>SEO + INBOUND DEMAND</span></div></div>
+    </div>
+  ) : null}
+  <p class="mock-diagram-note">This is a communication model, not a claim that every displayed path is the final production architecture.</p>
+</div>

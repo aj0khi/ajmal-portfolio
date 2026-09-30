@@ -1175,6 +1175,119 @@ body::before {
   font: 1rem/1.5 Georgia, serif;
 }
 
+.mock-diagram {
+  margin-top: 1.25rem;
+  padding: 0.8rem;
+  border: 1px solid #a7abb0;
+  background: #e1e3dc;
+  box-shadow: inset 0 0 0 3px #d0d4cb;
+}
+
+.mock-diagram-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 0.65rem;
+  border-bottom: 1px dashed #a7abb0;
+  color: #657183;
+  font-size: 0.55rem;
+}
+
+.diagram-signal {
+  color: #9a3e32;
+  font: 700 0.55rem var(--mono);
+}
+
+.diagram-flow,
+.diagram-rover-grid {
+  display: grid;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: 0.9rem;
+}
+
+.diagram-flow-wide {
+  grid-template-columns: 1fr auto 1fr auto 1fr;
+}
+
+.diagram-rover-grid {
+  grid-template-columns: 1fr auto 1.2fr auto 1fr;
+}
+
+.diagram-node {
+  display: grid;
+  gap: 0.28rem;
+  min-width: 0;
+  padding: 0.65rem 0.5rem;
+  border: 1px solid #496375;
+  background: #f4f1dd;
+  text-align: center;
+}
+
+.diagram-node strong {
+  color: #183f52;
+  font: 700 0.55rem var(--mono);
+  letter-spacing: 0.04em;
+}
+
+.diagram-node span {
+  overflow-wrap: anywhere;
+  color: #657183;
+  font: 0.58rem/1.25 var(--mono);
+}
+
+.diagram-node-accent {
+  border-color: #cd752a;
+  background: #f8e9c8;
+}
+
+.diagram-node-alert {
+  border-color: #9a3e32;
+  background: #f3d9cb;
+}
+
+.diagram-flow > b,
+.diagram-rover-grid > b,
+.diagram-stack > b {
+  color: #cd752a;
+  font: 700 1rem var(--mono);
+}
+
+.diagram-branch {
+  position: absolute;
+  display: none;
+}
+
+.diagram-stack {
+  display: grid;
+  justify-items: center;
+  gap: 0.35rem;
+  max-width: 34rem;
+  margin: 0.9rem auto 0;
+}
+
+.diagram-stack > .diagram-node {
+  width: min(100%, 27rem);
+}
+
+.diagram-split {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.6rem;
+  width: 100%;
+}
+
+.diagram-motors {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.mock-diagram-note {
+  margin: 0.8rem 0 0;
+  color: #657183;
+  font: 0.58rem/1.35 var(--mono);
+}
+
 .project-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1895,6 +2008,20 @@ body::before {
   }
 
   .research-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .diagram-flow-wide,
+  .diagram-rover-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .diagram-flow > b,
+  .diagram-rover-grid > b {
+    transform: rotate(90deg);
+  }
+
+  .diagram-split {
     grid-template-columns: 1fr;
   }
 

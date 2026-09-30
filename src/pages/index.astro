@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import DesktopWindow from '../components/DesktopWindow.astro';
+import MockDiagram from '../components/MockDiagram.astro';
 import OsIcon from '../components/OsIcon.astro';
 import WayBionicDiagram from '../components/WayBionicDiagram.astro';
 
@@ -52,6 +53,7 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
                   <p>{project.data.summary}</p>
                   {project.data.contribution ? <p class="file-contribution"><strong>MY CONTRIBUTION</strong>{project.data.contribution}</p> : null}
                   <div class="file-tags mono">{project.data.stack}</div>
+                  {project.data.title === 'HVAC Express' ? <MockDiagram kind="hvac" title="HVAC Express delivery flow" /> : null}
                   {project.data.link ? <a href={project.data.link} target="_blank" rel="noreferrer">OPEN SOURCE ↗</a> : null}
                 </article>
               ))}
@@ -66,6 +68,7 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
               <figure><img src="/assets/waybionic/engineer-monitor-normal.png" alt="WayBionic Engineering Monitor in a mock normal state." loading="lazy" /><figcaption class="mono">MOCK NORMAL / RVIZ</figcaption></figure>
               <figure><img src="/assets/waybionic/engineer-monitor-fault.png" alt="WayBionic Engineering Monitor showing a mock fault state." loading="lazy" /><figcaption class="mono">MOCK FAULT / STALE STATE</figcaption></figure>
             </div>
+            <MockDiagram kind="waybionic" title="WayBionic control loop" />
             <div class="joint-panel"><WayBionicDiagram /></div>
             <div class="window-actions"><a href="https://github.com/Waybionic/waybionic_ground_station" target="_blank" rel="noreferrer">OPEN REPOSITORY ↗</a><a href="https://drive.google.com/file/d/1WWgNoo82JjGdWspCLcINrK6-YqnF9omR/view?usp=sharing" target="_blank" rel="noreferrer">ARM VIDEO ↗</a></div>
           </DesktopWindow>
@@ -80,6 +83,7 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
               <div><strong>03</strong><span>Investigator workbench</span><small>Offline bundle review, case summaries, evidence export.</small></div>
               <div><strong>04</strong><span>Ledger + verifier</span><small>Witness tree heads, sealed release packets, local verification flow.</small></div>
             </div>
+            <MockDiagram kind="blackbox" title="BlackBox evidence flow" />
             <div class="window-note mono">PUBLIC VIEW / HIGH-LEVEL ARCHITECTURE ONLY / SENSITIVE DETAILS OMITTED</div>
           </DesktopWindow>
 
@@ -88,6 +92,7 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
             <h2>Teaching software<br /><em>to notice obstacles.</em></h2>
             <p class="window-copy">A wireless rover with independent left/right DC motor control and sonar-based distance sensing. The code separates movement, sensing, acceleration, and challenge logic.</p>
             <div class="rover-diagram" aria-label="Rover control flow"><span>SONAR</span><b>→</b><span>DECISION</span><b>→</b><span>MOTOR CONTROL</span></div>
+            <MockDiagram kind="rover" title="Rover control loop" />
             <div class="window-actions"><a href="https://github.com/aj0khi/CS30/tree/main/RoverProejct" target="_blank" rel="noreferrer">OPEN ROVER SOURCE ↗</a></div>
           </DesktopWindow>
 
