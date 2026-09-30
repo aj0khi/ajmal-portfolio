@@ -27,6 +27,10 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
             <OsIcon window="rover" icon="▤" label="Rover" />
             <OsIcon window="resume" icon="▧" label="Resume" />
             <OsIcon window="about" icon="★" label="About Aj" />
+            <OsIcon window="browser" icon="⌕" label="Browser" />
+            <OsIcon window="calculator" icon="⊞" label="Calculator" />
+            <OsIcon window="recycle" icon="♻" label="Recycle Bin" />
+            <OsIcon window="games" icon="✣" label="Games" />
           </div>
 
           <DesktopWindow id="portfolio" title="MY WORK / FILE EXPLORER" icon="▣" open class="window-portfolio">
@@ -93,8 +97,37 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
           <DesktopWindow id="about" title="ABOUT AJ / PERSONAL" icon="★" class="window-about">
             <div class="window-kicker mono">OUTSIDE THE CODE</div>
             <h2>The person behind<br /><em>the systems.</em></h2>
-            <p class="window-copy">When I am not building or debugging, I am usually somewhere between a Star Wars Legends rabbit hole, a very fast car, and a Banff trail.</p>
-            <div class="fun-facts"><span>✦ Star Wars / Legends + canon</span><span>✦ Cars that are extremely fast and cool</span><span>✦ Banff trails / Johnston Canyon / Big Beehive / Sarail Ridge</span></div>
+            <p class="window-copy">When I am not building or debugging, I am usually somewhere between a Star Wars Legends rabbit hole, a very fast car, a competitive match, and a Banff trail.</p>
+            <div class="fun-facts"><span>✦ Star Wars / Legends + canon</span><span>✦ Cars that are extremely fast and cool</span><span>✦ Valorant / Geometry Dash / Brawl Stars</span><span>✦ Banff trails / Johnston Canyon / Big Beehive / Sarail Ridge</span></div>
+          </DesktopWindow>
+
+          <DesktopWindow id="games" title="GAMES / PERSONAL" icon="✣" class="window-games">
+            <div class="window-kicker mono">AFTER HOURS / PERSONAL ARCHIVE</div>
+            <h2>Different systems,<br /><em>same obsession.</em></h2>
+            <div class="games-list"><div><strong>VALORANT</strong><span>Rounds, reads, and clean utility.</span></div><div><strong>GEOMETRY DASH</strong><span>Timing, repetition, and stubbornness.</span></div><div><strong>BRAWL STARS</strong><span>Fast matches and chaotic decisions.</span></div><div><strong>BANFF TRAILS</strong><span>Johnston Canyon / Big Beehive / Sarail Ridge.</span></div></div>
+          </DesktopWindow>
+
+          <DesktopWindow id="recycle" title="RECYCLE BIN" icon="♻" class="window-recycle">
+            <div class="window-kicker mono">SYSTEM UTILITY</div>
+            <h2>Nothing deleted<br /><em>yet.</em></h2>
+            <p class="window-copy">This bin is intentionally empty. Old ideas are usually archived, rebuilt, or turned into the next useful thing.</p>
+            <div class="empty-bin mono">0 OBJECTS / 0 BYTES</div>
+          </DesktopWindow>
+
+          <DesktopWindow id="calculator" title="CALCULATOR" icon="⊞" class="window-calculator">
+            <div class="calculator-display" data-calculator-display>0</div>
+            <div class="calculator-keys">
+              {['7', '8', '9', '/', '4', '5', '6', '*', '1', '2', '3', '-', '0', '.', '=', '+', 'C'].map((key) => <button type="button" data-calculator-key={key}>{key}</button>)}
+            </div>
+          </DesktopWindow>
+
+          <DesktopWindow id="browser" title="AJMAL BROWSER" icon="⌕" class="window-browser">
+            <div class="browser-toolbar">
+              <button type="button" data-browser-back aria-label="Back">◀</button><button type="button" data-browser-forward aria-label="Forward">▶</button><button type="button" data-browser-refresh aria-label="Refresh">↻</button>
+              <form data-browser-form><input data-browser-input value="https://github.com/aj0khi" aria-label="Browser address" /><button type="submit">GO</button></form>
+            </div>
+            <div class="browser-home" data-browser-home><p class="window-kicker mono">AJMAL BROWSER / QUICK LINKS</p><h2>Open a useful<br /><em>window to the web.</em></h2><div class="browser-links"><button type="button" data-browser-link="https://github.com/aj0khi">GitHub / aj0khi</button><button type="button" data-browser-link="https://calgaryhvacexpress.ca/">HVAC Express</button><button type="button" data-browser-link="https://www.linkedin.com/in/ajmal-khidri/">LinkedIn</button></div><p class="window-note mono">Some external sites block embedded viewing. Use the address bar or open the link in a new tab.</p></div>
+            <iframe data-browser-frame title="Embedded browser" sandbox="allow-forms allow-modals allow-popups allow-presentation allow-scripts" hidden></iframe>
           </DesktopWindow>
 
           <div class="start-menu" data-start-menu hidden>
@@ -248,5 +281,59 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
     updateClock();
     window.setInterval(updateClock, 30000);
     rebuildTaskbar();
+
+    const calculatorDisplay = desktop.querySelector<HTMLElement>('[data-calculator-display]');
+    let calculatorValue = '';
+    let calculatorExpression = '';
+    desktop.querySelectorAll<HTMLButtonElement>('[data-calculator-key]').forEach((key) => {
+      key.addEventListener('click', () => {
+        const value = key.dataset.calculatorKey ?? '';
+        if (value === 'C') {
+          calculatorValue = '';
+          calculatorExpression = '';
+        } else if (value === '=') {
+          try {
+            calculatorValue = String(Function(`return ${calculatorExpression}`)());
+            calculatorExpression = calculatorValue;
+          } catch {
+            calculatorValue = 'ERR';
+            calculatorExpression = '';
+          }
+        } else {
+          calculatorExpression += value;
+          calculatorValue = calculatorExpression;
+        }
+        if (calculatorDisplay) calculatorDisplay.textContent = calculatorValue || '0';
+      });
+    });
+
+    const browserForm = desktop.querySelector<HTMLFormElement>('[data-browser-form]');
+    const browserInput = desktop.querySelector<HTMLInputElement>('[data-browser-input]');
+    const browserFrame = desktop.querySelector<HTMLIFrameElement>('[data-browser-frame]');
+    const browserHome = desktop.querySelector<HTMLElement>('[data-browser-home]');
+    const browserHistory: string[] = [];
+    let browserIndex = -1;
+    const loadBrowserUrl = (url: string, addHistory = true) => {
+      if (!/^https?:\/\//i.test(url)) url = `https://${url}`;
+      if (addHistory) {
+        browserHistory.splice(browserIndex + 1);
+        browserHistory.push(url);
+        browserIndex = browserHistory.length - 1;
+      }
+      if (browserInput) browserInput.value = url;
+      if (browserFrame) {
+        browserFrame.hidden = false;
+        browserFrame.src = url;
+      }
+      if (browserHome) browserHome.hidden = true;
+    };
+    browserForm?.addEventListener('submit', (event) => {
+      event.preventDefault();
+      if (browserInput?.value) loadBrowserUrl(browserInput.value);
+    });
+    desktop.querySelectorAll<HTMLButtonElement>('[data-browser-link]').forEach((link) => link.addEventListener('click', () => loadBrowserUrl(link.dataset.browserLink ?? '')));
+    desktop.querySelector('[data-browser-back]')?.addEventListener('click', () => { if (browserIndex > 0) { browserIndex -= 1; loadBrowserUrl(browserHistory[browserIndex], false); } });
+    desktop.querySelector('[data-browser-forward]')?.addEventListener('click', () => { if (browserIndex < browserHistory.length - 1) { browserIndex += 1; loadBrowserUrl(browserHistory[browserIndex], false); } });
+    desktop.querySelector('[data-browser-refresh]')?.addEventListener('click', () => { if (browserFrame?.src) browserFrame.src = browserFrame.src; });
   }
 </script>
