@@ -839,3 +839,705 @@ h2 em {
     transform: none;
   }
 }
+
+/* AjmalOS: the portfolio is presented as a small, personal workstation. */
+body {
+  overflow: hidden;
+  background: #151311;
+  font-family: Tahoma, 'MS Sans Serif', sans-serif;
+}
+
+body::before {
+  display: none;
+}
+
+.crt-monitor {
+  display: grid;
+  min-height: 100svh;
+  place-items: center;
+  padding: clamp(0.5rem, 3vw, 2rem);
+  background: #171513;
+}
+
+.monitor-bezel {
+  position: relative;
+  width: min(96vw, 1180px);
+  height: min(92svh, 820px);
+  padding: clamp(1.2rem, 3vw, 2.8rem) clamp(1rem, 2.8vw, 2.5rem) clamp(2.5rem, 5vw, 4.5rem);
+  border: 2px solid #b4a997;
+  border-radius: 2.5% 2.5% 4% 4%;
+  background: linear-gradient(118deg, #d7cec0, #ab9e8c 50%, #c6b9a8);
+  box-shadow: 0 2rem 4rem rgba(0, 0, 0, 0.5), inset 0 1px #eee9de, inset 0 -1.5rem rgba(74, 59, 43, 0.15);
+}
+
+.monitor-brand {
+  position: absolute;
+  right: 7%;
+  bottom: 1.1rem;
+  color: #665b4d;
+  font: 700 0.75rem Georgia, serif;
+  letter-spacing: 0.12em;
+}
+
+.monitor-brand span {
+  margin-left: 0.2rem;
+  color: #8b3c25;
+}
+
+.monitor-led {
+  position: absolute;
+  bottom: 1.1rem;
+  left: 7%;
+  color: #645b50;
+  font: 600 0.55rem var(--mono);
+  letter-spacing: 0.08em;
+}
+
+.monitor-led span {
+  display: inline-block;
+  width: 0.45rem;
+  height: 0.45rem;
+  margin-right: 0.35rem;
+  border-radius: 50%;
+  background: #77a33b;
+  box-shadow: 0 0 0.5rem #b4e362;
+}
+
+.crt-screen {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  border: 0.7rem solid #252321;
+  border-radius: 3% 3% 5% 5%;
+  background: #0878b9;
+  box-shadow: inset 0 0 2rem #000, 0 0 0.5rem #171513;
+}
+
+.crt-glow,
+.crt-glow::after {
+  position: absolute;
+  z-index: 20;
+  inset: 0;
+  pointer-events: none;
+}
+
+.crt-glow {
+  background: linear-gradient(rgba(255, 255, 255, 0.025) 50%, rgba(0, 0, 0, 0.04) 50%);
+  background-size: 100% 4px;
+  mix-blend-mode: overlay;
+}
+
+.crt-glow::after {
+  content: '';
+  box-shadow: inset 0 0 3rem rgba(0, 0, 0, 0.28), inset 0 0 0.25rem rgba(255, 255, 255, 0.25);
+}
+
+.desktop-wallpaper {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  background: linear-gradient(#147bc9 0%, #66b8e9 56%, #b9e1e8 100%);
+}
+
+.desktop-wallpaper::before,
+.desktop-wallpaper::after {
+  position: absolute;
+  content: '';
+  pointer-events: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.86);
+  filter: blur(1.2rem);
+}
+
+.desktop-wallpaper::before {
+  top: 11%;
+  left: 12%;
+  width: 16rem;
+  height: 3rem;
+  transform: rotate(-8deg);
+}
+
+.desktop-wallpaper::after {
+  top: 19%;
+  right: 11%;
+  width: 20rem;
+  height: 4rem;
+  transform: rotate(8deg);
+}
+
+.hill {
+  position: absolute;
+  right: -10%;
+  bottom: 7%;
+  left: -10%;
+  height: 42%;
+  border-radius: 50% 50% 0 0;
+  transform: rotate(-4deg);
+}
+
+.hill-back {
+  bottom: 22%;
+  background: linear-gradient(180deg, #72b83e, #397c27);
+}
+
+.hill-front {
+  bottom: -18%;
+  height: 48%;
+  background: linear-gradient(180deg, #6eae25, #286a1d);
+  transform: rotate(3deg);
+}
+
+.desktop-status {
+  position: absolute;
+  top: 0.65rem;
+  right: 0.8rem;
+  z-index: 2;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.56rem;
+  text-shadow: 1px 1px #175d79;
+}
+
+.desktop-icons {
+  position: absolute;
+  z-index: 4;
+  top: 1rem;
+  left: 1rem;
+  display: grid;
+  gap: 0.7rem;
+  width: 5rem;
+}
+
+.desktop-icon {
+  display: grid;
+  justify-items: center;
+  gap: 0.25rem;
+  padding: 0.2rem;
+  border: 1px solid transparent;
+  color: white;
+  background: transparent;
+  font: 0.68rem Tahoma, sans-serif;
+  text-shadow: 1px 1px #164d67;
+  cursor: pointer;
+}
+
+.desktop-icon:hover,
+.desktop-icon:focus-visible {
+  border-color: rgba(255, 255, 255, 0.8);
+  background: rgba(38, 106, 149, 0.35);
+  outline: none;
+}
+
+.desktop-icon-art {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border: 1px solid #d4d9d0;
+  border-radius: 0.15rem;
+  color: #1d526c;
+  background: linear-gradient(#faf5d9, #d4c88c);
+  box-shadow: 1px 1px 0 #345;
+  font-size: 1.25rem;
+  text-shadow: none;
+}
+
+.os-window {
+  position: absolute;
+  z-index: 10;
+  top: 7%;
+  left: 13%;
+  width: min(78%, 850px);
+  max-height: 82%;
+  overflow: auto;
+  border: 2px solid #111b35;
+  background: #e8e5d8;
+  box-shadow: 0.45rem 0.55rem rgba(0, 25, 54, 0.45);
+}
+
+.os-window[hidden],
+.start-menu[hidden] {
+  display: none;
+}
+
+.window-titlebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 1.7rem;
+  padding: 0.18rem 0.25rem 0.18rem 0.45rem;
+  color: white;
+  background: linear-gradient(90deg, #11285e, #3e6eaa);
+  font: 700 0.7rem Tahoma, sans-serif;
+  cursor: move;
+  user-select: none;
+}
+
+.window-title {
+  display: flex;
+  gap: 0.35rem;
+  align-items: center;
+}
+
+.window-controls {
+  display: flex;
+  gap: 0.18rem;
+}
+
+.window-controls button {
+  width: 1.15rem;
+  height: 1.1rem;
+  padding: 0;
+  border: 1px solid #5c6b85;
+  color: #111b35;
+  background: #d9dce3;
+  font: 700 0.8rem Arial, sans-serif;
+  line-height: 0.8rem;
+  cursor: pointer;
+}
+
+.window-controls button:hover,
+.window-controls button:focus-visible {
+  color: white;
+  background: #9a3e32;
+}
+
+.window-content {
+  min-height: 18rem;
+  padding: clamp(1rem, 2.5vw, 2rem);
+  color: #1b2431;
+  background: #f1eee2;
+}
+
+.file-toolbar {
+  display: flex;
+  justify-content: space-between;
+  margin: -2rem -2rem 2rem;
+  padding: 0.4rem 0.6rem;
+  border-bottom: 1px solid #b7b8ab;
+  color: #536079;
+  background: #d8d8ca;
+  font-size: 0.58rem;
+}
+
+.window-kicker,
+.file-tags,
+.file-card-top {
+  color: #9a3e32;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.explorer-heading h1,
+.window-content h2 {
+  margin: 1rem 0;
+  color: #182d4f;
+  font: 600 clamp(2rem, 5vw, 4.5rem) Georgia, serif;
+  letter-spacing: -0.04em;
+  line-height: 0.92;
+}
+
+.explorer-heading h1 em,
+.window-content h2 em {
+  color: #b05236;
+  font-style: normal;
+}
+
+.window-intro,
+.window-copy {
+  max-width: 39rem;
+  color: #596272;
+  font: 1rem/1.5 Georgia, serif;
+}
+
+.project-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem;
+  margin-top: 2rem;
+}
+
+.file-card {
+  padding: 1rem;
+  border: 1px solid #b6b4a9;
+  background: #f8f6ed;
+  box-shadow: 2px 2px #d0cdbf;
+}
+
+.file-card-top {
+  display: flex;
+  justify-content: space-between;
+}
+
+.file-card h2 {
+  margin: 0.8rem 0;
+  color: #182d4f;
+  font: 600 1.35rem/1 Georgia, serif;
+}
+
+.file-card p {
+  margin-bottom: 1rem;
+  color: #596272;
+  font: 0.9rem/1.4 Georgia, serif;
+}
+
+.file-card a,
+.window-actions a,
+.resume-download {
+  display: inline-block;
+  margin-top: 1rem;
+  color: #9a3e32;
+  font: 700 0.62rem var(--mono);
+  text-decoration: none;
+}
+
+.file-card a:hover,
+.window-actions a:hover,
+.resume-download:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.25rem;
+}
+
+.window-waybionic {
+  top: 9%;
+  left: 18%;
+  width: min(70%, 800px);
+}
+
+.window-blackbox {
+  top: 13%;
+  left: 22%;
+  width: min(65%, 760px);
+}
+
+.window-rover {
+  top: 17%;
+  left: 28%;
+  width: min(57%, 680px);
+}
+
+.window-resume {
+  top: 22%;
+  left: 32%;
+  width: min(52%, 620px);
+}
+
+.window-about {
+  top: 16%;
+  left: 25%;
+  width: min(55%, 650px);
+}
+
+.waybionic-proof-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.7rem;
+  margin-top: 1.5rem;
+}
+
+.waybionic-proof-grid figure {
+  margin: 0;
+}
+
+.waybionic-proof-grid img {
+  display: block;
+  width: 100%;
+  border: 1px solid #182d4f;
+}
+
+.waybionic-proof-grid figcaption {
+  margin-top: 0.4rem;
+  color: #9a3e32;
+  font-size: 0.55rem;
+}
+
+.joint-panel {
+  margin-top: 1rem;
+}
+
+.window-waybionic .waybionic-diagram {
+  margin: 0;
+  padding: 0.7rem 0;
+  border-color: #b7b8ab;
+  grid-template-columns: minmax(0, 1.5fr) minmax(10rem, 0.6fr);
+}
+
+.window-waybionic .diagram-readout {
+  border-color: #b7b8ab;
+}
+
+.window-waybionic .diagram-readout strong,
+.window-waybionic .diagram-readout p:last-child {
+  color: #596272;
+}
+
+.window-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  border-top: 1px solid #b7b8ab;
+}
+
+.blackbox-layers {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.7rem;
+  margin-top: 1.5rem;
+}
+
+.blackbox-layers div {
+  display: grid;
+  grid-template-columns: 2rem 1fr;
+  padding: 0.8rem;
+  border: 1px solid #b7b8ab;
+  background: #f8f6ed;
+}
+
+.blackbox-layers strong {
+  grid-row: span 2;
+  color: #9a3e32;
+  font: 700 0.7rem var(--mono);
+}
+
+.blackbox-layers span {
+  color: #182d4f;
+  font: 700 0.72rem var(--mono);
+  text-transform: uppercase;
+}
+
+.blackbox-layers small {
+  grid-column: 2;
+  margin-top: 0.35rem;
+  color: #596272;
+  font: 0.8rem/1.35 Georgia, serif;
+}
+
+.window-note {
+  margin-top: 1.5rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid #b7b8ab;
+  color: #9a3e32;
+  font-size: 0.58rem;
+}
+
+.rover-diagram {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  margin-top: 2rem;
+  padding: 1.25rem;
+  border: 1px dashed #9a3e32;
+  color: #182d4f;
+  font: 700 0.68rem var(--mono);
+  text-align: center;
+}
+
+.rover-diagram b {
+  color: #9a3e32;
+  font-size: 1.3rem;
+}
+
+.resume-facts,
+.fun-facts {
+  display: grid;
+  gap: 0.55rem;
+  margin-top: 1.5rem;
+  color: #596272;
+  font: 700 0.68rem var(--mono);
+  line-height: 1.5;
+}
+
+.resume-download {
+  padding: 0.7rem 0.8rem;
+  border: 1px solid #9a3e32;
+}
+
+.taskbar {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 25;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  height: 2rem;
+  padding: 0.2rem;
+  border-top: 2px solid #e5e6df;
+  background: #b9bcc3;
+}
+
+.start-button,
+.taskbar-windows button {
+  height: 1.55rem;
+  border: 2px outset #d8d8d0;
+  color: #111b35;
+  background: #d1d2ca;
+  font: 700 0.62rem Tahoma, sans-serif;
+  cursor: pointer;
+}
+
+.start-button {
+  padding-inline: 0.75rem;
+  color: #1a3020;
+  font-style: italic;
+}
+
+.start-button:active,
+.taskbar-windows button.active {
+  border-style: inset;
+}
+
+.taskbar-windows {
+  display: flex;
+  flex: 1;
+  gap: 0.25rem;
+  overflow: hidden;
+}
+
+.taskbar-windows button {
+  max-width: 13rem;
+  overflow: hidden;
+  padding-inline: 0.6rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.system-tray {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+  height: 1.55rem;
+  padding: 0 0.5rem;
+  border: 1px inset #d8d8d0;
+  color: #38404d;
+  font-size: 0.58rem;
+}
+
+.start-menu {
+  position: absolute;
+  bottom: 2rem;
+  left: 0.2rem;
+  z-index: 30;
+  width: 12rem;
+  padding: 0.3rem;
+  border: 2px outset #d8d8d0;
+  background: #d1d2ca;
+  box-shadow: 0.3rem 0.3rem rgba(0, 0, 0, 0.3);
+}
+
+.start-heading {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.7rem;
+  color: white;
+  background: linear-gradient(#11285e, #3e6eaa);
+  font: 700 1rem Tahoma, sans-serif;
+}
+
+.start-heading span {
+  color: #e6d37a;
+  font-style: italic;
+}
+
+.start-menu button,
+.start-menu a {
+  display: block;
+  width: 100%;
+  padding: 0.7rem;
+  border: 0;
+  color: #111b35;
+  background: transparent;
+  font: 0.75rem Tahoma, sans-serif;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.start-menu button:hover,
+.start-menu a:hover,
+.start-menu button:focus-visible,
+.start-menu a:focus-visible {
+  color: white;
+  background: #315b98;
+  outline: none;
+}
+
+@media (max-width: 700px) {
+  body {
+    overflow: auto;
+  }
+
+  .crt-monitor {
+    display: block;
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  .monitor-bezel {
+    width: 100%;
+    height: 100vh;
+    min-height: 42rem;
+    padding: 0.5rem 0.5rem 2.8rem;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .monitor-brand,
+  .monitor-led {
+    display: none;
+  }
+
+  .crt-screen {
+    border-width: 0.35rem;
+    border-radius: 0;
+  }
+
+  .desktop-icons {
+    grid-template-columns: repeat(3, 4rem);
+    width: auto;
+    gap: 0.45rem;
+  }
+
+  .os-window,
+  .window-waybionic,
+  .window-blackbox,
+  .window-rover,
+  .window-resume,
+  .window-about {
+    top: 16%;
+    left: 5%;
+    width: 90%;
+    max-height: 74%;
+  }
+
+  .project-grid,
+  .waybionic-proof-grid,
+  .blackbox-layers {
+    grid-template-columns: 1fr;
+  }
+
+  .explorer-heading h1,
+  .window-content h2 {
+    font-size: 2.3rem;
+  }
+
+  .rover-diagram {
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .rover-diagram b {
+    transform: rotate(90deg);
+  }
+
+  .window-waybionic .waybionic-diagram {
+    display: block;
+  }
+
+  .window-waybionic .diagram-readout {
+    padding: 1rem 0 0;
+    border-top: 1px solid #b7b8ab;
+    border-left: 0;
+  }
+}

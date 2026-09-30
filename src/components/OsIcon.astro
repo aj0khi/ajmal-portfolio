@@ -1,0 +1,14 @@
+---
+interface Props {
+  window: string;
+  icon: string;
+  label: string;
+}
+
+const { window: windowId, icon, label } = Astro.props;
+---
+
+<button class="desktop-icon" type="button" data-window-open={windowId}>
+  <span class="desktop-icon-art" aria-hidden="true">{icon}</span>
+  <span>{label}</span>
+</button>
