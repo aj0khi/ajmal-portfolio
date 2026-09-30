@@ -1042,9 +1042,9 @@ body::before {
   top: 1rem;
   left: 1rem;
   display: grid;
-  grid-template-columns: repeat(3, 4.8rem);
+  grid-template-columns: repeat(3, 5.2rem);
   gap: 0.7rem;
-  width: 15.5rem;
+  width: 16.8rem;
 }
 
 .desktop-icon {
@@ -1055,7 +1055,7 @@ body::before {
   border: 1px solid transparent;
   color: white;
   background: transparent;
-  font: 0.68rem Tahoma, sans-serif;
+  font: 0.72rem Tahoma, sans-serif;
   text-shadow: 1px 1px #164d67;
   cursor: pointer;
 }
@@ -1069,8 +1069,8 @@ body::before {
 
 .desktop-icon-art {
   display: grid;
-  width: 2rem;
-  height: 2rem;
+  width: 2.25rem;
+  height: 2.25rem;
   place-items: center;
   border: 1px solid #d4d9d0;
   border-radius: 0.15rem;
@@ -1968,7 +1968,7 @@ body::before {
   display: flex;
   align-items: center;
   gap: 0.35rem;
-  height: 2rem;
+  height: 2.55rem;
   padding: 0.2rem;
   border-top: 2px solid #e5e6df;
   background: #b9bcc3;
@@ -1976,7 +1976,7 @@ body::before {
 
 .start-button,
 .taskbar-windows button {
-  height: 1.55rem;
+  height: 2rem;
   border: 2px outset #d8d8d0;
   color: #111b35;
   background: #d1d2ca;
@@ -2018,11 +2018,16 @@ body::before {
   display: flex;
   gap: 0.4rem;
   align-items: center;
-  height: 1.55rem;
+  height: 2rem;
   padding: 0 0.5rem;
   border: 1px inset #d8d8d0;
   color: #38404d;
   font-size: 0.58rem;
+}
+
+.system-tray span {
+  color: #38404d;
+  white-space: nowrap;
 }
 
 .start-menu {
@@ -2171,7 +2176,7 @@ body::before {
   }
 
   .desktop-icons {
-    grid-template-columns: repeat(3, 4rem);
+    grid-template-columns: repeat(3, 4.2rem);
     width: auto;
   }
 
