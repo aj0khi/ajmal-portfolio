@@ -22,7 +22,7 @@ The deployable static site is generated in `dist/`.
 
 ## Hosting
 
-Upload the contents of `dist/` to a static host such as Hostinger. The site does not require a Node.js server at runtime.
+Upload the contents of `dist/` to a static host such as Hostinger. The main site is static, while `public/proxy.php` is an optional Hostinger PHP endpoint used by the in-app browser for destinations that block iframe embedding. Keep it behind HTTPS and do not use it for private URLs or authenticated browsing.
 
 ## Content
 

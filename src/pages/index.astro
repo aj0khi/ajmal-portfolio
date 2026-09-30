@@ -390,7 +390,7 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
     };
     const loadBrowserUrl = (input: string, addHistory = true, openExternally = true) => {
       const url = resolveBrowserInput(input);
-      const blockedHost = /(^|\.)google\.[^/]+|(^|\.)youtube\.com|(^|\.)linkedin\.com/i.test(url);
+      const proxiedHost = /(^|\.)google\.[^/]+|(^|\.)youtube\.com|(^|\.)linkedin\.com/i.test(url);
       if (addHistory) {
         browserHistory.splice(browserIndex + 1);
         browserHistory.push(url);
@@ -398,11 +398,11 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
       }
       if (browserInput) browserInput.value = url;
       if (browserFrame) {
-        browserFrame.hidden = blockedHost;
-        browserFrame.src = url;
+        browserFrame.hidden = false;
+        browserFrame.src = proxiedHost ? `/proxy.php?url=${encodeURIComponent(url)}` : url;
       }
       if (browserHome) browserHome.hidden = true;
-      if (browserResult) browserResult.hidden = !blockedHost;
+      if (browserResult) browserResult.hidden = true;
       if (browserResultTitle) browserResultTitle.textContent = url.includes('google.com/search') ? 'Google search opened.' : 'Page opened externally.';
       if (browserResultLink) browserResultLink.href = url;
       if (openExternally) window.open(url, '_blank', 'noopener,noreferrer');
