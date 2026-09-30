@@ -21,19 +21,20 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
           <div class="desktop-status mono">AJMALOS 1.0 / LOCAL ARCHIVE / {new Date().getFullYear()}</div>
 
           <div class="desktop-icons" aria-label="Applications">
-            <OsIcon window="portfolio" icon="▣" label="My Work" />
-            <OsIcon window="waybionic" icon="⚙" label="WayBionic" />
-            <OsIcon window="blackbox" icon="⬢" label="BlackBox" />
-            <OsIcon window="rover" icon="▤" label="Rover" />
-            <OsIcon window="resume" icon="▧" label="Resume" />
-            <OsIcon window="about" icon="★" label="About Aj" />
-            <OsIcon window="browser" icon="⌕" label="Browser" />
-            <OsIcon window="calculator" icon="⊞" label="Calculator" />
-            <OsIcon window="recycle" icon="♻" label="Recycle Bin" />
-            <OsIcon window="games" icon="✣" label="Games" />
-            <OsIcon window="system" icon="ⓘ" label="System Info" />
-            <OsIcon window="work" icon="▥" label="Work History" />
-            <OsIcon window="skills" icon="⌘" label="Skills" />
+            <OsIcon window="portfolio" icon="▣" label="My Work" src="/icons/my-work.svg" />
+            <OsIcon window="waybionic" icon="⚙" label="WayBionic" src="/icons/waybionic.svg" />
+            <OsIcon window="blackbox" icon="⬢" label="BlackBox" src="/icons/blackbox.svg" />
+            <OsIcon window="rover" icon="▤" label="Rover" src="/icons/rover.svg" />
+            <OsIcon window="resume" icon="▧" label="Resume" src="/icons/resume.svg" />
+            <OsIcon window="about" icon="★" label="About Aj" src="/icons/about-aj.svg" />
+            <OsIcon window="browser" icon="⌕" label="Browser" src="/icons/browser.svg" />
+            <OsIcon window="calculator" icon="⊞" label="Calculator" src="/icons/calculator.svg" />
+            <OsIcon window="recycle" icon="♻" label="Recycle Bin" src="/icons/recycle.svg" />
+            <OsIcon window="games" icon="✣" label="Games" src="/icons/games.svg" />
+            <OsIcon window="system" icon="ⓘ" label="System Info" src="/icons/about-aj.svg" />
+            <OsIcon window="work" icon="▥" label="Work History" src="/icons/resume.svg" />
+            <OsIcon window="skills" icon="⌘" label="Skills" src="/icons/waybionic.svg" />
+            <OsIcon window="research" icon="◉" label="Research" src="/icons/research.svg" />
           </div>
 
           <DesktopWindow id="portfolio" title="MY WORK / FILE EXPLORER" icon="▣" open class="window-portfolio">
@@ -121,13 +122,21 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
           <DesktopWindow id="work" title="WORK HISTORY / TIMELINE" icon="▥" class="window-work">
             <div class="window-kicker mono">EXPERIENCE LOG / VERIFIED ENTRIES</div>
             <h2>Work that has<br /><em>to keep running.</em></h2>
-            <div class="timeline"><div><time>MAR 2024 — PRESENT</time><strong>HVAC Express</strong><span>Technical Lead + Sales Associate · website, hosting, lead-generation systems, direct client sales.</span></div><div><time>AUG 2026 — PRESENT</time><strong>WayBionic Robotics</strong><span>Member · ROS2-based remote-teleoperation surgical arm project.</span></div><div><time>FEB — MAY 2026</time><strong>Mount Royal University</strong><span>Learning Peer / Tutor · one-on-one academic support in technical coursework.</span></div></div>
+            <div class="timeline"><div><time>MAR 2024 — PRESENT</time><strong>HVAC Express</strong><span>Technical Lead + Sales Associate · website, hosting, lead-generation systems, direct client sales.</span></div><div><time>AUG 2026 — PRESENT</time><strong>WayBionic Robotics</strong><span>Member · ROS2-based remote-teleoperation surgical arm project.</span></div><div><time>FEB — MAY 2026</time><strong>Mount Royal University</strong><span>Learning Peer / Tutor · one-on-one academic support in technical coursework.</span></div><div><time>SEP 2026 — PRESENT</time><strong>Cybersecurity Club / UCalgary</strong><span>Junior Executive · support workshops, resources, and educational initiatives.</span></div><div><time>AUG 2026 — PRESENT</time><strong>SYNK</strong><span>Engineer Intern · contributed to a scalable AI-generated TV-head visual brand asset.</span></div></div>
           </DesktopWindow>
 
           <DesktopWindow id="skills" title="SKILLS / TOOLBOX" icon="⌘" class="window-skills">
             <div class="window-kicker mono">CURRENT TOOLSET / NOT A BADGE WALL</div>
             <h2>Tools for the<br /><em>next iteration.</em></h2>
             <div class="skills-explorer"><div><strong>LANGUAGES</strong><span>Java · Python · JavaScript · HTML/CSS</span></div><div><strong>ROBOTICS + SYSTEMS</strong><span>ROS2 · RViz · URDF · MuJoCo · Isaac Lab · Nav2/SLAM</span></div><div><strong>CONCEPTS</strong><span>OOP + inheritance · Stack/Queue/LinkedList · File I/O · event-driven programming · hardware integration</span></div><div><strong>TOOLS</strong><span>Git/GitHub · Java Swing · Phidgets SDK · IntelliJ IDEA · WordPress/PHP</span></div></div>
+          </DesktopWindow>
+
+          <DesktopWindow id="research" title="RESEARCH / PERSONAL" icon="◉" class="window-research">
+            <div class="window-kicker mono">PERSONAL TECHNICAL RESEARCH / PUBLIC STUDY</div>
+            <h2>Science fiction<br /><em>with numbers attached.</em></h2>
+            <p class="window-copy">A feasibility assessment for a metre-scale confined-plasma cutting blade, modelled as a sheared-flow-stabilized screw pinch. The study separates what current plasma physics supports from the technology gaps that still block a handheld system.</p>
+            <div class="research-grid"><div><strong>PHYSICS</strong><span>Confined plasma / Z-pinch feasibility</span></div><div><strong>GAPS IDENTIFIED</strong><span>Compact power density and ambient-air exclusion</span></div><div><strong>FORMAT</strong><span>27-page design study and preprint</span></div><div><strong>WHY IT MATTERS</strong><span>Curiosity, modelling, and honest limits over sci-fi handwaving</span></div></div>
+            <div class="window-note mono">PERSONAL RESEARCH / NOT A PRODUCT CLAIM</div>
           </DesktopWindow>
 
           <DesktopWindow id="recycle" title="RECYCLE BIN" icon="♻" class="window-recycle">
@@ -149,7 +158,8 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
               <button type="button" data-browser-back aria-label="Back">◀</button><button type="button" data-browser-forward aria-label="Forward">▶</button><button type="button" data-browser-refresh aria-label="Refresh">↻</button>
               <form data-browser-form><input data-browser-input value="https://github.com/aj0khi" placeholder="Search or enter address" aria-label="Browser address or search" /><button type="submit">GO</button></form><button type="button" data-browser-external aria-label="Open current page in a new tab">↗</button>
             </div>
-            <div class="browser-home" data-browser-home><p class="window-kicker mono">AJMAL BROWSER / QUICK LINKS</p><h2>Open a useful<br /><em>window to the web.</em></h2><div class="browser-links"><button type="button" data-browser-link="https://github.com/aj0khi">GitHub / aj0khi</button><button type="button" data-browser-link="https://calgaryhvacexpress.ca/">HVAC Express</button><button type="button" data-browser-link="https://www.linkedin.com/in/ajmal-khidri/">LinkedIn</button></div><p class="window-note mono">Some external sites block embedded viewing. Use the address bar or open the link in a new tab.</p></div>
+            <div class="browser-home" data-browser-home><p class="window-kicker mono">AJMAL BROWSER / QUICK LINKS</p><h2>Open a useful<br /><em>window to the web.</em></h2><div class="browser-links"><button type="button" data-browser-link="https://github.com/aj0khi">GitHub / aj0khi</button><button type="button" data-browser-link="https://calgaryhvacexpress.ca/">HVAC Express</button><button type="button" data-browser-link="https://www.linkedin.com/in/ajmal-khidri/">LinkedIn</button></div><p class="window-note mono">Searches and external pages open in a real browser tab when a site blocks embedded viewing.</p></div>
+            <div class="browser-result" data-browser-result hidden><p class="window-kicker mono">EXTERNAL PAGE / READY</p><h2 data-browser-result-title>Page opened in a new tab.</h2><p class="window-copy">This site protects itself from embedded browsing. The destination is still ready in the real browser tab.</p><a class="resume-download" data-browser-result-link href="#" target="_blank" rel="noreferrer">OPEN CURRENT PAGE ↗</a></div>
             <iframe data-browser-frame title="Embedded browser" sandbox="allow-forms allow-modals allow-popups allow-presentation allow-scripts" hidden></iframe>
           </DesktopWindow>
 
@@ -336,6 +346,9 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
     const browserInput = desktop.querySelector<HTMLInputElement>('[data-browser-input]');
     const browserFrame = desktop.querySelector<HTMLIFrameElement>('[data-browser-frame]');
     const browserHome = desktop.querySelector<HTMLElement>('[data-browser-home]');
+    const browserResult = desktop.querySelector<HTMLElement>('[data-browser-result]');
+    const browserResultTitle = desktop.querySelector<HTMLElement>('[data-browser-result-title]');
+    const browserResultLink = desktop.querySelector<HTMLAnchorElement>('[data-browser-result-link]');
     const browserHistory: string[] = [];
     let browserIndex = -1;
     const resolveBrowserInput = (input: string) => {
@@ -344,7 +357,7 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
       if (value.includes(' ') || !value.includes('.')) return `https://www.google.com/search?q=${encodeURIComponent(value)}`;
       return `https://${value}`;
     };
-    const loadBrowserUrl = (input: string, addHistory = true, openSearchExternally = false) => {
+    const loadBrowserUrl = (input: string, addHistory = true, openExternally = true) => {
       const url = resolveBrowserInput(input);
       if (addHistory) {
         browserHistory.splice(browserIndex + 1);
@@ -353,20 +366,23 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
       }
       if (browserInput) browserInput.value = url;
       if (browserFrame) {
-        browserFrame.hidden = false;
+        browserFrame.hidden = true;
         browserFrame.src = url;
       }
       if (browserHome) browserHome.hidden = true;
-      if (openSearchExternally && url.includes('google.com/search')) window.open(url, '_blank', 'noopener,noreferrer');
+      if (browserResult) browserResult.hidden = false;
+      if (browserResultTitle) browserResultTitle.textContent = url.includes('google.com/search') ? 'Search opened in a new tab.' : 'Page opened in a new tab.';
+      if (browserResultLink) browserResultLink.href = url;
+      if (openExternally) window.open(url, '_blank', 'noopener,noreferrer');
     };
     browserForm?.addEventListener('submit', (event) => {
       event.preventDefault();
-      if (browserInput?.value) loadBrowserUrl(browserInput.value, true, !/^https?:\/\//i.test(browserInput.value.trim()));
+      if (browserInput?.value) loadBrowserUrl(browserInput.value);
     });
     desktop.querySelectorAll<HTMLButtonElement>('[data-browser-link]').forEach((link) => link.addEventListener('click', () => loadBrowserUrl(link.dataset.browserLink ?? '')));
     desktop.querySelector('[data-browser-back]')?.addEventListener('click', () => { if (browserIndex > 0) { browserIndex -= 1; loadBrowserUrl(browserHistory[browserIndex], false); } });
     desktop.querySelector('[data-browser-forward]')?.addEventListener('click', () => { if (browserIndex < browserHistory.length - 1) { browserIndex += 1; loadBrowserUrl(browserHistory[browserIndex], false); } });
-    desktop.querySelector('[data-browser-refresh]')?.addEventListener('click', () => { if (browserFrame?.src) browserFrame.src = browserFrame.src; });
+    desktop.querySelector('[data-browser-refresh]')?.addEventListener('click', () => { if (browserInput?.value) loadBrowserUrl(browserInput.value); });
     desktop.querySelector('[data-browser-external]')?.addEventListener('click', () => { if (browserInput?.value) window.open(resolveBrowserInput(browserInput.value), '_blank', 'noopener,noreferrer'); });
   }
 </script>
