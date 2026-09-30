@@ -1047,8 +1047,11 @@ body::before {
   top: 7%;
   left: 13%;
   width: min(78%, 850px);
+  height: min(78%, 680px);
   max-height: 82%;
-  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   border: 2px solid #111b35;
   background: #e8e5d8;
   box-shadow: 0.45rem 0.55rem rgba(0, 25, 54, 0.45);
@@ -1095,6 +1098,10 @@ body::before {
   cursor: pointer;
 }
 
+.window-controls button[data-window-maximize] {
+  font-size: 0.65rem;
+}
+
 .window-controls button:hover,
 .window-controls button:focus-visible {
   color: white;
@@ -1102,10 +1109,21 @@ body::before {
 }
 
 .window-content {
+  flex: 1;
+  min-height: 0;
   min-height: 18rem;
+  overflow: auto;
   padding: clamp(1rem, 2.5vw, 2rem);
   color: #1b2431;
   background: #f1eee2;
+}
+
+.os-window.is-maximized {
+  top: 0.35rem !important;
+  left: 0.35rem !important;
+  width: calc(100% - 0.7rem) !important;
+  height: calc(100% - 2.7rem) !important;
+  max-height: none;
 }
 
 .file-toolbar {
@@ -1394,6 +1412,10 @@ body::before {
   border-style: inset;
 }
 
+.taskbar-windows button.minimized {
+  opacity: 0.68;
+}
+
 .taskbar-windows {
   display: flex;
   flex: 1;
@@ -1514,6 +1536,7 @@ body::before {
     top: 16%;
     left: 5%;
     width: 90%;
+    height: 74%;
     max-height: 74%;
   }
 

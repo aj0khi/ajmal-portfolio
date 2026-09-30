@@ -130,6 +130,8 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
       const target = desktop.querySelector<HTMLElement>(`[data-window="${id}"]`);
       if (!target) return;
       target.hidden = false;
+      target.dataset.windowOpened = 'true';
+      target.dataset.windowMinimized = 'false';
       highestZ += 1;
       target.style.zIndex = String(highestZ);
       desktop.querySelectorAll(`[data-task-window="${id}"]`).forEach((item) => item.classList.add('active'));
@@ -138,7 +140,13 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
       });
     };
 
+    const toggleMaximize = (windowElement: HTMLElement) => {
+      windowElement.classList.toggle('is-maximized');
+      windowElement.dataset.maximized = windowElement.classList.contains('is-maximized') ? 'true' : 'false';
+    };
+
     windows.forEach((windowElement) => {
+      if (!windowElement.hidden) windowElement.dataset.windowOpened = 'true';
       const titlebar = windowElement.querySelector<HTMLElement>('.window-titlebar');
       if (!titlebar) return;
 
@@ -165,16 +173,22 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
         window.addEventListener('pointermove', moveWindow);
         window.addEventListener('pointerup', releaseWindow, { once: true });
       });
+
+      titlebar.addEventListener('dblclick', (event) => {
+        if ((event.target as HTMLElement).closest('button')) return;
+        toggleMaximize(windowElement);
+      });
     });
 
     const rebuildTaskbar = () => {
       taskbar.innerHTML = '';
       windows.forEach((item) => {
-        if (!item.hidden) {
+        if (item.dataset.windowOpened === 'true') {
           const button = document.createElement('button');
           button.type = 'button';
           button.dataset.taskWindow = item.dataset.window ?? '';
           button.textContent = item.querySelector('.window-title')?.textContent?.trim() ?? 'Window';
+          if (item.hidden) button.classList.add('minimized');
           button.addEventListener('click', () => focusWindow(item.dataset.window ?? ''));
           taskbar.append(button);
         }
@@ -186,6 +200,7 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
       const opener = target.closest<HTMLElement>('[data-window-open]');
       const closer = target.closest<HTMLElement>('[data-window-close]');
       const minimizer = target.closest<HTMLElement>('[data-window-minimize]');
+      const maximizer = target.closest<HTMLElement>('[data-window-maximize]');
 
       if (opener) {
         focusWindow(opener.dataset.windowOpen ?? '');
@@ -195,14 +210,26 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
       if (closer) {
         const id = closer.dataset.windowClose ?? '';
         const targetWindow = desktop.querySelector<HTMLElement>(`[data-window="${id}"]`);
-        if (targetWindow) targetWindow.hidden = true;
+        if (targetWindow) {
+          targetWindow.hidden = true;
+          targetWindow.dataset.windowOpened = 'false';
+          targetWindow.dataset.windowMinimized = 'false';
+        }
         rebuildTaskbar();
       }
       if (minimizer) {
         const id = minimizer.dataset.windowMinimize ?? '';
         const targetWindow = desktop.querySelector<HTMLElement>(`[data-window="${id}"]`);
-        if (targetWindow) targetWindow.hidden = true;
+        if (targetWindow) {
+          targetWindow.hidden = true;
+          targetWindow.dataset.windowMinimized = 'true';
+        }
         rebuildTaskbar();
+      }
+      if (maximizer) {
+        const id = maximizer.dataset.windowMaximize ?? '';
+        const targetWindow = desktop.querySelector<HTMLElement>(`[data-window="${id}"]`);
+        if (targetWindow) toggleMaximize(targetWindow);
       }
     });
 

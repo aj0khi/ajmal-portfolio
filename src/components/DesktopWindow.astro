@@ -15,6 +15,7 @@ const { id, title, icon, class: className = '', open = false } = Astro.props;
     <span class="window-title"><span aria-hidden="true">{icon}</span>{title}</span>
     <span class="window-controls">
       <button type="button" data-window-minimize={id} aria-label={`Minimize ${title}`}>_</button>
+      <button type="button" data-window-maximize={id} aria-label={`Maximize ${title}`}>□</button>
       <button type="button" data-window-close={id} aria-label={`Close ${title}`}>×</button>
     </span>
   </header>
