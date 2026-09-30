@@ -397,11 +397,11 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
       }
       if (browserInput) browserInput.value = url;
       if (browserFrame) {
-        browserFrame.hidden = true;
+        browserFrame.hidden = false;
         browserFrame.src = url;
       }
       if (browserHome) browserHome.hidden = true;
-      if (browserResult) browserResult.hidden = false;
+      if (browserResult) browserResult.hidden = true;
       if (browserResultTitle) browserResultTitle.textContent = url.includes('google.com/search') ? 'Search destination ready.' : 'Page destination ready.';
       if (browserResultLink) browserResultLink.href = url;
       if (openExternally) window.open(url, '_blank', 'noopener,noreferrer');
