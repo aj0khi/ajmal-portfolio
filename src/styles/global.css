@@ -863,7 +863,7 @@ body::before {
   position: relative;
   width: min(97vw, 1240px);
   height: min(91svh, 820px);
-  padding: clamp(1.2rem, 3vw, 2.8rem) clamp(1rem, 2.8vw, 2.5rem) clamp(2.5rem, 5vw, 4.5rem);
+  padding: clamp(0.85rem, 2vw, 1.8rem) clamp(0.7rem, 2vw, 1.8rem) clamp(2.5rem, 5vw, 4.5rem);
   border: 2px solid #b4a997;
   border-radius: 2.5% 2.5% 4% 4%;
   background: linear-gradient(118deg, #d7cec0, #ab9e8c 50%, #c6b9a8);
@@ -907,10 +907,49 @@ body::before {
   position: relative;
   height: 100%;
   overflow: hidden;
-  border: 0.7rem solid #252321;
+  border: 0.22rem solid #252321;
   border-radius: 3% 3% 5% 5%;
   background: #0878b9;
-  box-shadow: inset 0 0 2rem #000, 0 0 0.5rem #171513;
+  box-shadow: inset 0 0 1.5rem #000, 0 0 0.65rem #171513, 0 0 2rem rgba(255, 255, 255, 0.08);
+}
+
+.boot-sequence {
+  position: absolute;
+  z-index: 40;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  gap: 0.55rem;
+  color: #c9dfaa;
+  background: #1a2520;
+  font-family: var(--mono);
+  text-align: center;
+  animation: boot-fade 1.5s 0.35s forwards;
+  pointer-events: none;
+}
+
+.boot-sequence strong {
+  color: #e5c86e;
+  font: 700 clamp(1.5rem, 5vw, 3.2rem) var(--mono);
+  letter-spacing: 0.16em;
+}
+
+.boot-sequence span {
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+}
+
+.boot-sequence i {
+  display: block;
+  width: min(14rem, 45vw);
+  height: 0.35rem;
+  margin: 0.4rem auto 0;
+  background: linear-gradient(90deg, #cd752a 70%, #53645b 70%);
+}
+
+@keyframes boot-fade {
+  0%, 70% { opacity: 1; }
+  100% { visibility: hidden; opacity: 0; }
 }
 
 .crt-glow,
@@ -1936,7 +1975,7 @@ body::before {
   }
 
   .crt-screen {
-    border-width: 0.35rem;
+    border-width: 0.18rem;
     border-radius: 0;
   }
 
