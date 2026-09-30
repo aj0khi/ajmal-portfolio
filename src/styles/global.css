@@ -1245,6 +1245,14 @@ body::before {
   margin-top: 0.9rem;
 }
 
+.diagram-roadmap {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr auto 1fr;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: 0.9rem;
+}
+
 .diagram-flow-wide {
   grid-template-columns: 1fr auto 1fr auto 1fr;
 }
@@ -2051,12 +2059,14 @@ body::before {
   }
 
   .diagram-flow-wide,
-  .diagram-rover-grid {
+  .diagram-rover-grid,
+  .diagram-roadmap {
     grid-template-columns: 1fr;
   }
 
   .diagram-flow > b,
-  .diagram-rover-grid > b {
+  .diagram-rover-grid > b,
+  .diagram-roadmap > b {
     transform: rotate(90deg);
   }
 

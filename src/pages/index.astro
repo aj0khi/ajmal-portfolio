@@ -54,6 +54,9 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
                   <p>{project.data.summary}</p>
                   {project.data.contribution ? <p class="file-contribution"><strong>MY CONTRIBUTION</strong>{project.data.contribution}</p> : null}
                   <div class="file-tags mono">{project.data.stack}</div>
+                  {project.data.title === 'WayBionic — ROS2 Ground Station' ? <MockDiagram kind="waybionic" title="WayBionic control loop" /> : null}
+                  {project.data.title === 'Personal Robotics Roadmap' ? <MockDiagram kind="roadmap" title="Robotics learning roadmap" /> : null}
+                  {project.data.title === 'Autonomous Obstacle-Avoiding Rover' ? <MockDiagram kind="rover" title="Rover control loop" /> : null}
                   {project.data.title === 'HVAC Express' ? <MockDiagram kind="hvac" title="HVAC Express delivery flow" /> : null}
                   {project.data.link ? <a href={project.data.link} target="_blank" rel="noreferrer">OPEN SOURCE ↗</a> : null}
                 </article>

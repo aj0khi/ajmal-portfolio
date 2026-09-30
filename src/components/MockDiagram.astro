@@ -1,6 +1,6 @@
 ---
 interface Props {
-  kind: 'waybionic' | 'blackbox' | 'rover' | 'hvac';
+  kind: 'waybionic' | 'blackbox' | 'rover' | 'hvac' | 'roadmap';
   title: string;
 }
 
@@ -36,6 +36,9 @@ const { kind, title } = Astro.props;
       <div class="diagram-node diagram-node-accent"><strong>HVAC EXPRESS SITE</strong><span>WORDPRESS / PHP / HTML + CSS</span></div><b>↓</b>
       <div class="diagram-split"><div class="diagram-node"><strong>HOSTINGER</strong><span>DOMAIN + INFRASTRUCTURE</span></div><div class="diagram-node"><strong>LEAD SYSTEM</strong><span>SEO + INBOUND DEMAND</span></div></div>
     </div>
+  ) : null}
+  {kind === 'roadmap' ? (
+    <div class="diagram-roadmap"><div class="diagram-node"><strong>MUJOCO</strong><span>IMITATION</span></div><b>→</b><div class="diagram-node diagram-node-accent"><strong>ISAAC LAB</strong><span>RL LOCOMOTION</span></div><b>→</b><div class="diagram-node"><strong>NAV2 / SLAM</strong><span>REAL NAVIGATION</span></div></div>
   ) : null}
   <p class="mock-diagram-note">This is a communication model, not a claim that every displayed path is the final production architecture.</p>
 </div>
