@@ -7,15 +7,15 @@
     <button type="button" class="ik-start" data-ik-start>INITIALIZE SIMULATION</button>
   </div>
   <div class="ik-stage" data-ik-stage hidden>
-    <canvas data-ik-canvas aria-label="Interactive simulated six degree of freedom robotic arm"></canvas>
+    <canvas data-ik-canvas aria-label="Interactive simulated four joint old-arm motion test"></canvas>
     <div class="ik-readout">
       <div><span>MODE</span><strong data-ik-mode>SIMULATION</strong></div>
-      <div><span>JOINTS</span><strong>5 DOF + MIMIC</strong></div>
+      <div><span>JOINTS</span><strong>4 JOINT OLD ARM</strong></div>
       <div><span>TARGET</span><strong data-ik-target>TRACKING</strong></div>
       <div><span>LIMITS</span><strong data-ik-limits>NOMINAL</strong></div>
     </div>
   </div>
-  <p class="ik-note" data-ik-note>Nothing is connected to a robot. This uses the current five-actuated-joint URDF shape; limits remain provisional in the source workspace.</p>
+  <p class="ik-note" data-ik-note>Nothing is connected to a robot. This represents the old-arm motion test; the source bridge reports 0–270° physical ranges, while calibration remains a hardware concern.</p>
 </section>
 
 <script>
@@ -53,8 +53,8 @@
       scene.add(target);
 
       const segmentLength = 0.48;
-      const points = Array.from({ length: 7 }, (_, index) => new THREE.Vector3(0, index * segmentLength, 0));
-      const joints = points.slice(0, 6).map(() => new THREE.Mesh(
+      const points = Array.from({ length: 5 }, (_, index) => new THREE.Vector3(0, index * segmentLength, 0));
+      const joints = points.slice(0, 4).map(() => new THREE.Mesh(
         new THREE.SphereGeometry(0.075, 12, 12),
         new THREE.MeshBasicMaterial({ color: 0xe5c86e })
       ));
@@ -104,7 +104,7 @@
       const animate = () => {
         const root = points[0].clone();
         const reach = root.distanceTo(target.position);
-        const totalLength = segmentLength * 6;
+        const totalLength = segmentLength * 4;
         if (reach >= totalLength) {
           for (let index = 1; index < points.length; index += 1) {
             points[index].copy(points[index - 1]).lerp(target.position, segmentLength / points[index - 1].distanceTo(target.position));
