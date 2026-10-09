@@ -1036,6 +1036,60 @@ body::before {
   text-shadow: 1px 1px #175d79;
 }
 
+.desktop-pet {
+  position: absolute;
+  z-index: 5;
+  bottom: 2.9rem;
+  left: 22rem;
+  display: grid;
+  width: 2.4rem;
+  height: 2.7rem;
+  place-items: center;
+  border: 0;
+  color: #e5c86e;
+  background: transparent;
+  cursor: pointer;
+  transition: transform 180ms ease, opacity 180ms ease;
+}
+
+.desktop-pet span {
+  display: grid;
+  width: 1.7rem;
+  height: 1.2rem;
+  place-items: center;
+  border: 2px solid #183f52;
+  border-radius: 0.3rem;
+  color: #cd752a;
+  background: #dfe7e0;
+  box-shadow: 0 0.4rem 0 -0.15rem #183f52;
+  font-size: 0.8rem;
+}
+
+.desktop-pet i {
+  position: absolute;
+  top: 0;
+  right: 0.15rem;
+  width: 0.35rem;
+  height: 0.7rem;
+  border: 1px solid #183f52;
+  background: #cd752a;
+  transform: rotate(30deg);
+}
+
+.desktop-pet.is-waving {
+  animation: pet-wave 550ms ease;
+}
+
+.desktop-pet.is-off {
+  opacity: 0.3;
+}
+
+@keyframes pet-wave {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  35% { transform: translateY(-0.35rem) rotate(-8deg); }
+  70% { transform: translateY(-0.2rem) rotate(8deg); }
+}
+
 .desktop-icons {
   position: absolute;
   z-index: 4;
@@ -2665,6 +2719,10 @@ body::before {
     grid-template-columns: repeat(3, 4rem);
     width: auto;
     gap: 0.45rem;
+  }
+
+  .desktop-pet {
+    display: none;
   }
 
   .os-window,
