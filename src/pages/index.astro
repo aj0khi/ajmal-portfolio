@@ -65,7 +65,7 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
               <h1>Things I have<br /><em>built or touched.</em></h1>
               <p class="window-intro">A personal archive of physical systems, software, and the businesses that taught me to keep things running.</p>
             </div>
-            <div class="featured-strip"><span class="mono">FEATURED SYSTEMS / OPEN ON ARRIVAL</span><button type="button" data-window-open="waybionic">INITIALIZE 3D ARM ↗</button><button type="button" data-window-open="rosgraph">VIEW ROS2 GRAPH ↗</button><button type="button" data-window-open="blackbox">RUN CHAIN DEMO ↗</button></div>
+            <div class="featured-strip"><span class="mono">FEATURED SYSTEMS / OPEN ON ARRIVAL</span><button type="button" data-window-open="waybionic">INITIALIZE 3D ARM ↗</button><button type="button" data-window-open="rosgraph">VIEW ROS2 GRAPH ↗</button><button type="button" data-window-open="blackbox">RUN CHAIN DEMO ↗</button><button type="button" data-window-open="restore">SYSTEM RESTORE ↗</button><button type="button" data-window-open="hvacsim">HVAC LAB ↗</button><button type="button" data-window-open="oldarm">OLD ARM JOINTS ↗</button><button type="button" data-window-open="filesystem">OPEN /HOME/AJ ↗</button><button type="button" data-window-open="system">PROFILES + INFO ↗</button><button type="button" data-tour-start>START RECRUITER TOUR ↗</button></div>
             <StaleStateLab />
             <div class="project-grid">
               {projects.map((project, projectIndex) => (
