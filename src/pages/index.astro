@@ -8,6 +8,8 @@ import MockDiagram from '../components/MockDiagram.astro';
 import OsIcon from '../components/OsIcon.astro';
 import StaleStateLab from '../components/StaleStateLab.astro';
 import SystemRestore from '../components/SystemRestore.astro';
+import SystemMonitor from '../components/SystemMonitor.astro';
+import RosGraph from '../components/RosGraph.astro';
 import WayBionic3D from '../components/WayBionic3D.astro';
 import WayBionicDiagram from '../components/WayBionicDiagram.astro';
 
@@ -47,6 +49,8 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
             <OsIcon window="media" icon="▶" label="Media" src="/icons/media.svg" />
             <OsIcon window="restore" icon="↶" label="Restore" src="/icons/notes.svg" />
             <OsIcon window="hvacsim" icon="⌁" label="HVAC Lab" src="/icons/waybionic.svg" />
+            <OsIcon window="rosgraph" icon="◎" label="ROS Graph" src="/icons/waybionic.svg" />
+            <OsIcon window="monitor" icon="▥" label="System Monitor" src="/icons/terminal.svg" />
           </div>
 
           <DesktopWindow id="portfolio" title="MY WORK / FILE EXPLORER" icon="▣" open class="window-portfolio">
@@ -151,6 +155,14 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
             <div class="window-kicker mono">CURRENT TOOLSET / NOT A BADGE WALL</div>
             <h2>Tools for the<br /><em>next iteration.</em></h2>
             <div class="skills-explorer"><div><strong>LANGUAGES</strong><span>Java · Python · JavaScript · HTML/CSS</span></div><div><strong>ROBOTICS + SYSTEMS</strong><span>ROS2 · RViz · URDF · MuJoCo · Isaac Lab · Nav2/SLAM</span></div><div><strong>CONCEPTS</strong><span>OOP + inheritance · Stack/Queue/LinkedList · File I/O · event-driven programming · hardware integration</span></div><div><strong>TOOLS</strong><span>Git/GitHub · Java Swing · Phidgets SDK · IntelliJ IDEA · WordPress/PHP</span></div></div>
+          </DesktopWindow>
+
+          <DesktopWindow id="rosgraph" title="ROS2 / GRAPH VIEWER" icon="◎" class="window-rosgraph">
+            <RosGraph />
+          </DesktopWindow>
+
+          <DesktopWindow id="monitor" title="SYSTEM MONITOR" icon="▥" class="window-monitor">
+            <SystemMonitor />
           </DesktopWindow>
 
           <DesktopWindow id="research" title="RESEARCH / PERSONAL" icon="◉" class="window-research">

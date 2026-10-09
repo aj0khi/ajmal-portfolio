@@ -1,0 +1,20 @@
+<section class="ros-graph" data-ros-graph>
+  <div class="window-kicker mono">ROS2 ARCHITECTURE / SIMULATED GRAPH</div>
+  <h2>Nodes, topics,<br /><em>and the path between.</em></h2>
+  <div class="ros-canvas"><svg viewBox="0 0 700 250" role="img" aria-label="Simulated ROS2 ground station graph"><path d="M120 125h150M390 125h170M270 125l120-75M270 125l120 75"/><circle cx="120" cy="125" r="42"/><circle cx="270" cy="125" r="42"/><circle cx="390" cy="50" r="36"/><circle cx="390" cy="200" r="36"/><circle cx="560" cy="125" r="42"/><text x="120" y="121">MOTION</text><text x="120" y="136">PANEL</text><text x="270" y="121">JOINT</text><text x="270" y="136">DRIVER</text><text x="390" y="46">DIAG</text><text x="390" y="61">CLI</text><text x="390" y="196">RVIZ</text><text x="390" y="211">MONITOR</text><text x="560" y="121">ARM</text><text x="560" y="136">STATE</text></svg></div>
+  <div class="ros-stream"><span class="mono">/diagnostics</span><strong data-ros-rate>12.0 Hz</strong><span data-ros-message>diagnostic_array: nominal</span></div>
+  <p class="window-note mono">SIMULATED GRAPH / SWAPPABLE FUTURE ROSBRIDGE SOURCE</p>
+</section>
+<script>
+  const rosGraph = document.querySelector<HTMLElement>('[data-ros-graph]');
+  if (rosGraph) {
+    const rate = rosGraph.querySelector<HTMLElement>('[data-ros-rate]');
+    const message = rosGraph.querySelector<HTMLElement>('[data-ros-message]');
+    let tick = 0;
+    window.setInterval(() => {
+      tick += 1;
+      if (rate) rate.textContent = `${(11.5 + Math.sin(tick / 3) * 0.5).toFixed(1)} Hz`;
+      if (message) message.textContent = tick % 5 === 0 ? 'diagnostic_array: stale check passed' : 'diagnostic_array: nominal';
+    }, 1000);
+  }
+</script>

@@ -1,0 +1,36 @@
+<section class="system-monitor" data-system-monitor>
+  <div class="window-kicker mono">LIVE LOCAL TELEMETRY / PRIVACY-SAFE</div>
+  <h2>System health<br /><em>from this browser.</em></h2>
+  <div class="monitor-grid"><div><span>VIEWPORT</span><strong data-monitor-viewport>--</strong></div><div><span>TIMEZONE</span><strong data-monitor-timezone>--</strong></div><div><span>FPS</span><strong data-monitor-fps>--</strong></div><div><span>MEMORY EST.</span><strong data-monitor-memory>--</strong></div><div><span>ONLINE</span><strong data-monitor-online>--</strong></div><div><span>REDUCED MOTION</span><strong data-monitor-motion>--</strong></div></div>
+  <p class="window-note mono">LOCAL BROWSER VALUES / NOTHING UPLOADED</p>
+</section>
+<script>
+  const monitor = document.querySelector<HTMLElement>('[data-system-monitor]');
+  if (monitor) {
+    const setText = (selector: string, value: string) => { const node = monitor.querySelector<HTMLElement>(selector); if (node) node.textContent = value; };
+    const update = () => {
+      setText('[data-monitor-viewport]', `${window.innerWidth} × ${window.innerHeight}`);
+      setText('[data-monitor-timezone]', Intl.DateTimeFormat().resolvedOptions().timeZone);
+      setText('[data-monitor-online]', navigator.onLine ? 'ONLINE' : 'OFFLINE');
+      setText('[data-monitor-motion]', matchMedia('(prefers-reduced-motion: reduce)').matches ? 'ON' : 'OFF');
+      const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory;
+      setText('[data-monitor-memory]', memory ? `${memory} GB EST.` : 'UNAVAILABLE');
+    };
+    let frames = 0;
+    let last = performance.now();
+    const measure = (now: number) => {
+      frames += 1;
+      if (now - last >= 1000) {
+        setText('[data-monitor-fps]', `${Math.round((frames * 1000) / (now - last))} FPS`);
+        frames = 0;
+        last = now;
+      }
+      requestAnimationFrame(measure);
+    };
+    update();
+    window.addEventListener('resize', update);
+    window.addEventListener('online', update);
+    window.addEventListener('offline', update);
+    requestAnimationFrame(measure);
+  }
+</script>
