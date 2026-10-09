@@ -1215,6 +1215,103 @@ body::before {
   font: 1rem/1.5 Georgia, serif;
 }
 
+.waybionic-3d {
+  margin-top: 1.4rem;
+  padding: 0.9rem;
+  border: 1px solid #496375;
+  background: #dfe3da;
+}
+
+.ik-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.ik-header h3 {
+  margin: 0.5rem 0 0;
+  color: #183f52;
+  font: 600 1.5rem/0.95 Georgia, serif;
+}
+
+.ik-header h3 em {
+  color: #b05236;
+  font-style: normal;
+}
+
+.ik-start {
+  flex: 0 0 auto;
+  padding: 0.6rem 0.7rem;
+  border: 1px solid #9a3e32;
+  color: #9a3e32;
+  background: #f7f1d6;
+  font: 700 0.58rem var(--mono);
+  cursor: pointer;
+}
+
+.ik-start:hover,
+.ik-start:focus-visible {
+  color: #fff;
+  background: #9a3e32;
+}
+
+.ik-start:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.ik-stage {
+  position: relative;
+  height: min(24rem, 55vw);
+  min-height: 15rem;
+  margin-top: 0.9rem;
+  overflow: hidden;
+  border: 1px solid #183f52;
+  background: #1e2932;
+}
+
+.ik-stage canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: crosshair;
+}
+
+.ik-readout {
+  position: absolute;
+  right: 0.6rem;
+  bottom: 0.6rem;
+  left: 0.6rem;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.4rem;
+  padding: 0.45rem;
+  color: #c8d8c1;
+  background: rgba(20, 31, 37, 0.88);
+  font-family: var(--mono);
+}
+
+.ik-readout div {
+  display: grid;
+  gap: 0.18rem;
+}
+
+.ik-readout span {
+  color: #e5c86e;
+  font-size: 0.48rem;
+}
+
+.ik-readout strong {
+  font-size: 0.56rem;
+}
+
+.ik-note {
+  margin: 0.65rem 0 0;
+  color: #657183;
+  font: 0.58rem/1.35 var(--mono);
+}
+
 .mock-diagram {
   margin-top: 1.25rem;
   padding: 0.8rem;

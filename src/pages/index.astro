@@ -4,6 +4,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import DesktopWindow from '../components/DesktopWindow.astro';
 import MockDiagram from '../components/MockDiagram.astro';
 import OsIcon from '../components/OsIcon.astro';
+import WayBionic3D from '../components/WayBionic3D.astro';
 import WayBionicDiagram from '../components/WayBionicDiagram.astro';
 
 const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
@@ -75,6 +76,7 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
               <figure><img src="/assets/waybionic/engineer-monitor-normal.png" alt="WayBionic Engineering Monitor in a mock normal state." loading="lazy" /><figcaption class="mono">MOCK NORMAL / RVIZ</figcaption></figure>
               <figure><img src="/assets/waybionic/engineer-monitor-fault.png" alt="WayBionic Engineering Monitor showing a mock fault state." loading="lazy" /><figcaption class="mono">MOCK FAULT / STALE STATE</figcaption></figure>
             </div>
+            <WayBionic3D />
             <MockDiagram kind="waybionic" title="WayBionic control loop" />
             <div class="joint-panel"><WayBionicDiagram /></div>
             <div class="window-actions"><a href="https://github.com/Waybionic/waybionic_ground_station" target="_blank" rel="noreferrer">OPEN REPOSITORY ↗</a><a href="https://drive.google.com/file/d/1WWgNoo82JjGdWspCLcINrK6-YqnF9omR/view?usp=sharing" target="_blank" rel="noreferrer">ARM VIDEO ↗</a></div>
