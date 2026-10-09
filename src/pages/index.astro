@@ -1,7 +1,9 @@
 ---
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import BlackBoxDemo from '../components/BlackBoxDemo.astro';
 import DesktopWindow from '../components/DesktopWindow.astro';
+import HvacSimulator from '../components/HvacSimulator.astro';
 import MockDiagram from '../components/MockDiagram.astro';
 import OsIcon from '../components/OsIcon.astro';
 import StaleStateLab from '../components/StaleStateLab.astro';
@@ -44,6 +46,7 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
             <OsIcon window="terminal" icon=">_" label="Terminal" src="/icons/terminal.svg" />
             <OsIcon window="media" icon="▶" label="Media" src="/icons/media.svg" />
             <OsIcon window="restore" icon="↶" label="Restore" src="/icons/notes.svg" />
+            <OsIcon window="hvacsim" icon="⌁" label="HVAC Lab" src="/icons/waybionic.svg" />
           </div>
 
           <DesktopWindow id="portfolio" title="MY WORK / FILE EXPLORER" icon="▣" open class="window-portfolio">
@@ -97,6 +100,7 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
               <div><strong>04</strong><span>Ledger + verifier</span><small>Witness tree heads, sealed release packets, local verification flow.</small></div>
             </div>
             <MockDiagram kind="blackbox" title="BlackBox evidence flow" />
+            <BlackBoxDemo />
             <div class="window-note mono">PUBLIC VIEW / HIGH-LEVEL ARCHITECTURE ONLY / SENSITIVE DETAILS OMITTED</div>
           </DesktopWindow>
 
@@ -185,6 +189,10 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
             <div class="empty-bin mono">0 OBJECTS / 0 BYTES</div>
           </DesktopWindow>
 
+          <DesktopWindow id="hvacsim" title="HVAC / COMFORT CALCULATOR" icon="⌁" class="window-hvacsim">
+            <HvacSimulator />
+          </DesktopWindow>
+
           <DesktopWindow id="calculator" title="CALCULATOR" icon="⊞" class="window-calculator">
             <div class="calculator-display" data-calculator-display>0</div>
             <div class="calculator-keys">
@@ -211,6 +219,7 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
             <button type="button" data-window-open="notes">▤ &nbsp; Build Notes</button>
             <button type="button" data-window-open="terminal">&gt;_ &nbsp; Terminal</button>
             <button type="button" data-window-open="about">★ &nbsp; About Aj</button>
+            <button type="button" data-tour-start>▶ &nbsp; 30-SECOND TOUR</button>
             <a href="mailto:khidri.ajmal@gmail.com">✉ &nbsp; Email Ajmal</a>
           </div>
 
@@ -218,6 +227,10 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
             <label class="mono" for="command-input">COMMAND PALETTE / SEARCH WINDOWS</label>
             <input id="command-input" data-command-input placeholder="Try: WayBionic, Resume, Terminal" autocomplete="off" />
             <div data-command-results></div>
+          </div>
+
+          <div class="tour-overlay" data-tour-overlay hidden>
+            <div class="tour-card"><p class="window-kicker mono">GUIDED RECRUITER TOUR</p><h2 data-tour-title>AjmalOS in 30 seconds.</h2><p data-tour-copy>Control returns to you at any time. This tour only opens public portfolio windows.</p><div><button type="button" data-tour-next>START TOUR</button><button type="button" data-tour-stop>EXIT</button></div></div>
           </div>
 
           <footer class="taskbar">
@@ -467,5 +480,37 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
       }
       if (event.key === 'Escape' && palette) palette.hidden = true;
     });
+
+    const tourOverlay = desktop.querySelector<HTMLElement>('[data-tour-overlay]');
+    const tourTitle = desktop.querySelector<HTMLElement>('[data-tour-title]');
+    const tourCopy = desktop.querySelector<HTMLElement>('[data-tour-copy]');
+    const tourNext = desktop.querySelector<HTMLButtonElement>('[data-tour-next]');
+    let tourStep = -1;
+    const tourSteps = [
+      ['Evidence first.', 'My Work opens the archive of systems and contributions.', 'portfolio'],
+      ['The robot work.', 'WayBionic shows the movement panels, diagnostics, and simulation.', 'waybionic'],
+      ['The resume.', 'The current PDF is ready for a recruiter to download.', 'resume'],
+      ['Open to the next system.', 'Contact and public profile links are one window away.', 'system']
+    ];
+    const advanceTour = () => {
+      tourStep += 1;
+      if (tourStep >= tourSteps.length) {
+        if (tourOverlay) tourOverlay.hidden = true;
+        return;
+      }
+      const step = tourSteps[tourStep];
+      focusWindow(step[2]);
+      if (tourTitle) tourTitle.textContent = step[0];
+      if (tourCopy) tourCopy.textContent = step[1];
+      if (tourNext) tourNext.textContent = tourStep === tourSteps.length - 1 ? 'FINISH TOUR' : 'NEXT';
+      rebuildTaskbar();
+    };
+    desktop.querySelector('[data-tour-start]')?.addEventListener('click', () => { if (tourOverlay) tourOverlay.hidden = false; tourStep = -1; advanceTour(); });
+    tourNext?.addEventListener('click', advanceTour);
+    desktop.querySelector('[data-tour-stop]')?.addEventListener('click', () => { if (tourOverlay) tourOverlay.hidden = true; });
+    document.addEventListener('keydown', (event) => { if (tourOverlay && !tourOverlay.hidden && event.key === 'Escape') tourOverlay.hidden = true; });
+
+    const deepWindow = location.hash.match(/^#\/?(?:work\/)?([a-z0-9-]+)$/i)?.[1];
+    if (deepWindow && desktop.querySelector(`[data-window="${deepWindow}"]`)) focusWindow(deepWindow);
   }
 </script>

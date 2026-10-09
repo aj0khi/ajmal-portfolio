@@ -1,0 +1,20 @@
+<section class="hvac-simulator" data-hvac-sim>
+  <div class="window-kicker mono">LOCAL ESTIMATE / NOT A QUOTE</div>
+  <h2>Comfort, calculated<br /><em>before the call.</em></h2>
+  <div class="hvac-fields"><label>Area (sq ft)<input type="number" value="1200" min="100" step="50" data-hvac-area /></label><label>Climate factor<select data-hvac-factor><option value="35">Calgary / standard</option><option value="40">Older or drafty home</option><option value="30">Well-insulated home</option></select></label></div>
+  <div class="hvac-output"><span class="mono">ROUGH COOLING LOAD</span><strong data-hvac-output>3.5 tons</strong><small>Rule-of-thumb estimate only. A qualified technician must size equipment on site.</small></div>
+</section>
+<script>
+  const hvac = document.querySelector<HTMLElement>('[data-hvac-sim]');
+  if (hvac) {
+    const area = hvac.querySelector<HTMLInputElement>('[data-hvac-area]');
+    const factor = hvac.querySelector<HTMLSelectElement>('[data-hvac-factor]');
+    const output = hvac.querySelector<HTMLElement>('[data-hvac-output]');
+    const update = () => {
+      const tons = Math.max(1, Math.round(((Number(area?.value) || 1200) * Number(factor?.value || 35)) / 12000 * 2) / 2);
+      if (output) output.textContent = `${tons.toFixed(1)} tons`;
+    };
+    area?.addEventListener('input', update);
+    factor?.addEventListener('change', update);
+  }
+</script>

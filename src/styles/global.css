@@ -1576,6 +1576,12 @@ body::before {
   width: min(52%, 640px);
 }
 
+.window-hvacsim {
+  top: 18%;
+  left: 28%;
+  width: min(54%, 660px);
+}
+
 .window-games {
   top: 19%;
   left: 35%;
@@ -2003,6 +2009,138 @@ body::before {
   font: 1rem/1.45 Georgia, serif;
 }
 
+.hvac-simulator {
+  max-width: 42rem;
+}
+
+.hvac-simulator h2,
+.blackbox-demo h2 {
+  margin: 1rem 0;
+  color: #183f52;
+  font: 600 clamp(2rem, 4vw, 3.5rem)/0.92 Georgia, serif;
+}
+
+.hvac-simulator h2 em,
+.blackbox-demo h2 em {
+  color: #b05236;
+  font-style: normal;
+}
+
+.hvac-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem;
+  margin-top: 1.5rem;
+}
+
+.hvac-fields label {
+  display: grid;
+  gap: 0.35rem;
+  color: #9a3e32;
+  font: 700 0.58rem var(--mono);
+}
+
+.hvac-fields input,
+.hvac-fields select {
+  min-width: 0;
+  padding: 0.55rem;
+  border: 2px inset #d8d8d0;
+  color: #183f52;
+  background: #fffef8;
+  font: 0.75rem var(--mono);
+}
+
+.hvac-output {
+  display: grid;
+  gap: 0.4rem;
+  margin-top: 1.5rem;
+  padding: 1.1rem;
+  border: 1px solid #cd752a;
+  background: #f8e9c8;
+}
+
+.hvac-output span {
+  color: #9a3e32;
+  font-size: 0.58rem;
+}
+
+.hvac-output strong {
+  color: #183f52;
+  font: 700 2rem var(--mono);
+}
+
+.hvac-output small {
+  color: #657183;
+  font: 0.75rem/1.4 Georgia, serif;
+}
+
+.chain-records {
+  display: grid;
+  gap: 0.6rem;
+  margin-top: 1.5rem;
+}
+
+.chain-records > div {
+  display: grid;
+  grid-template-columns: 8rem 1fr;
+  gap: 0.25rem 1rem;
+  padding: 0.7rem;
+  border: 1px solid #b7b8ab;
+  background: #f8f6ed;
+}
+
+.chain-records span {
+  color: #9a3e32;
+  font-size: 0.55rem;
+}
+
+.chain-records strong {
+  color: #183f52;
+  font: 700 0.75rem var(--mono);
+}
+
+.chain-records small {
+  grid-column: 2;
+  color: #657183;
+  font: 0.62rem var(--mono);
+}
+
+.chain-records code {
+  color: #183f52;
+}
+
+.chain-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.chain-actions button {
+  padding: 0.55rem 0.65rem;
+  border: 1px solid #496375;
+  color: #183f52;
+  background: #f7f1d6;
+  font: 700 0.55rem var(--mono);
+  cursor: pointer;
+}
+
+.chain-actions button:hover,
+.chain-actions button:focus-visible {
+  color: #fff;
+  background: #9a3e32;
+}
+
+.chain-actions strong {
+  color: #657183;
+  font: 700 0.58rem var(--mono);
+}
+
+.blackbox-demo[data-state="mutated"] .chain-actions strong {
+  color: #9a3e32;
+}
+
 .command-palette {
   position: absolute;
   z-index: 50;
@@ -2046,6 +2184,54 @@ body::before {
 .command-palette button:focus-visible {
   color: #fff;
   background: #315b98;
+}
+
+.tour-overlay {
+  position: absolute;
+  z-index: 60;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(10, 23, 34, 0.24);
+}
+
+.tour-overlay[hidden] {
+  display: none;
+}
+
+.tour-card {
+  width: min(26rem, 80%);
+  padding: 1.2rem;
+  border: 2px solid #111b35;
+  background: #f1eee2;
+  box-shadow: 0.45rem 0.55rem rgba(0, 25, 54, 0.45);
+}
+
+.tour-card h2 {
+  margin: 0.8rem 0;
+  color: #183f52;
+  font: 600 2.1rem/0.95 Georgia, serif;
+}
+
+.tour-card p:not(.window-kicker) {
+  color: #596272;
+  font: 1rem/1.45 Georgia, serif;
+}
+
+.tour-card button {
+  margin: 0.8rem 0.45rem 0 0;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid #9a3e32;
+  color: #9a3e32;
+  background: #f7f1d6;
+  font: 700 0.58rem var(--mono);
+  cursor: pointer;
+}
+
+.tour-card button:hover,
+.tour-card button:focus-visible {
+  color: #fff;
+  background: #9a3e32;
 }
 
 .media-placeholder:hover,
@@ -2398,7 +2584,8 @@ body::before {
   .window-notes,
   .window-terminal,
   .window-media,
-  .window-restore {
+  .window-restore,
+  .window-hvacsim {
     top: 16%;
     left: 5%;
     width: 90%;
@@ -2446,6 +2633,18 @@ body::before {
 
   .research-grid {
     grid-template-columns: 1fr;
+  }
+
+  .hvac-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .chain-records > div {
+    grid-template-columns: 1fr;
+  }
+
+  .chain-records small {
+    grid-column: auto;
   }
 
   .stale-row {

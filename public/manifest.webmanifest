@@ -1,0 +1,10 @@
+{
+  "name": "AjmalOS — Ajmal Khidri",
+  "short_name": "AjmalOS",
+  "start_url": "/",
+  "display": "fullscreen",
+  "background_color": "#171513",
+  "theme_color": "#d7cec0",
+  "description": "Ajmal Khidri's interactive portfolio archive.",
+  "icons": [{ "src": "/icons/my-work.svg", "sizes": "256x256", "type": "image/svg+xml", "purpose": "any maskable" }]
+}

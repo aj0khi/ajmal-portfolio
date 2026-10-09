@@ -20,6 +20,7 @@ const {
     <meta name="viewport" content="width=device-width" />
     <meta name="description" content={description} />
     <meta name="theme-color" content="#f3efe6" />
+    <link rel="manifest" href="/manifest.webmanifest" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
@@ -37,6 +38,7 @@ const {
   <body>
     <slot />
     <script>
+      if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => undefined);
       document.documentElement.classList.add('js');
 
       const revealItems = document.querySelectorAll<HTMLElement>('[data-reveal]');

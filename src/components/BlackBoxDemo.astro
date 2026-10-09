@@ -1,0 +1,38 @@
+<section class="blackbox-demo" data-blackbox-demo>
+  <div class="window-kicker mono">LOCAL DEMO / SHA-256 CHAIN</div>
+  <h2>Change one record.<br /><em>Watch the chain notice.</em></h2>
+  <div class="chain-records"><div data-chain-record="0"><span class="mono">01 / SENSOR EVENT</span><strong>motor_current = 0.85A</strong><small>hash: <code data-chain-hash="0">pending</code></small></div><div data-chain-record="1"><span class="mono">02 / COMMAND EVENT</span><strong>motion_test = HOME</strong><small>prev: <code data-chain-prev="1">pending</code></small></div><div data-chain-record="2"><span class="mono">03 / REVIEW EVENT</span><strong>operator_ack = true</strong><small>prev: <code data-chain-prev="2">pending</code></small></div></div>
+  <div class="chain-actions"><button type="button" data-chain-run>SEAL DEMO CHAIN</button><button type="button" data-chain-mutate>SIMULATE MUTATION</button><strong data-chain-status>UNSEALED</strong></div>
+  <p class="window-note mono">Conceptual browser demo. Not production evidence and not a cryptographic claim about this website.</p>
+</section>
+<script>
+  const chainDemo = document.querySelector<HTMLElement>('[data-blackbox-demo]');
+  if (chainDemo) {
+    let sealed = false;
+    let mutated = false;
+    const status = chainDemo.querySelector<HTMLElement>('[data-chain-status]');
+    const hash = async (value: string) => {
+      const bytes = new TextEncoder().encode(value);
+      const digest = await crypto.subtle.digest('SHA-256', bytes);
+      return [...new Uint8Array(digest)].map((item) => item.toString(16).padStart(2, '0')).join('').slice(0, 16);
+    };
+    const seal = async () => {
+      let previous = 'GENESIS';
+      for (let index = 0; index < 3; index += 1) {
+        const record = chainDemo.querySelector(`[data-chain-record="${index}"]`);
+        const text = record?.textContent ?? '';
+        const current = await hash(`${previous}:${text}:${mutated && index === 1 ? 'changed' : ''}`);
+        const hashNode = record?.querySelector('[data-chain-hash]') ?? record?.querySelector(`[data-chain-prev="${index}"]`);
+        if (hashNode) hashNode.textContent = current;
+        const previousNode = record?.querySelector(`[data-chain-prev="${index}"]`);
+        if (previousNode) previousNode.textContent = previous;
+        previous = current;
+      }
+      sealed = true;
+      if (status) status.textContent = mutated ? 'MUTATION DETECTED' : 'CHAIN SEALED';
+      chainDemo.dataset.state = mutated ? 'mutated' : 'sealed';
+    };
+    chainDemo.querySelector('[data-chain-run]')?.addEventListener('click', seal);
+    chainDemo.querySelector('[data-chain-mutate]')?.addEventListener('click', () => { mutated = true; if (sealed) seal(); else if (status) status.textContent = 'READY TO SEAL'; });
+  }
+</script>
