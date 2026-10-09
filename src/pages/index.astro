@@ -56,8 +56,6 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
             <OsIcon window="oldarm" icon="◌" label="Old Arm" src="/icons/waybionic.svg" />
             <OsIcon window="filesystem" icon="⌂" label="Files" src="/icons/my-work.svg" />
           </div>
-          <button class="desktop-pet" type="button" data-desktop-pet title="Toggle desktop robot pet" aria-label="Toggle desktop robot pet"><span>●</span><i></i></button>
-
           <DesktopWindow id="portfolio" title="MY WORK / FILE EXPLORER" icon="▣" open class="window-portfolio">
             <div class="file-toolbar mono">FILE &nbsp; EDIT &nbsp; VIEW &nbsp; HELP <span>LOCAL ARCHIVE / 04 ITEMS</span></div>
             <div class="explorer-heading">
@@ -277,8 +275,6 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
   const taskbar = document.querySelector('[data-taskbar]');
   const startMenu = document.querySelector<HTMLElement>('[data-start-menu]');
   const startToggle = document.querySelector('[data-start-toggle]');
-  const pet = desktop?.querySelector<HTMLElement>('[data-desktop-pet]');
-  let petEnabled = true;
   let highestZ = 10;
 
   if (desktop && taskbar && startMenu && startToggle) {
@@ -295,8 +291,6 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
       desktop.querySelectorAll('[data-task-window]').forEach((item) => {
         if (item.getAttribute('data-task-window') !== id) item.classList.remove('active');
       });
-      if (petEnabled) pet?.classList.add('is-waving');
-      window.setTimeout(() => pet?.classList.remove('is-waving'), 550);
     };
 
     const toggleMaximize = (windowElement: HTMLElement) => {
@@ -511,15 +505,6 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
       }
       if (event.key === 'Escape' && palette) palette.hidden = true;
     });
-    desktop.addEventListener('pointermove', (event) => {
-      if (!petEnabled || !pet) return;
-      const pointerEvent = event as PointerEvent;
-      const bounds = desktop.getBoundingClientRect();
-      const x = Math.max(2, Math.min(bounds.width - 42, pointerEvent.clientX - bounds.left - 20));
-      pet.style.left = `${x}px`;
-    });
-    pet?.addEventListener('click', () => { petEnabled = !petEnabled; pet.classList.toggle('is-off', !petEnabled); });
-
     const tourOverlay = desktop.querySelector<HTMLElement>('[data-tour-overlay]');
     const tourTitle = desktop.querySelector<HTMLElement>('[data-tour-title]');
     const tourCopy = desktop.querySelector<HTMLElement>('[data-tour-copy]');
