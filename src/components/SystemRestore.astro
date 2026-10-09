@@ -1,0 +1,27 @@
+<section class="system-restore" data-restore>
+  <div class="window-kicker mono">LOCAL ARCHIVE / CURATED SNAPSHOTS</div>
+  <h2>Drag the archive<br /><em>through time.</em></h2>
+  <input type="range" min="0" max="3" value="3" step="1" data-restore-range aria-label="Portfolio history" />
+  <div class="restore-scale mono"><span>FOUNDATION</span><span>ROBOTICS</span><span>OS SHELL</span><span>NOW</span></div>
+  <div class="restore-readout"><strong data-restore-title>AJMALOS / CURRENT BUILD</strong><p data-restore-copy>Desktop archive, project diagrams, recruiter view, and real evidence windows.</p></div>
+  <p class="window-note mono">CURATED HISTORY / NO PRIVATE COMMITS EXPOSED</p>
+</section>
+<script>
+  const restore = document.querySelector<HTMLElement>('[data-restore]');
+  if (restore) {
+    const range = restore.querySelector<HTMLInputElement>('[data-restore-range]');
+    const title = restore.querySelector<HTMLElement>('[data-restore-title]');
+    const copy = restore.querySelector<HTMLElement>('[data-restore-copy]');
+    const states = [
+      ['FOUNDATION / BUILD LOG', 'The portfolio begins as an editorial working log for physical systems and honest progress.'],
+      ['EVIDENCE / PROJECT ARCHIVE', 'Projects gain contribution details, diagrams, public links, and real visual evidence.'],
+      ['AJMALOS / DESKTOP ARCHIVE', 'The portfolio becomes a vintage workstation with applications, utilities, and project windows.'],
+      ['AJMALOS / CURRENT BUILD', 'Desktop archive, project diagrams, recruiter view, and real evidence windows.']
+    ];
+    range?.addEventListener('input', () => {
+      const state = states[Number(range.value)] ?? states[3];
+      if (title) title.textContent = state[0];
+      if (copy) copy.textContent = state[1];
+    });
+  }
+</script>

@@ -4,6 +4,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import DesktopWindow from '../components/DesktopWindow.astro';
 import MockDiagram from '../components/MockDiagram.astro';
 import OsIcon from '../components/OsIcon.astro';
+import StaleStateLab from '../components/StaleStateLab.astro';
+import SystemRestore from '../components/SystemRestore.astro';
 import WayBionic3D from '../components/WayBionic3D.astro';
 import WayBionicDiagram from '../components/WayBionicDiagram.astro';
 
@@ -41,6 +43,7 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
             <OsIcon window="notes" icon="▤" label="Build Notes" src="/icons/notes.svg" />
             <OsIcon window="terminal" icon=">_" label="Terminal" src="/icons/terminal.svg" />
             <OsIcon window="media" icon="▶" label="Media" src="/icons/media.svg" />
+            <OsIcon window="restore" icon="↶" label="Restore" src="/icons/notes.svg" />
           </div>
 
           <DesktopWindow id="portfolio" title="MY WORK / FILE EXPLORER" icon="▣" open class="window-portfolio">
@@ -77,6 +80,7 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
               <figure><img src="/assets/waybionic/engineer-monitor-fault.png" alt="WayBionic Engineering Monitor showing a mock fault state." loading="lazy" /><figcaption class="mono">MOCK FAULT / STALE STATE</figcaption></figure>
             </div>
             <WayBionic3D />
+            <StaleStateLab />
             <MockDiagram kind="waybionic" title="WayBionic control loop" />
             <div class="joint-panel"><WayBionicDiagram /></div>
             <div class="window-actions"><a href="https://github.com/Waybionic/waybionic_ground_station" target="_blank" rel="noreferrer">OPEN REPOSITORY ↗</a><a href="https://drive.google.com/file/d/1WWgNoo82JjGdWspCLcINrK6-YqnF9omR/view?usp=sharing" target="_blank" rel="noreferrer">ARM VIDEO ↗</a></div>
@@ -170,6 +174,10 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
             <div class="window-actions"><a href="https://drive.google.com/file/d/1WWgNoo82JjGdWspCLcINrK6-YqnF9omR/view?usp=sharing" target="_blank" rel="noreferrer">OPEN ARM VIDEO ↗</a></div>
           </DesktopWindow>
 
+          <DesktopWindow id="restore" title="SYSTEM RESTORE / AJMALOS" icon="↶" class="window-restore">
+            <SystemRestore />
+          </DesktopWindow>
+
           <DesktopWindow id="recycle" title="RECYCLE BIN" icon="♻" class="window-recycle">
             <div class="window-kicker mono">SYSTEM UTILITY</div>
             <h2>Nothing deleted<br /><em>yet.</em></h2>
@@ -204,6 +212,12 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
             <button type="button" data-window-open="terminal">&gt;_ &nbsp; Terminal</button>
             <button type="button" data-window-open="about">★ &nbsp; About Aj</button>
             <a href="mailto:khidri.ajmal@gmail.com">✉ &nbsp; Email Ajmal</a>
+          </div>
+
+          <div class="command-palette" data-command-palette hidden>
+            <label class="mono" for="command-input">COMMAND PALETTE / SEARCH WINDOWS</label>
+            <input id="command-input" data-command-input placeholder="Try: WayBionic, Resume, Terminal" autocomplete="off" />
+            <div data-command-results></div>
           </div>
 
           <footer class="taskbar">
@@ -418,5 +432,40 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
     desktop.querySelector('[data-browser-forward]')?.addEventListener('click', () => { if (browserIndex < browserHistory.length - 1) { browserIndex += 1; loadBrowserUrl(browserHistory[browserIndex], false); } });
     desktop.querySelector('[data-browser-refresh]')?.addEventListener('click', () => { if (browserInput?.value) loadBrowserUrl(browserInput.value); });
     desktop.querySelector('[data-browser-external]')?.addEventListener('click', () => { if (browserInput?.value) window.open(resolveBrowserInput(browserInput.value), '_blank', 'noopener,noreferrer'); });
+
+    const palette = desktop.querySelector<HTMLElement>('[data-command-palette]');
+    const paletteInput = desktop.querySelector<HTMLInputElement>('[data-command-input]');
+    const paletteResults = desktop.querySelector<HTMLElement>('[data-command-results]');
+    const renderPaletteResults = () => {
+      if (!paletteResults) return;
+      const query = paletteInput?.value.toLowerCase() ?? '';
+      paletteResults.innerHTML = '';
+      windows.forEach((item) => {
+        const id = item.dataset.window ?? '';
+        const title = item.querySelector('.window-title')?.textContent?.trim() ?? id;
+        if (!query || `${id} ${title}`.toLowerCase().includes(query)) {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.textContent = `OPEN ${title}`;
+          button.addEventListener('click', () => {
+            focusWindow(id);
+            if (palette) palette.hidden = true;
+          });
+          paletteResults.append(button);
+        }
+      });
+    };
+    paletteInput?.addEventListener('input', renderPaletteResults);
+    document.addEventListener('keydown', (event) => {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault();
+        if (palette) palette.hidden = !palette.hidden;
+        if (palette && !palette.hidden) {
+          renderPaletteResults();
+          paletteInput?.focus();
+        }
+      }
+      if (event.key === 'Escape' && palette) palette.hidden = true;
+    });
   }
 </script>

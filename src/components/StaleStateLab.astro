@@ -1,0 +1,29 @@
+<section class="stale-lab" data-stale-lab>
+  <div class="stale-lab-head"><p class="window-kicker mono">DIAGNOSTICS LAB / SIMULATED SAMPLES</p><span class="mono" data-lab-clock>AGE 0.2s</span></div>
+  <h3>When fresh data goes stale,<br /><em>the monitor should say so.</em></h3>
+  <div class="stale-controls"><button type="button" data-lab-mode="fresh">FRESH</button><button type="button" data-lab-mode="stale">STALE</button><button type="button" data-lab-mode="future">FUTURE-DATED</button></div>
+  <div class="stale-row"><span class="mono">joint_state / elbow</span><strong data-lab-state>NOMINAL</strong><span data-lab-value>age: 0.2s</span></div>
+  <p class="stale-lab-note" data-lab-note>Current sample is inside the expected freshness window.</p>
+</section>
+<script>
+  const lab = document.querySelector<HTMLElement>('[data-stale-lab]');
+  if (lab) {
+    const state = lab.querySelector<HTMLElement>('[data-lab-state]');
+    const value = lab.querySelector<HTMLElement>('[data-lab-value]');
+    const note = lab.querySelector<HTMLElement>('[data-lab-note]');
+    const clock = lab.querySelector<HTMLElement>('[data-lab-clock]');
+    const modes = {
+      fresh: ['NOMINAL', 'age: 0.2s', 'Current sample is inside the expected freshness window.'],
+      stale: ['STALE', 'age: 4.8s', 'A stale value is worse than no value when it looks current.'],
+      future: ['INVALID', 'stamp: +2.1s', 'Future-dated samples are surfaced instead of silently accepted.']
+    } as const;
+    lab.querySelectorAll<HTMLButtonElement>('[data-lab-mode]').forEach((button) => button.addEventListener('click', () => {
+      const mode = modes[button.dataset.labMode as keyof typeof modes] ?? modes.fresh;
+      if (state) state.textContent = mode[0];
+      if (value) value.textContent = mode[1];
+      if (note) note.textContent = mode[2];
+      if (clock) clock.textContent = mode[1].toUpperCase();
+      lab.dataset.labState = button.dataset.labMode ?? 'fresh';
+    }));
+  }
+</script>
