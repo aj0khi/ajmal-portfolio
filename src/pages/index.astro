@@ -5,10 +5,12 @@ import BlackBoxDemo from '../components/BlackBoxDemo.astro';
 import DesktopWindow from '../components/DesktopWindow.astro';
 import HvacSimulator from '../components/HvacSimulator.astro';
 import MockDiagram from '../components/MockDiagram.astro';
+import OldArmPanel from '../components/OldArmPanel.astro';
 import OsIcon from '../components/OsIcon.astro';
 import StaleStateLab from '../components/StaleStateLab.astro';
 import SystemRestore from '../components/SystemRestore.astro';
 import SystemMonitor from '../components/SystemMonitor.astro';
+import VirtualFileSystem from '../components/VirtualFileSystem.astro';
 import RosGraph from '../components/RosGraph.astro';
 import WayBionic3D from '../components/WayBionic3D.astro';
 import WayBionicDiagram from '../components/WayBionicDiagram.astro';
@@ -51,6 +53,8 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
             <OsIcon window="hvacsim" icon="⌁" label="HVAC Lab" src="/icons/waybionic.svg" />
             <OsIcon window="rosgraph" icon="◎" label="ROS Graph" src="/icons/waybionic.svg" />
             <OsIcon window="monitor" icon="▥" label="System Monitor" src="/icons/terminal.svg" />
+            <OsIcon window="oldarm" icon="◌" label="Old Arm" src="/icons/waybionic.svg" />
+            <OsIcon window="filesystem" icon="⌂" label="Files" src="/icons/my-work.svg" />
           </div>
           <button class="desktop-pet" type="button" data-desktop-pet title="Toggle desktop robot pet" aria-label="Toggle desktop robot pet"><span>●</span><i></i></button>
 
@@ -144,6 +148,7 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
             <div class="window-kicker mono">PUBLIC PROFILE / RECRUITER VIEW</div>
             <h2>Ajmal Khidri<br /><em>Computer Science student.</em></h2>
             <div class="system-grid"><div><strong>LOCATION</strong><span>Calgary, Alberta</span></div><div><strong>EDUCATION</strong><span>University of Calgary / B.Sc. Computer Science / Expected 2029</span></div><div><strong>FOCUS</strong><span>Robotics, software systems, hardware integration</span></div><div><strong>STATUS</strong><span>Open to software and robotics internships</span></div></div>
+            <div class="profile-switcher"><span class="mono">PROFILE</span><button type="button" data-profile="light">LIGHT</button><button type="button" data-profile="night">NIGHT SHIFT</button><button type="button" data-profile="amber">AMBER TERMINAL</button></div>
             <div class="window-actions"><a href="mailto:khidri.ajmal@gmail.com">EMAIL AJMAL ↗</a><a href="https://www.linkedin.com/in/ajmal-khidri/" target="_blank" rel="noreferrer">LINKEDIN ↗</a><a href="https://scholar.google.com/citations?hl=en&tzom=360&user=-3vElwEAAAAJ" target="_blank" rel="noreferrer">GOOGLE SCHOLAR ↗</a></div>
           </DesktopWindow>
 
@@ -165,6 +170,14 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
 
           <DesktopWindow id="monitor" title="SYSTEM MONITOR" icon="▥" class="window-monitor">
             <SystemMonitor />
+          </DesktopWindow>
+
+          <DesktopWindow id="oldarm" title="OLD ARM / JOINT PANEL" icon="◌" class="window-oldarm">
+            <OldArmPanel />
+          </DesktopWindow>
+
+          <DesktopWindow id="filesystem" title="FILES / HOME AJ" icon="⌂" class="window-filesystem">
+            <VirtualFileSystem />
           </DesktopWindow>
 
           <DesktopWindow id="research" title="RESEARCH / PERSONAL" icon="◉" class="window-research">
@@ -538,5 +551,13 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
 
     const deepWindow = location.hash.match(/^#\/?(?:work\/)?([a-z0-9-]+)$/i)?.[1];
     if (deepWindow && desktop.querySelector(`[data-window="${deepWindow}"]`)) focusWindow(deepWindow);
+
+    const savedProfile = localStorage.getItem('ajmalos-profile') ?? 'light';
+    (desktop as HTMLElement).dataset.profile = savedProfile;
+    desktop.querySelectorAll<HTMLButtonElement>('[data-profile]').forEach((button) => button.addEventListener('click', () => {
+      const profile = button.dataset.profile ?? 'light';
+      (desktop as HTMLElement).dataset.profile = profile;
+      localStorage.setItem('ajmalos-profile', profile);
+    }));
   }
 </script>

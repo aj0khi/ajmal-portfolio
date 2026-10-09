@@ -1680,6 +1680,18 @@ body::before {
   width: min(50%, 620px);
 }
 
+.window-oldarm {
+  top: 14%;
+  left: 24%;
+  width: min(62%, 740px);
+}
+
+.window-filesystem {
+  top: 12%;
+  left: 27%;
+  width: min(58%, 700px);
+}
+
 .window-games {
   top: 19%;
   left: 35%;
@@ -2334,6 +2346,123 @@ body::before {
   overflow-wrap: anywhere;
 }
 
+.old-arm-panel h2,
+.virtual-fs h2 {
+  margin: 1rem 0;
+  color: #183f52;
+  font: 600 clamp(2rem, 4vw, 3.5rem)/0.92 Georgia, serif;
+}
+
+.old-arm-panel h2 em,
+.virtual-fs h2 em {
+  color: #b05236;
+  font-style: normal;
+}
+
+.old-arm-joints {
+  display: grid;
+  gap: 0.6rem;
+  margin-top: 1.5rem;
+}
+
+.old-arm-joints div {
+  display: grid;
+  grid-template-columns: 1fr 11rem 1fr;
+  gap: 0.7rem;
+  align-items: center;
+  padding: 0.7rem;
+  border: 1px solid #b7b8ab;
+  background: #f8f6ed;
+}
+
+.old-arm-joints strong {
+  color: #183f52;
+  font: 700 0.65rem var(--mono);
+  overflow-wrap: anywhere;
+}
+
+.old-arm-joints span {
+  color: #9a3e32;
+  font: 0.55rem var(--mono);
+}
+
+.old-arm-joints input {
+  accent-color: #cd752a;
+}
+
+.vfs-output {
+  min-height: 9rem;
+  margin-top: 1.5rem;
+  padding: 0.8rem;
+  white-space: pre-wrap;
+  color: #bdd9ad;
+  background: #202d2b;
+  font: 0.7rem/1.6 var(--mono);
+}
+
+.vfs-form {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-top: 0.6rem;
+  color: #9a3e32;
+}
+
+.vfs-form input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  color: #183f52;
+  background: transparent;
+  font: 0.7rem var(--mono);
+  outline: none;
+}
+
+.profile-switcher {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.profile-switcher > span {
+  color: #9a3e32;
+  font-size: 0.55rem;
+}
+
+.profile-switcher button {
+  padding: 0.4rem 0.5rem;
+  border: 1px solid #496375;
+  color: #183f52;
+  background: #f7f1d6;
+  font: 700 0.52rem var(--mono);
+  cursor: pointer;
+}
+
+.profile-switcher button:hover,
+.profile-switcher button:focus-visible {
+  color: #fff;
+  background: #9a3e32;
+}
+
+[data-desktop][data-profile='night'] .desktop-wallpaper {
+  filter: saturate(0.7) brightness(0.65);
+}
+
+.desktop-wallpaper[data-profile='amber'],
+[data-desktop][data-profile='amber'] .os-window {
+  filter: sepia(0.35) saturate(1.2);
+}
+
+[data-desktop][data-profile='amber'] .desktop-wallpaper {
+  background: linear-gradient(#6e4c20, #b27b2f 55%, #30251d);
+}
+
+[data-desktop][data-profile='amber'] .hill {
+  filter: sepia(1) saturate(1.5) brightness(0.65);
+}
+
 .command-palette {
   position: absolute;
   z-index: 50;
@@ -2784,7 +2913,9 @@ body::before {
   .window-restore,
   .window-hvacsim,
   .window-rosgraph,
-  .window-monitor {
+  .window-monitor,
+  .window-oldarm,
+  .window-filesystem {
     top: 16%;
     left: 5%;
     width: 90%;
@@ -2847,6 +2978,10 @@ body::before {
   }
 
   .monitor-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .old-arm-joints div {
     grid-template-columns: 1fr;
   }
 

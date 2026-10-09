@@ -1,0 +1,69 @@
+<section class="virtual-fs" data-virtual-fs>
+  <div class="window-kicker mono">INDEXEDDB / LOCAL VIRTUAL FILESYSTEM</div>
+  <h2>/home/aj<br /><em>persistent archive.</em></h2>
+  <div class="vfs-output" data-vfs-output>AjmalOS filesystem ready. Type help.</div>
+  <form class="vfs-form" data-vfs-form><span class="mono">aj@ajmalos:~$</span><input data-vfs-input aria-label="Virtual filesystem command" autocomplete="off" /></form>
+  <p class="window-note mono">LOCAL ONLY / PERSISTS IN THIS BROWSER / NO UPLOADS</p>
+</section>
+<script>
+  const vfs = document.querySelector<HTMLElement>('[data-virtual-fs]');
+  if (vfs) {
+    const output = vfs.querySelector<HTMLElement>('[data-vfs-output]');
+    const form = vfs.querySelector<HTMLFormElement>('[data-vfs-form]');
+    const input = vfs.querySelector<HTMLInputElement>('[data-vfs-input]');
+    const seed = {
+      '/home/aj/README.txt': 'AjmalOS local archive. Systems, projects, and build notes.',
+      '/home/aj/projects/waybionic.md': 'WayBionic: old-arm motion panel, diagnostics, and ROS2 ground station.',
+      '/home/aj/projects/blackbox.md': 'BlackBox: local-first evidence core, owner portal, ledger, and verifier.',
+      '/home/aj/resume/resume.pdf': 'Binary PDF asset available from the Resume application.'
+    } as Record<string, string>;
+    let files: Record<string, string> = { ...seed };
+    const ready = new Promise<void>((resolve) => {
+      if (!('indexedDB' in window)) {
+        const stored = localStorage.getItem('ajmalos-vfs');
+        files = stored ? JSON.parse(stored) as Record<string, string> : files;
+        resolve();
+        return;
+      }
+      const request = indexedDB.open('ajmalos-vfs', 1);
+      request.onupgradeneeded = () => request.result.createObjectStore('files');
+      request.onsuccess = () => {
+        const database = request.result;
+        const transaction = database.transaction('files', 'readonly');
+        const getAll = transaction.objectStore('files').getAll();
+        const getKeys = transaction.objectStore('files').getAllKeys();
+        getAll.onsuccess = () => getKeys.onsuccess = () => {
+          if (getAll.result.length) files = Object.fromEntries(getKeys.result.map((key, index) => [String(key), getAll.result[index]]));
+          else {
+            const seedTransaction = database.transaction('files', 'readwrite');
+            Object.entries(files).forEach(([path, content]) => seedTransaction.objectStore('files').put(content, path));
+          }
+          resolve();
+        };
+      };
+      request.onerror = () => resolve();
+    });
+    const persist = () => {
+      localStorage.setItem('ajmalos-vfs-fallback', JSON.stringify(files));
+      if (!('indexedDB' in window)) return;
+      const request = indexedDB.open('ajmalos-vfs', 1);
+      request.onsuccess = () => {
+        const transaction = request.result.transaction('files', 'readwrite');
+        Object.entries(files).forEach(([path, content]) => transaction.objectStore('files').put(content, path));
+      };
+    };
+    const write = (text: string) => { if (output) output.textContent = text; };
+    const command = (raw: string) => {
+      const [name, ...args] = raw.trim().split(/\s+/);
+      if (!name) return;
+      if (name === 'help') return write('ls  tree  cat <path>  touch <path>  clear');
+      if (name === 'clear') return write('');
+      if (name === 'ls') return write(Object.keys(files).map((path) => path.replace('/home/aj/', '')).join('\n'));
+      if (name === 'tree') return write('/home/aj\n├── README.txt\n├── projects\n│   ├── waybionic.md\n│   └── blackbox.md\n└── resume\n    └── resume.pdf');
+      if (name === 'cat') return write(files[args[0]] ?? 'cat: file not found');
+      if (name === 'touch') { const path = args[0]?.startsWith('/') ? args[0] : `/home/aj/${args[0] ?? 'new-note.txt'}`; files[path] = ''; persist(); return write(`created ${path}`); }
+      write(`${name}: command not found`);
+    };
+    form?.addEventListener('submit', async (event) => { event.preventDefault(); await ready; command(input?.value ?? ''); if (input) input.value = ''; });
+  }
+</script>
