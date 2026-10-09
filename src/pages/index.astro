@@ -61,6 +61,8 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
               <h1>Things I have<br /><em>built or touched.</em></h1>
               <p class="window-intro">A personal archive of physical systems, software, and the businesses that taught me to keep things running.</p>
             </div>
+            <div class="featured-strip"><span class="mono">FEATURED SYSTEMS / OPEN ON ARRIVAL</span><button type="button" data-window-open="waybionic">INITIALIZE 3D ARM ↗</button><button type="button" data-window-open="rosgraph">VIEW ROS2 GRAPH ↗</button><button type="button" data-window-open="blackbox">RUN CHAIN DEMO ↗</button></div>
+            <StaleStateLab />
             <div class="project-grid">
               {projects.map((project, projectIndex) => (
                 <article class="file-card">
@@ -88,7 +90,6 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
               <figure><img src="/assets/waybionic/engineer-monitor-fault.png" alt="WayBionic Engineering Monitor showing a mock fault state." loading="lazy" /><figcaption class="mono">MOCK FAULT / STALE STATE</figcaption></figure>
             </div>
             <WayBionic3D />
-            <StaleStateLab />
             <MockDiagram kind="waybionic" title="WayBionic control loop" />
             <div class="joint-panel"><WayBionicDiagram /></div>
             <div class="window-actions"><a href="https://github.com/Waybionic/waybionic_ground_station" target="_blank" rel="noreferrer">OPEN REPOSITORY ↗</a><a href="https://drive.google.com/file/d/1WWgNoo82JjGdWspCLcINrK6-YqnF9omR/view?usp=sharing" target="_blank" rel="noreferrer">ARM VIDEO ↗</a></div>

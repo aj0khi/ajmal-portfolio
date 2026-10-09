@@ -1269,6 +1269,38 @@ body::before {
   font: 1rem/1.5 Georgia, serif;
 }
 
+.featured-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  align-items: center;
+  margin-top: 1.2rem;
+  padding: 0.65rem;
+  border: 1px solid #cd752a;
+  background: #f8e9c8;
+}
+
+.featured-strip > span {
+  flex: 1 0 100%;
+  color: #9a3e32;
+  font-size: 0.55rem;
+}
+
+.featured-strip button {
+  padding: 0.5rem 0.6rem;
+  border: 1px solid #496375;
+  color: #183f52;
+  background: #f7f1d6;
+  font: 700 0.55rem var(--mono);
+  cursor: pointer;
+}
+
+.featured-strip button:hover,
+.featured-strip button:focus-visible {
+  color: #fff;
+  background: #9a3e32;
+}
+
 .waybionic-3d {
   margin-top: 1.4rem;
   padding: 0.9rem;
