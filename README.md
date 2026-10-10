@@ -20,7 +20,7 @@ npm run build
 
 The deployable static site is generated in `dist/`.
 
-The full WayBionic arm demo video is intentionally excluded from GitHub because it exceeds GitHub's 100 MB file limit. Upload `public/assets/waybionic/arm-demo.mov` directly to the matching Hostinger `dist/assets/waybionic/` path after deployment; the Drive fallback remains available.
+The original WayBionic arm video was compressed to `public/assets/waybionic/arm-demo.mp4` for web delivery and remains under GitHub's file limit. The Media Player keeps the Drive fallback available.
 
 ## Hosting
 
