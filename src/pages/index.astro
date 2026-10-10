@@ -199,8 +199,8 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
           <DesktopWindow id="media" title="MEDIA PLAYER / WAYBIONIC" icon="▶" class="window-media">
             <div class="window-kicker mono">MEDIA ARCHIVE / EXTERNAL VIDEO</div>
             <h2>The arm<br /><em>actually moves.</em></h2>
-            <a class="media-placeholder" href="https://drive.google.com/file/d/1WWgNoo82JjGdWspCLcINrK6-YqnF9omR/view?usp=sharing" target="_blank" rel="noreferrer"><span>▶</span><strong>WAYBIONIC ARM / LATEST DEMO</strong><small>Play video in a new tab. Drive does not allow reliable embedded playback here.</small></a>
-            <div class="window-actions"><a href="https://drive.google.com/file/d/1WWgNoo82JjGdWspCLcINrK6-YqnF9omR/view?usp=sharing" target="_blank" rel="noreferrer">OPEN ARM VIDEO ↗</a></div>
+            <video class="arm-video" controls playsinline preload="metadata" poster="/assets/waybionic/engineer-monitor-normal.png"><source src="/assets/waybionic/arm-demo.mov" type="video/quicktime" />Your browser cannot play this MOV file. Use the Drive fallback below.</video>
+            <div class="window-actions"><a href="/assets/waybionic/arm-demo.mov" download>DOWNLOAD ARM DEMO ↘</a><a href="https://drive.google.com/file/d/1WWgNoo82JjGdWspCLcINrK6-YqnF9omR/view?usp=sharing" target="_blank" rel="noreferrer">OPEN DRIVE FALLBACK ↗</a></div>
           </DesktopWindow>
 
           <DesktopWindow id="restore" title="SYSTEM RESTORE / AJMALOS" icon="↶" class="window-restore">

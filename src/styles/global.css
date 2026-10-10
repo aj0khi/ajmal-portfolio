@@ -1995,6 +1995,15 @@ body::before {
   font: 0.85rem/1.4 Georgia, serif;
 }
 
+.arm-video {
+  display: block;
+  width: 100%;
+  max-height: 26rem;
+  margin-top: 1.5rem;
+  border: 1px solid #183f52;
+  background: #202d2b;
+}
+
 .stale-lab {
   margin-top: 1.25rem;
   padding: 0.9rem;
