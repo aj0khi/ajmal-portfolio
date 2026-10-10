@@ -929,7 +929,7 @@ body::before {
 }
 
 .boot-sequence strong {
-  color: #e5c86e;
+  color: #a6b989;
   font: 700 clamp(1.5rem, 5vw, 3.2rem) var(--mono);
   letter-spacing: 0.16em;
 }
@@ -944,7 +944,7 @@ body::before {
   width: min(14rem, 45vw);
   height: 0.35rem;
   margin: 0.4rem auto 0;
-  background: linear-gradient(90deg, #cd752a 70%, #53645b 70%);
+  background: linear-gradient(90deg, #4a97aa 70%, #53645b 70%);
 }
 
 @keyframes boot-fade {
@@ -1168,7 +1168,7 @@ body::before {
 .window-controls button:hover,
 .window-controls button:focus-visible {
   color: white;
-  background: #9a3e32;
+  background: #2f6f86;
 }
 
 .window-content {
@@ -1221,7 +1221,7 @@ body::before {
 .window-kicker,
 .file-tags,
 .file-card-top {
-  color: #9a3e32;
+  color: #2f6f86;
   font-size: 0.58rem;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -1238,7 +1238,7 @@ body::before {
 
 .explorer-heading h1 em,
 .window-content h2 em {
-  color: #b05236;
+  color: #2f6f86;
   font-style: normal;
 }
 
@@ -1256,13 +1256,13 @@ body::before {
   align-items: center;
   margin-top: 1.2rem;
   padding: 0.65rem;
-  border: 1px solid #cd752a;
-  background: #f8e9c8;
+  border: 1px solid #4a97aa;
+  background: #d7e6e5;
 }
 
 .featured-strip > span {
   flex: 1 0 100%;
-  color: #9a3e32;
+  color: #2f6f86;
   font-size: 0.55rem;
 }
 
@@ -1278,7 +1278,7 @@ body::before {
 .featured-strip button:hover,
 .featured-strip button:focus-visible {
   color: #fff;
-  background: #9a3e32;
+  background: #2f6f86;
 }
 
 .waybionic-3d {
@@ -1302,15 +1302,15 @@ body::before {
 }
 
 .ik-header h3 em {
-  color: #b05236;
+  color: #2f6f86;
   font-style: normal;
 }
 
 .ik-start {
   flex: 0 0 auto;
   padding: 0.6rem 0.7rem;
-  border: 1px solid #9a3e32;
-  color: #9a3e32;
+  border: 1px solid #2f6f86;
+  color: #2f6f86;
   background: #f7f1d6;
   font: 700 0.58rem var(--mono);
   cursor: pointer;
@@ -1319,7 +1319,7 @@ body::before {
 .ik-start:hover,
 .ik-start:focus-visible {
   color: #fff;
-  background: #9a3e32;
+  background: #2f6f86;
 }
 
 .ik-start:disabled {
@@ -1364,7 +1364,7 @@ body::before {
 }
 
 .ik-readout span {
-  color: #e5c86e;
+  color: #a6b989;
   font-size: 0.48rem;
 }
 
@@ -1398,7 +1398,7 @@ body::before {
 }
 
 .diagram-signal {
-  color: #9a3e32;
+  color: #2f6f86;
   font: 700 0.55rem var(--mono);
 }
 
@@ -1449,19 +1449,19 @@ body::before {
 }
 
 .diagram-node-accent {
-  border-color: #cd752a;
-  background: #f8e9c8;
+  border-color: #4a97aa;
+  background: #d7e6e5;
 }
 
 .diagram-node-alert {
-  border-color: #9a3e32;
+  border-color: #2f6f86;
   background: #f3d9cb;
 }
 
 .diagram-flow > b,
 .diagram-rover-grid > b,
 .diagram-stack > b {
-  color: #cd752a;
+  color: #4a97aa;
   font: 700 1rem var(--mono);
 }
 
@@ -1543,7 +1543,7 @@ body::before {
 .file-contribution strong {
   display: block;
   margin-bottom: 0.3rem;
-  color: #9a3e32;
+  color: #2f6f86;
   font: 700 0.55rem var(--mono);
   letter-spacing: 0.08em;
 }
@@ -1553,7 +1553,7 @@ body::before {
 .resume-download {
   display: inline-block;
   margin-top: 1rem;
-  color: #9a3e32;
+  color: #2f6f86;
   font: 700 0.62rem var(--mono);
   text-decoration: none;
 }
@@ -1718,7 +1718,7 @@ body::before {
 
 .waybionic-proof-grid figcaption {
   margin-top: 0.4rem;
-  color: #9a3e32;
+  color: #2f6f86;
   font-size: 0.55rem;
 }
 
@@ -1766,7 +1766,7 @@ body::before {
 
 .blackbox-layers strong {
   grid-row: span 2;
-  color: #9a3e32;
+  color: #2f6f86;
   font: 700 0.7rem var(--mono);
 }
 
@@ -1787,7 +1787,7 @@ body::before {
   margin-top: 1.5rem;
   padding-top: 0.8rem;
   border-top: 1px solid #b7b8ab;
-  color: #9a3e32;
+  color: #2f6f86;
   font-size: 0.58rem;
 }
 
@@ -1797,14 +1797,14 @@ body::before {
   justify-content: space-around;
   margin-top: 2rem;
   padding: 1.25rem;
-  border: 1px dashed #9a3e32;
+  border: 1px dashed #2f6f86;
   color: #182d4f;
   font: 700 0.68rem var(--mono);
   text-align: center;
 }
 
 .rover-diagram b {
-  color: #9a3e32;
+  color: #2f6f86;
   font-size: 1.3rem;
 }
 
@@ -1837,7 +1837,7 @@ body::before {
 .system-grid strong,
 .skills-explorer strong,
 .timeline time {
-  color: #9a3e32;
+  color: #2f6f86;
   font: 700 0.58rem var(--mono);
   letter-spacing: 0.07em;
 }
@@ -1895,7 +1895,7 @@ body::before {
 }
 
 .research-grid strong {
-  color: #9a3e32;
+  color: #2f6f86;
   font: 700 0.58rem var(--mono);
   letter-spacing: 0.07em;
 }
@@ -1921,7 +1921,7 @@ body::before {
 }
 
 .notes-list time {
-  color: #9a3e32;
+  color: #2f6f86;
   font: 700 0.58rem var(--mono);
 }
 
@@ -1950,7 +1950,7 @@ body::before {
 }
 
 .terminal-screen span {
-  color: #e6c66b;
+  color: #a6b989;
 }
 
 .terminal-screen .terminal-ok {
@@ -1958,7 +1958,7 @@ body::before {
 }
 
 .terminal-screen b {
-  color: #e6c66b;
+  color: #a6b989;
 }
 
 .media-placeholder {
@@ -1967,7 +1967,7 @@ body::before {
   gap: 0.75rem;
   margin-top: 1.5rem;
   padding: 2rem 1rem;
-  border: 1px dashed #9a3e32;
+  border: 1px dashed #2f6f86;
   color: #183f52;
   background: linear-gradient(135deg, #d4e6e8, #f7f1d6);
   text-align: center;
@@ -1981,7 +1981,7 @@ body::before {
   place-items: center;
   border-radius: 50%;
   color: #f7f1d6;
-  background: #cd752a;
+  background: #4a97aa;
   font-size: 1.5rem;
 }
 
@@ -2024,7 +2024,7 @@ body::before {
 }
 
 .stale-lab h3 em {
-  color: #b05236;
+  color: #2f6f86;
   font-style: normal;
 }
 
@@ -2046,7 +2046,7 @@ body::before {
 .stale-controls button:hover,
 .stale-controls button:focus-visible {
   color: #fff;
-  background: #9a3e32;
+  background: #2f6f86;
 }
 
 .stale-row {
@@ -2069,7 +2069,7 @@ body::before {
 
 .stale-lab[data-lab-state="stale"] .stale-row strong,
 .stale-lab[data-lab-state="future"] .stale-row strong {
-  color: #9a3e32;
+  color: #2f6f86;
 }
 
 .stale-lab-note {
@@ -2081,14 +2081,14 @@ body::before {
 .system-restore input[type='range'] {
   width: 100%;
   margin-top: 2rem;
-  accent-color: #cd752a;
+  accent-color: #4a97aa;
 }
 
 .restore-scale {
   display: flex;
   justify-content: space-between;
   gap: 0.4rem;
-  color: #9a3e32;
+  color: #2f6f86;
   font-size: 0.52rem;
 }
 
@@ -2123,7 +2123,7 @@ body::before {
 
 .hvac-simulator h2 em,
 .blackbox-demo h2 em {
-  color: #b05236;
+  color: #2f6f86;
   font-style: normal;
 }
 
@@ -2137,7 +2137,7 @@ body::before {
 .hvac-fields label {
   display: grid;
   gap: 0.35rem;
-  color: #9a3e32;
+  color: #2f6f86;
   font: 700 0.58rem var(--mono);
 }
 
@@ -2156,12 +2156,12 @@ body::before {
   gap: 0.4rem;
   margin-top: 1.5rem;
   padding: 1.1rem;
-  border: 1px solid #cd752a;
-  background: #f8e9c8;
+  border: 1px solid #4a97aa;
+  background: #d7e6e5;
 }
 
 .hvac-output span {
-  color: #9a3e32;
+  color: #2f6f86;
   font-size: 0.58rem;
 }
 
@@ -2191,7 +2191,7 @@ body::before {
 }
 
 .chain-records span {
-  color: #9a3e32;
+  color: #2f6f86;
   font-size: 0.55rem;
 }
 
@@ -2230,7 +2230,7 @@ body::before {
 .chain-actions button:hover,
 .chain-actions button:focus-visible {
   color: #fff;
-  background: #9a3e32;
+  background: #2f6f86;
 }
 
 .chain-actions strong {
@@ -2239,7 +2239,7 @@ body::before {
 }
 
 .blackbox-demo[data-state="mutated"] .chain-actions strong {
-  color: #9a3e32;
+  color: #2f6f86;
 }
 
 .ros-graph h2,
@@ -2251,7 +2251,7 @@ body::before {
 
 .ros-graph h2 em,
 .system-monitor h2 em {
-  color: #b05236;
+  color: #2f6f86;
   font-style: normal;
 }
 
@@ -2270,7 +2270,7 @@ body::before {
 
 .ros-canvas path {
   fill: none;
-  stroke: #cd752a;
+  stroke: #4a97aa;
   stroke-dasharray: 5 5;
   stroke-width: 2;
 }
@@ -2301,7 +2301,7 @@ body::before {
 
 .ros-stream span:first-child,
 .ros-stream strong {
-  color: #e5c86e;
+  color: #a6b989;
 }
 
 .ros-stream span:last-child {
@@ -2327,7 +2327,7 @@ body::before {
 }
 
 .monitor-grid span {
-  color: #9a3e32;
+  color: #2f6f86;
   font: 700 0.55rem var(--mono);
 }
 
@@ -2346,7 +2346,7 @@ body::before {
 
 .old-arm-panel h2 em,
 .virtual-fs h2 em {
-  color: #b05236;
+  color: #2f6f86;
   font-style: normal;
 }
 
@@ -2373,12 +2373,12 @@ body::before {
 }
 
 .old-arm-joints span {
-  color: #9a3e32;
+  color: #2f6f86;
   font: 0.55rem var(--mono);
 }
 
 .old-arm-joints input {
-  accent-color: #cd752a;
+  accent-color: #4a97aa;
 }
 
 .vfs-output {
@@ -2396,7 +2396,7 @@ body::before {
   gap: 0.5rem;
   align-items: center;
   margin-top: 0.6rem;
-  color: #9a3e32;
+  color: #2f6f86;
 }
 
 .vfs-form input {
@@ -2418,7 +2418,7 @@ body::before {
 }
 
 .profile-switcher > span {
-  color: #9a3e32;
+  color: #2f6f86;
   font-size: 0.55rem;
 }
 
@@ -2434,7 +2434,7 @@ body::before {
 .profile-switcher button:hover,
 .profile-switcher button:focus-visible {
   color: #fff;
-  background: #9a3e32;
+  background: #2f6f86;
 }
 
 [data-desktop][data-profile='night'] .desktop-wallpaper {
@@ -2534,8 +2534,8 @@ body::before {
 .tour-card button {
   margin: 0.8rem 0.45rem 0 0;
   padding: 0.55rem 0.7rem;
-  border: 1px solid #9a3e32;
-  color: #9a3e32;
+  border: 1px solid #2f6f86;
+  color: #2f6f86;
   background: #f7f1d6;
   font: 700 0.58rem var(--mono);
   cursor: pointer;
@@ -2544,7 +2544,7 @@ body::before {
 .tour-card button:hover,
 .tour-card button:focus-visible {
   color: #fff;
-  background: #9a3e32;
+  background: #2f6f86;
 }
 
 .media-placeholder:hover,
@@ -2576,7 +2576,7 @@ body::before {
 }
 
 .games-list strong {
-  color: #9a3e32;
+  color: #2f6f86;
   font: 700 0.68rem var(--mono);
 }
 
@@ -2655,7 +2655,7 @@ body::before {
 }
 
 .browser-tab.active {
-  color: #9a3e32;
+  color: #2f6f86;
   background: #f1eee2;
 }
 
@@ -2715,8 +2715,8 @@ body::before {
 
 .browser-links button {
   padding: 0.65rem 0.8rem;
-  border: 1px solid #9a3e32;
-  color: #9a3e32;
+  border: 1px solid #2f6f86;
+  color: #2f6f86;
   background: #f8f6ed;
   font: 700 0.65rem var(--mono);
   cursor: pointer;
@@ -2725,7 +2725,7 @@ body::before {
 .browser-links button:hover,
 .browser-links button:focus-visible {
   color: #fff;
-  background: #9a3e32;
+  background: #2f6f86;
 }
 
 .window-browser iframe {
@@ -2743,7 +2743,7 @@ body::before {
 
 .resume-download {
   padding: 0.7rem 0.8rem;
-  border: 1px solid #9a3e32;
+  border: 1px solid #2f6f86;
 }
 
 .taskbar {
@@ -2870,7 +2870,7 @@ body::before {
 }
 
 .calendar-weekdays {
-  color: #9a3e32;
+  color: #2f6f86;
   font-size: 0.52rem;
 }
 
@@ -2885,7 +2885,7 @@ body::before {
 .calendar-grid span.today {
   border-radius: 50%;
   color: #fff;
-  background: #9a3e32;
+  background: #2f6f86;
 }
 
 .calendar-footer {
