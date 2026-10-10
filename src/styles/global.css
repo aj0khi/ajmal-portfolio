@@ -2692,9 +2692,9 @@ body::before {
 
 .taskbar {
   position: absolute;
-  right: 0.35rem;
-  bottom: 0.2rem;
-  left: 0.35rem;
+  right: 0;
+  bottom: 0;
+  left: 0;
   z-index: 25;
   display: flex;
   align-items: center;

@@ -466,9 +466,9 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
       if (browserInput?.value) loadBrowserUrl(browserInput.value);
     });
     desktop.querySelectorAll<HTMLButtonElement>('[data-browser-link]').forEach((link) => link.addEventListener('click', () => loadBrowserUrl(link.dataset.browserLink ?? '')));
-    desktop.querySelector('[data-browser-back]')?.addEventListener('click', () => { if (browserIndex > 0) { browserIndex -= 1; loadBrowserUrl(browserHistory[browserIndex], false); } });
-    desktop.querySelector('[data-browser-forward]')?.addEventListener('click', () => { if (browserIndex < browserHistory.length - 1) { browserIndex += 1; loadBrowserUrl(browserHistory[browserIndex], false); } });
-    desktop.querySelector('[data-browser-refresh]')?.addEventListener('click', () => { if (browserInput?.value) loadBrowserUrl(browserInput.value); });
+    desktop.querySelector('[data-browser-back]')?.addEventListener('click', () => { if (browserIndex > 0) { browserIndex -= 1; loadBrowserUrl(browserHistory[browserIndex], false, false); } });
+    desktop.querySelector('[data-browser-forward]')?.addEventListener('click', () => { if (browserIndex < browserHistory.length - 1) { browserIndex += 1; loadBrowserUrl(browserHistory[browserIndex], false, false); } });
+    desktop.querySelector('[data-browser-refresh]')?.addEventListener('click', () => { if (browserInput?.value) loadBrowserUrl(browserInput.value, false, false); });
     desktop.querySelector('[data-browser-external]')?.addEventListener('click', () => { if (browserInput?.value) window.open(resolveBrowserInput(browserInput.value), '_blank', 'noopener,noreferrer'); });
 
     const palette = desktop.querySelector<HTMLElement>('[data-command-palette]');
