@@ -10,6 +10,6 @@ const { window: windowId, icon, label, src } = Astro.props;
 ---
 
 <button class="desktop-icon" type="button" data-window-open={windowId}>
-  <span class="desktop-icon-art" aria-hidden="true">{src ? <img src={src} alt="" /> : icon}</span>
+  <span class={`desktop-icon-art ${src ? 'desktop-icon-image' : ''}`} aria-hidden="true">{src ? <img src={src} alt="" /> : icon}</span>
   <span>{label}</span>
 </button>

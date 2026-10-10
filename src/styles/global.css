@@ -1088,6 +1088,12 @@ body::before {
   object-fit: contain;
 }
 
+.desktop-icon-image {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
 @media (min-width: 701px) {
   .desktop-icons {
     grid-template-columns: repeat(4, 4.7rem);
