@@ -261,8 +261,14 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
           <footer class="taskbar">
             <button class="start-button" type="button" data-start-toggle>START</button>
             <div class="taskbar-windows" data-taskbar></div>
-            <div class="system-tray mono"><span title="Network">◉</span><span title="Volume">◖))</span><span title="Battery">▰</span><span title="System">▣</span><span data-clock>00:00</span></div>
+            <div class="system-tray mono"><span title="Network">◉</span><span title="Volume">◖))</span><span title="Battery">▰</span><span title="System">▣</span><button type="button" data-clock-toggle data-clock>00:00</button></div>
           </footer>
+          <aside class="calendar-popup" data-calendar hidden>
+            <div class="calendar-head"><strong data-calendar-month>MONTH YEAR</strong><button type="button" data-calendar-close aria-label="Close calendar">×</button></div>
+            <div class="calendar-weekdays mono"><span>SU</span><span>MO</span><span>TU</span><span>WE</span><span>TH</span><span>FR</span><span>SA</span></div>
+            <div class="calendar-grid" data-calendar-grid></div>
+            <p class="calendar-footer mono" data-calendar-footer></p>
+          </aside>
         </div>
       </div>
       <div class="monitor-led" aria-label="Monitor status"><span></span> POWER / ONLINE</div>
@@ -394,7 +400,32 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
       if (!startMenu.contains(target) && target !== startToggle) startMenu.hidden = true;
     });
 
-    const clock = desktop.querySelector('[data-clock]');
+    const clock = desktop.querySelector<HTMLButtonElement>('[data-clock]');
+    const calendar = desktop.querySelector<HTMLElement>('[data-calendar]');
+    const calendarGrid = desktop.querySelector<HTMLElement>('[data-calendar-grid]');
+    const calendarMonth = desktop.querySelector<HTMLElement>('[data-calendar-month]');
+    const calendarFooter = desktop.querySelector<HTMLElement>('[data-calendar-footer]');
+    const renderCalendar = () => {
+      if (!calendarGrid || !calendarMonth || !calendarFooter) return;
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = today.getMonth();
+      const firstDay = new Date(year, month, 1).getDay();
+      const days = new Date(year, month + 1, 0).getDate();
+      calendarMonth.textContent = today.toLocaleDateString([], { month: 'long', year: 'numeric' }).toUpperCase();
+      calendarFooter.textContent = `${Intl.DateTimeFormat().resolvedOptions().timeZone} / ${today.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' })}`;
+      calendarGrid.innerHTML = '';
+      for (let blank = 0; blank < firstDay; blank += 1) calendarGrid.append(document.createElement('span'));
+      for (let day = 1; day <= days; day += 1) {
+        const cell = document.createElement('span');
+        cell.textContent = String(day);
+        if (day === today.getDate()) cell.classList.add('today');
+        calendarGrid.append(cell);
+      }
+    };
+    renderCalendar();
+    clock?.addEventListener('click', () => { if (calendar) calendar.hidden = !calendar.hidden; });
+    desktop.querySelector('[data-calendar-close]')?.addEventListener('click', () => { if (calendar) calendar.hidden = true; });
     const updateClock = () => {
       if (clock) clock.textContent = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     };
@@ -443,6 +474,12 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
       return `https://${value}`;
     };
     const loadBrowserUrl = (input: string, addHistory = true, openExternally = true) => {
+      const internal = input.trim().match(/^ajmalos:\/\/?([a-z0-9-]+)/i)?.[1];
+      if (internal && desktop.querySelector(`[data-window="${internal}"]`)) {
+        focusWindow(internal);
+        if (browserInput) browserInput.value = `ajmalos://${internal}`;
+        return;
+      }
       const url = resolveBrowserInput(input);
       const proxiedHost = /(^|\.)google\.[^/]+|(^|\.)youtube\.com|(^|\.)linkedin\.com/i.test(url);
       if (addHistory) {
@@ -504,6 +541,13 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
         }
       }
       if (event.key === 'Escape' && palette) palette.hidden = true;
+      if (event.altKey && ['ArrowLeft', 'ArrowRight'].includes(event.key)) {
+        const focusedWindow = [...windows].sort((left, right) => Number(right.style.zIndex || 0) - Number(left.style.zIndex || 0))[0];
+        if (focusedWindow) {
+          focusedWindow.classList.remove('is-snapped-left', 'is-snapped-right');
+          focusedWindow.classList.add(event.key === 'ArrowLeft' ? 'is-snapped-left' : 'is-snapped-right');
+        }
+      }
     });
     const tourOverlay = desktop.querySelector<HTMLElement>('[data-tour-overlay]');
     const tourTitle = desktop.querySelector<HTMLElement>('[data-tour-title]');
