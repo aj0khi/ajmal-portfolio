@@ -1236,6 +1236,21 @@ body::before {
   line-height: 0.92;
 }
 
+.window-portfolio .explorer-heading h1 {
+  max-width: 12ch;
+  margin: 0.65rem 0 0.8rem;
+  font-size: clamp(2.4rem, 4vw, 3.8rem);
+}
+
+.window-portfolio .window-intro {
+  max-width: 34rem;
+  font-size: 0.92rem;
+}
+
+.window-portfolio .featured-strip {
+  margin-top: 0.9rem;
+}
+
 .explorer-heading h1 em,
 .window-content h2 em {
   color: #2f6f86;
