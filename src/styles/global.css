@@ -2628,10 +2628,40 @@ body::before {
 .browser-toolbar {
   display: flex;
   gap: 0.3rem;
-  margin: -2rem -2rem 1rem;
+  margin: 0 -2rem 1rem;
   padding: 0.4rem;
   border-bottom: 1px solid #b7b8ab;
   background: #d8d8ca;
+}
+
+.browser-tabs {
+  display: flex;
+  gap: 0.25rem;
+  margin: -2rem -2rem 0;
+  padding: 0.35rem 0.4rem 0;
+  background: #b9bcc3;
+}
+
+.browser-tab,
+.browser-new-tab {
+  min-height: 1.7rem;
+  padding: 0.35rem 0.7rem;
+  border: 1px solid #8d929a;
+  border-bottom: 0;
+  color: #182d4f;
+  background: #d8d8ca;
+  font: 700 0.58rem var(--mono);
+  cursor: pointer;
+}
+
+.browser-tab.active {
+  color: #9a3e32;
+  background: #f1eee2;
+}
+
+.browser-new-tab {
+  min-width: 1.8rem;
+  padding-inline: 0.4rem;
 }
 
 .browser-toolbar > button,

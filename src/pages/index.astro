@@ -226,8 +226,9 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
           </DesktopWindow>
 
           <DesktopWindow id="browser" title="AJMAL BROWSER" icon="⌕" class="window-browser">
+            <div class="browser-tabs"><button type="button" class="browser-tab active" data-browser-tab>AJMAL SEARCH</button><button type="button" class="browser-new-tab" data-browser-new aria-label="New browser tab">+</button></div>
             <div class="browser-toolbar">
-              <button type="button" data-browser-back aria-label="Back">◀</button><button type="button" data-browser-forward aria-label="Forward">▶</button><button type="button" data-browser-refresh aria-label="Refresh">↻</button>
+              <button type="button" data-browser-home-button aria-label="Home">⌂</button><button type="button" data-browser-back aria-label="Back">◀</button><button type="button" data-browser-forward aria-label="Forward">▶</button><button type="button" data-browser-refresh aria-label="Refresh">↻</button>
               <form data-browser-form><input data-browser-input value="https://github.com/aj0khi" placeholder="Search or enter address" aria-label="Browser address or search" /><button type="submit">GO</button></form><button type="button" data-browser-external aria-label="Open current page in a new tab">↗</button>
             </div>
             <div class="browser-home" data-browser-home><p class="window-kicker mono">AJMAL BROWSER / QUICK LINKS</p><h2>Open a useful<br /><em>window to the web.</em></h2><div class="browser-links"><button type="button" data-browser-link="https://github.com/aj0khi">GitHub / aj0khi</button><button type="button" data-browser-link="https://calgaryhvacexpress.ca/">HVAC Express</button><button type="button" data-browser-link="https://www.linkedin.com/in/ajmal-khidri/">LinkedIn</button></div><p class="window-note mono">Searches and external pages open in a real browser tab when a site blocks embedded viewing.</p></div>
@@ -465,6 +466,8 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
     const browserResult = desktop.querySelector<HTMLElement>('[data-browser-result]');
     const browserResultTitle = desktop.querySelector<HTMLElement>('[data-browser-result-title]');
     const browserResultLink = desktop.querySelector<HTMLAnchorElement>('[data-browser-result-link]');
+    const browserHomeButton = desktop.querySelector('[data-browser-home-button]');
+    const browserNewTab = desktop.querySelector<HTMLButtonElement>('[data-browser-new]');
     const browserHistory: string[] = [];
     let browserIndex = -1;
     const resolveBrowserInput = (input: string) => {
@@ -502,6 +505,16 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
       event.preventDefault();
       if (browserInput?.value) loadBrowserUrl(browserInput.value);
     });
+    const resetBrowser = () => {
+      browserHistory.length = 0;
+      browserIndex = -1;
+      if (browserInput) browserInput.value = '';
+      if (browserFrame) browserFrame.hidden = true;
+      if (browserHome) browserHome.hidden = false;
+      if (browserResult) browserResult.hidden = true;
+    };
+    browserHomeButton?.addEventListener('click', resetBrowser);
+    browserNewTab?.addEventListener('click', resetBrowser);
     desktop.querySelectorAll<HTMLButtonElement>('[data-browser-link]').forEach((link) => link.addEventListener('click', () => loadBrowserUrl(link.dataset.browserLink ?? '')));
     desktop.querySelector('[data-browser-back]')?.addEventListener('click', () => { if (browserIndex > 0) { browserIndex -= 1; loadBrowserUrl(browserHistory[browserIndex], false, false); } });
     desktop.querySelector('[data-browser-forward]')?.addEventListener('click', () => { if (browserIndex < browserHistory.length - 1) { browserIndex += 1; loadBrowserUrl(browserHistory[browserIndex], false, false); } });
