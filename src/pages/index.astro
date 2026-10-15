@@ -303,6 +303,8 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
       desktop.querySelectorAll('[data-task-window]').forEach((item) => {
         if (item.getAttribute('data-task-window') !== id) item.classList.remove('active');
       });
+      const openCalendar = desktop.querySelector<HTMLElement>('[data-calendar]');
+      if (openCalendar) openCalendar.hidden = true;
     };
 
     const toggleMaximize = (windowElement: HTMLElement) => {
@@ -533,10 +535,23 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
       if (!paletteResults) return;
       const query = paletteInput?.value.toLowerCase() ?? '';
       paletteResults.innerHTML = '';
-      windows.forEach((item) => {
+      const matches = [...windows].filter((item) => {
         const id = item.dataset.window ?? '';
         const title = item.querySelector('.window-title')?.textContent?.trim() ?? id;
-        if (!query || `${id} ${title}`.toLowerCase().includes(query)) {
+        return !query || `${id} ${title}`.toLowerCase().includes(query);
+      }).sort((left, right) => {
+        const leftText = `${left.dataset.window ?? ''} ${left.querySelector('.window-title')?.textContent?.trim() ?? ''}`.toLowerCase();
+        const rightText = `${right.dataset.window ?? ''} ${right.querySelector('.window-title')?.textContent?.trim() ?? ''}`.toLowerCase();
+        const leftTitle = left.querySelector('.window-title')?.textContent?.trim().toLowerCase() ?? '';
+        const rightTitle = right.querySelector('.window-title')?.textContent?.trim().toLowerCase() ?? '';
+        const leftExact = left.dataset.window === query || leftTitle.startsWith(query);
+        const rightExact = right.dataset.window === query || rightTitle.startsWith(query);
+        return Number(rightExact) - Number(leftExact) || leftText.localeCompare(rightText);
+      });
+      matches.forEach((item) => {
+        const id = item.dataset.window ?? '';
+        const title = item.querySelector('.window-title')?.textContent?.trim() ?? id;
+        {
           const button = document.createElement('button');
           button.type = 'button';
           button.textContent = `OPEN ${title}`;
