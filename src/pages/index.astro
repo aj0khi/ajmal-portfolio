@@ -286,6 +286,11 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
 
   if (desktop && taskbar && startMenu && startToggle) {
     const windows = desktop.querySelectorAll<HTMLElement>('[data-window]');
+    const portfolioWindow = desktop.querySelector<HTMLElement>('[data-window="portfolio"]');
+    if (portfolioWindow) {
+      portfolioWindow.hidden = false;
+      portfolioWindow.dataset.windowOpened = 'true';
+    }
     const focusWindow = (id: string) => {
       const target = desktop.querySelector<HTMLElement>(`[data-window="${id}"]`);
       if (!target) return;
