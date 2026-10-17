@@ -1238,6 +1238,8 @@ body {
 .world-layer .systems-world-stage { height: 100%; min-height: 0; border: 0; }
 .world-layer .systems-world-stage canvas { height: 100%; min-height: 0; }
 .world-layer .world-note { position: absolute; bottom: 3.4rem; left: 1rem; color: rgba(39, 123, 156, 0.88); text-shadow: 0 1px #ffffff; }
+.world-layer .world-note { display: none; }
+.world-layer .world-legend { bottom: 3.8rem; }
 [data-desktop][data-mode='world'] .desktop-icons { opacity: 0; pointer-events: none; }
 
 .world-legend {

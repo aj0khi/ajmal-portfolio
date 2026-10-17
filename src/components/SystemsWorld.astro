@@ -45,30 +45,30 @@
       try {
         const THREE = await import('three');
         const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x87d9ef);
-        scene.fog = new THREE.Fog(0x87d9ef, 7, 19);
-        const camera = new THREE.PerspectiveCamera(58, 1, 0.1, 30);
+        scene.background = new THREE.Color(0x74c4df);
+        scene.fog = new THREE.Fog(0x74c4df, 8, 21);
+        const camera = new THREE.PerspectiveCamera(58, 1, 0.1, 32);
         const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
         renderer.setPixelRatio(Math.min(devicePixelRatio, 1.35));
-        scene.add(new THREE.HemisphereLight(0xdff8ff, 0x102436, 1.8));
-        const keyLight = new THREE.DirectionalLight(0x68e0d5, 2.8);
+        scene.add(new THREE.HemisphereLight(0xf5ffff, 0x1d5b59, 1.45));
+        const keyLight = new THREE.DirectionalLight(0xffffff, 2.4);
         keyLight.position.set(-4, 8, 5);
         scene.add(keyLight);
-        const warmLight = new THREE.PointLight(0xd8ed77, 3, 9);
+        const warmLight = new THREE.PointLight(0xd8ed77, 2.2, 8);
         warmLight.position.set(0, 2.5, -2);
         scene.add(warmLight);
 
         const ground = new THREE.Mesh(
           new THREE.PlaneGeometry(18, 18),
-          new THREE.MeshStandardMaterial({ color: 0x6dbca4, roughness: 0.72, metalness: 0.12 })
+          new THREE.MeshStandardMaterial({ color: 0x348f79, roughness: 0.82, metalness: 0.08 })
         );
         ground.rotation.x = -Math.PI / 2;
         scene.add(ground);
-        const grid = new THREE.GridHelper(18, 18, 0x65aeb7, 0x9fe2d1);
+        const grid = new THREE.GridHelper(18, 18, 0x9ce1d0, 0x4b9b91);
         grid.position.y = 0.015;
         scene.add(grid);
 
-        const wallMaterial = new THREE.MeshStandardMaterial({ color: 0x71c9b0, roughness: 0.8 });
+        const wallMaterial = new THREE.MeshStandardMaterial({ color: 0x2d816f, roughness: 0.82 });
         const wallBack = new THREE.Mesh(new THREE.BoxGeometry(14, 2.2, 0.2), wallMaterial);
         wallBack.position.set(0, 1.1, -7);
         scene.add(wallBack);
@@ -77,17 +77,20 @@
         scene.add(wallLeft);
 
         const architecture = new THREE.Group();
-        const platformMaterial = new THREE.MeshStandardMaterial({ color: 0x9fe2d1, roughness: 0.62, metalness: 0.16 });
-        const trimMaterial = new THREE.MeshStandardMaterial({ color: 0xefffff, roughness: 0.3, metalness: 0.22 });
-        const addBox = (size: [number, number, number], position: [number, number, number], material = platformMaterial, rotation?: [number, number, number]) => {
+        const colliders: Array<{ minX: number; maxX: number; minZ: number; maxZ: number; top: number }> = [];
+        colliders.push({ minX: -7, maxX: 7, minZ: -7.2, maxZ: -6.7, top: 2.2 }, { minX: -7.2, maxX: -6.7, minZ: -7, maxZ: 7, top: 2.2 });
+        const platformMaterial = new THREE.MeshStandardMaterial({ color: 0x4ba794, roughness: 0.62, metalness: 0.16 });
+        const trimMaterial = new THREE.MeshStandardMaterial({ color: 0xe9fff1, roughness: 0.3, metalness: 0.22 });
+        const addBox = (size: [number, number, number], position: [number, number, number], material = platformMaterial, rotation?: [number, number, number], collidable = false) => {
           const box = new THREE.Mesh(new THREE.BoxGeometry(...size), material);
           box.position.set(...position);
           if (rotation) box.rotation.set(...rotation);
           architecture.add(box);
+          if (collidable && !rotation) colliders.push({ minX: position[0] - size[0] / 2, maxX: position[0] + size[0] / 2, minZ: position[2] - size[2] / 2, maxZ: position[2] + size[2] / 2, top: position[1] + size[1] / 2 });
           return box;
         };
         const addColumn = (x: number, z: number, height: number) => addBox([0.18, height, 0.18], [x, height / 2, z], trimMaterial);
-        addBox([5.2, 0.22, 1.7], [-2.2, 0.65, -2.9]);
+        addBox([5.2, 0.22, 1.7], [-2.2, 0.65, -2.9], platformMaterial, undefined, true);
         [-4.2, -2.2, -0.2].forEach((x) => addColumn(x, -2.9, 0.65));
         addBox([7.5, 0.2, 1], [0, 1.75, -0.45], trimMaterial);
         [-3.4, 0, 3.4].forEach((x) => { addColumn(x, -0.45, 1.75); addBox([0.6, 0.08, 1.15], [x, 1.92, -0.45], platformMaterial); });
@@ -200,17 +203,25 @@
         const observer = new ResizeObserver(resize);
         observer.observe(canvas.parentElement ?? canvas);
         let lastTime = performance.now();
+        const collides = (x: number, z: number) => colliders.some((collider) => x > collider.minX - 0.24 && x < collider.maxX + 0.24 && z > collider.minZ - 0.24 && z < collider.maxZ + 0.24 && player.position.y < collider.top + 0.65);
+        const movePlayer = (deltaX: number, deltaZ: number) => {
+          const nextX = Math.max(-5.8, Math.min(5.8, player.position.x + deltaX));
+          const nextZ = Math.max(-5.8, Math.min(5.8, player.position.z + deltaZ));
+          if (!collides(nextX, player.position.z)) player.position.x = nextX;
+          if (!collides(player.position.x, nextZ)) player.position.z = nextZ;
+        };
         const animate = () => {
           const now = performance.now();
           const delta = Math.min((now - lastTime) / 1000, 0.05);
           lastTime = now;
           const speed = (keys.shift ? 4.4 : 2.5) * delta;
-          if (keys.w || keys.arrowup) player.position.z -= speed;
-          if (keys.s || keys.arrowdown) player.position.z += speed;
-          if (keys.a || keys.arrowleft) player.position.x -= speed;
-          if (keys.d || keys.arrowright) player.position.x += speed;
-          player.position.x = Math.max(-5.8, Math.min(5.8, player.position.x));
-          player.position.z = Math.max(-5.8, Math.min(5.8, player.position.z));
+          let deltaX = 0;
+          let deltaZ = 0;
+          if (keys.w || keys.arrowup) deltaZ -= speed;
+          if (keys.s || keys.arrowdown) deltaZ += speed;
+          if (keys.a || keys.arrowleft) deltaX -= speed;
+          if (keys.d || keys.arrowright) deltaX += speed;
+          movePlayer(deltaX, deltaZ);
           verticalVelocity -= 12 * delta;
           player.position.y += verticalVelocity * delta;
           if (player.position.y <= 0) { player.position.y = 0; verticalVelocity = 0; grounded = true; }
