@@ -3887,6 +3887,61 @@ body { background: #09121b; }
   color: #087788;
 }
 
+.window-model-rail {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-height: 7.2rem;
+  overflow: hidden;
+  border-bottom: 1px solid #6eaaa9;
+  background: linear-gradient(110deg, #d7e8e1, #c3ded8 55%, #a7ced0);
+}
+
+.window-model-rail::before {
+  position: absolute;
+  top: 50%;
+  right: 8rem;
+  left: 1rem;
+  height: 1px;
+  content: '';
+  background: rgba(11, 120, 134, 0.35);
+  box-shadow: 0 0 1rem rgba(104, 224, 213, 0.45);
+}
+
+.window-model-rail .diagram-model {
+  position: relative;
+  top: auto;
+  right: auto;
+  width: 8.5rem;
+  height: 6rem;
+  margin-right: 1rem;
+  border-left: 1px solid rgba(11, 120, 134, 0.28);
+}
+
+.window-model-rail .diagram-model-label {
+  display: none;
+}
+
+.window-model-caption {
+  position: absolute;
+  bottom: 0.55rem;
+  left: 1rem;
+  color: #087788;
+  font-size: 0.45rem;
+  letter-spacing: 0.08em;
+}
+
+.window-model-rail + .window-content {
+  padding-top: 1.35rem;
+}
+
+@media (max-width: 700px) {
+  .window-model-rail { min-height: 5.7rem; }
+  .window-model-rail .diagram-model { width: 6.8rem; height: 4.8rem; margin-right: 0.55rem; }
+  .window-model-caption { left: 0.7rem; font-size: 0.4rem; }
+}
+
 .file-toolbar {
   letter-spacing: 0.04em;
   background: #d5e3de;

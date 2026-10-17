@@ -1,4 +1,6 @@
 ---
+import SystemModel from './SystemModel.astro';
+
 interface Props {
   id: string;
   title: string;
@@ -8,6 +10,13 @@ interface Props {
 }
 
 const { id, title, icon, class: className = '', open = false } = Astro.props;
+const modelByWindow: Record<string, 'waybionic' | 'blackbox' | 'rover' | 'hvac' | 'roadmap'> = {
+  portfolio: 'roadmap', waybionic: 'waybionic', blackbox: 'blackbox', rover: 'rover', resume: 'roadmap', about: 'roadmap',
+  browser: 'roadmap', calculator: 'blackbox', recycle: 'blackbox', games: 'roadmap', system: 'roadmap', work: 'roadmap',
+  skills: 'roadmap', research: 'blackbox', notes: 'roadmap', terminal: 'blackbox', media: 'waybionic', restore: 'blackbox',
+  hvacsim: 'hvac', rosgraph: 'waybionic', monitor: 'blackbox', oldarm: 'waybionic', filesystem: 'blackbox'
+};
+const model = modelByWindow[id];
 ---
 
 <section class={`os-window ${className}`} data-window={id} aria-label={`${title} window`} hidden={!open}>
@@ -19,6 +28,7 @@ const { id, title, icon, class: className = '', open = false } = Astro.props;
       <button type="button" data-window-close={id} aria-label={`Close ${title}`}>×</button>
     </span>
   </header>
+  {model ? <div class="window-model-rail"><SystemModel kind={model} /><span class="window-model-caption mono">CONCEPT MODEL / {model.toUpperCase()} / LIVE VIEW</span></div> : null}
   <div class="window-content">
     <slot />
   </div>

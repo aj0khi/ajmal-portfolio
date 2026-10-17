@@ -20,9 +20,11 @@ const { kind } = Astro.props;
       const host = canvas.closest<HTMLElement>('[data-system-model]');
       const kind = host?.dataset.systemModel;
       if (!host || !kind) return;
-      canvas.dataset.modelReady = 'true';
+      const ownerWindow = host.closest<HTMLElement>('[data-window]');
+      let started = false;
 
       const start = async () => {
+        canvas.dataset.modelReady = 'true';
         try {
           const THREE = await import('three');
           const scene = new THREE.Scene();
@@ -95,7 +97,16 @@ const { kind } = Astro.props;
           host.classList.add('model-fallback');
         }
       };
-      if ('requestIdleCallback' in window) requestIdleCallback(start); else setTimeout(start, 500);
+      const maybeStart = () => {
+        if (started || ownerWindow?.hidden || host.getClientRects().length === 0) return;
+        started = true;
+        if ('requestIdleCallback' in window) requestIdleCallback(start); else setTimeout(start, 500);
+      };
+      const visibilityObserver = new IntersectionObserver((entries) => { if (entries.some((entry) => entry.isIntersecting)) maybeStart(); });
+      visibilityObserver.observe(host);
+      const windowObserver = new MutationObserver(maybeStart);
+      if (ownerWindow) windowObserver.observe(ownerWindow, { attributes: true, attributeFilter: ['hidden'] });
+      maybeStart();
     });
   }
 </script>
