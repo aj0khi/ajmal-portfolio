@@ -1610,6 +1610,14 @@ body::before {
   width: min(70%, 800px);
 }
 
+.window-portfolio {
+  top: 5%;
+  left: 8%;
+  width: min(86%, 1080px);
+  height: min(86%, 770px);
+  max-height: 88%;
+}
+
 .window-blackbox {
   top: 13%;
   left: 22%;
