@@ -1210,11 +1210,72 @@ body {
 .world-prompt button:hover, .world-prompt button:focus-visible { color: #f0f6e9; background: #0b7886; }
 .world-note { margin: 0; color: #5f777d; font-size: 0.52rem; }
 
+.world-legend {
+  position: absolute;
+  bottom: 1rem;
+  left: 1rem;
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  gap: 0.35rem 0.75rem;
+  padding: 0.65rem;
+  border: 1px solid rgba(104, 224, 213, 0.45);
+  color: #b9d7d4;
+  background: rgba(11, 23, 34, 0.78);
+  font-size: 0.46rem;
+}
+
+.world-legend > span {
+  grid-column: 1 / -1;
+  color: #d8ed77;
+}
+
+.world-legend div {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.world-legend i {
+  display: block;
+  width: 0.38rem;
+  height: 0.38rem;
+  border-radius: 50%;
+  box-shadow: 0 0 0.45rem currentColor;
+}
+
+.legend-waybionic { color: #68e0d5; background: #68e0d5; }
+.legend-blackbox { color: #d8ed77; background: #d8ed77; }
+.legend-rover { color: #69bced; background: #69bced; }
+.legend-hvac { color: #ffb38b; background: #ffb38b; }
+.legend-profile { color: #f0f6e9; background: #f0f6e9; }
+
+.world-compass {
+  position: absolute;
+  top: 3.7rem;
+  right: 1rem;
+  display: grid;
+  justify-items: center;
+  gap: 0.15rem;
+  color: #d8ed77;
+  font-size: 0.45rem;
+}
+
+.world-compass b {
+  width: 1rem;
+  height: 1rem;
+  border: 1px solid #68e0d5;
+  border-radius: 50%;
+  box-shadow: 0 0 0.65rem rgba(104, 224, 213, 0.5);
+}
+
 @media (max-width: 700px) {
   .window-field { top: 16%; left: 5%; width: 90%; height: 74%; max-height: 74%; }
   .systems-world-stage, .systems-world-stage canvas { min-height: 23rem; }
   .world-hud { font-size: 0.43rem; }
   .world-hud-right span:first-child { display: none; }
+  .world-legend { grid-template-columns: 1fr; font-size: 0.42rem; }
+  .world-legend > span { grid-column: auto; }
+  .world-compass { top: 3rem; }
 }
 
 /* AjmalOS: the portfolio is presented as a small, personal workstation. */

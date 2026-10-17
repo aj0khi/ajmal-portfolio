@@ -12,6 +12,15 @@
       <p data-world-prompt-copy>Press E to inspect this system.</p>
       <button type="button" data-world-open>INSPECT SYSTEM ↗</button>
     </div>
+    <div class="world-legend">
+      <span class="mono">FIELD STATIONS</span>
+      <div><i class="legend-waybionic"></i>WAYBIONIC</div>
+      <div><i class="legend-blackbox"></i>BLACKBOX</div>
+      <div><i class="legend-rover"></i>ROVER</div>
+      <div><i class="legend-hvac"></i>HVAC LAB</div>
+      <div><i class="legend-profile"></i>ABOUT AJMAL</div>
+    </div>
+    <div class="world-compass mono" aria-hidden="true"><span>N</span><b></b><span>E</span></div>
   </div>
   <p class="world-note mono">A walkable archive of systems, experiments, and working notes. No account. No score. Just explore.</p>
 </section>
@@ -81,7 +90,7 @@
           { id: 'hvacsim', title: 'HVAC LAB', copy: 'Comfort calculation / practical delivery', position: [-4.2, 2.8], color: 0xffb38b, type: 'fan' },
           { id: 'system', title: 'ABOUT AJMAL', copy: 'Profile / resume / contact / next system', position: [4, 3], color: 0xd8ed77, type: 'profile' }
         ];
-        type Station = { position: InstanceType<typeof THREE.Vector3>; rotation: { y: number }; userData: typeof stationData[number] };
+        type Station = { position: InstanceType<typeof THREE.Vector3>; rotation: { y: number }; scale: { lerp: (target: InstanceType<typeof THREE.Vector3>, alpha: number) => void }; userData: typeof stationData[number] };
         const stations: Station[] = [];
         const stationMaterial = (color: number) => new THREE.MeshStandardMaterial({ color, emissive: color, emissiveIntensity: 0.24, roughness: 0.34, metalness: 0.28 });
         stationData.forEach((data) => {
@@ -154,7 +163,7 @@
           player.position.z = Math.max(-5.8, Math.min(5.8, player.position.z));
           camera.position.lerp(new THREE.Vector3(player.position.x, 5.2, player.position.z + 6.2), 0.08);
           camera.lookAt(player.position.x, 0.45, player.position.z - 1.2);
-          stations.forEach((station, index) => { station.rotation.y += delta * (index % 2 ? -0.18 : 0.24); station.position.y = Math.sin(performance.now() * 0.001 + index) * 0.035; });
+          stations.forEach((station, index) => { station.rotation.y += delta * (index % 2 ? -0.18 : 0.24); station.position.y = Math.sin(performance.now() * 0.001 + index) * 0.035; station.scale.lerp(new THREE.Vector3(station === selected ? 1.12 : 1, station === selected ? 1.12 : 1, station === selected ? 1.12 : 1), 0.12); });
           updateSelection();
           if (coordinates) coordinates.textContent = `SECTOR ${Math.round(player.position.x).toString().padStart(2, '0')} / ${Math.round(player.position.z).toString().padStart(2, '0')}`;
           renderer.render(scene, camera);
