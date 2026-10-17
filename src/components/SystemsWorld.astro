@@ -1,0 +1,170 @@
+<section class="systems-world" data-systems-world>
+  <div class="systems-world-stage">
+    <canvas data-world-canvas aria-label="Interactive 3D Systems Field"></canvas>
+    <div class="world-reticle" aria-hidden="true"></div>
+    <div class="world-hud mono">
+      <div><span>AJMALOS / FIELD MODE</span><strong data-world-status>WALK TO A STATION</strong></div>
+      <div class="world-hud-right"><span>WASD MOVE / E INSPECT</span><span data-world-coordinates>SECTOR 00 / 00</span></div>
+    </div>
+    <div class="world-prompt" data-world-prompt hidden>
+      <span class="mono" data-world-prompt-kicker>STATION DETECTED</span>
+      <strong data-world-prompt-title>PROJECT</strong>
+      <p data-world-prompt-copy>Press E to inspect this system.</p>
+      <button type="button" data-world-open>INSPECT SYSTEM ↗</button>
+    </div>
+  </div>
+  <p class="world-note mono">A walkable archive of systems, experiments, and working notes. No account. No score. Just explore.</p>
+</section>
+
+<script>
+  const world = document.querySelector<HTMLElement>('[data-systems-world]');
+  const canvas = world?.querySelector<HTMLCanvasElement>('[data-world-canvas]');
+  const status = world?.querySelector<HTMLElement>('[data-world-status]');
+  const coordinates = world?.querySelector<HTMLElement>('[data-world-coordinates]');
+  const prompt = world?.querySelector<HTMLElement>('[data-world-prompt]');
+  const promptTitle = world?.querySelector<HTMLElement>('[data-world-prompt-title]');
+  const promptCopy = world?.querySelector<HTMLElement>('[data-world-prompt-copy]');
+  const openButton = world?.querySelector<HTMLButtonElement>('[data-world-open]');
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (world && canvas && !world.dataset.initialized) {
+    world.dataset.initialized = 'true';
+    const launch = async () => {
+      try {
+        const THREE = await import('three');
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x0b1722);
+        scene.fog = new THREE.Fog(0x0b1722, 7, 19);
+        const camera = new THREE.PerspectiveCamera(58, 1, 0.1, 30);
+        const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+        renderer.setPixelRatio(Math.min(devicePixelRatio, 1.35));
+        scene.add(new THREE.HemisphereLight(0xdff8ff, 0x102436, 1.8));
+        const keyLight = new THREE.DirectionalLight(0x68e0d5, 2.8);
+        keyLight.position.set(-4, 8, 5);
+        scene.add(keyLight);
+        const warmLight = new THREE.PointLight(0xd8ed77, 3, 9);
+        warmLight.position.set(0, 2.5, -2);
+        scene.add(warmLight);
+
+        const ground = new THREE.Mesh(
+          new THREE.PlaneGeometry(18, 18),
+          new THREE.MeshStandardMaterial({ color: 0x122c3a, roughness: 0.72, metalness: 0.12 })
+        );
+        ground.rotation.x = -Math.PI / 2;
+        scene.add(ground);
+        const grid = new THREE.GridHelper(18, 18, 0x2b7780, 0x194653);
+        grid.position.y = 0.015;
+        scene.add(grid);
+
+        const wallMaterial = new THREE.MeshStandardMaterial({ color: 0x163947, roughness: 0.8 });
+        const wallBack = new THREE.Mesh(new THREE.BoxGeometry(14, 2.2, 0.2), wallMaterial);
+        wallBack.position.set(0, 1.1, -7);
+        scene.add(wallBack);
+        const wallLeft = new THREE.Mesh(new THREE.BoxGeometry(0.2, 2.2, 14), wallMaterial);
+        wallLeft.position.set(-7, 1.1, 0);
+        scene.add(wallLeft);
+
+        const player = new THREE.Group();
+        const playerBody = new THREE.Mesh(new THREE.CapsuleGeometry(0.16, 0.34, 4, 10), new THREE.MeshStandardMaterial({ color: 0xd8ed77, emissive: 0x435d1e, emissiveIntensity: 0.4 }));
+        playerBody.position.y = 0.4;
+        player.add(playerBody);
+        const playerLight = new THREE.PointLight(0xd8ed77, 1.8, 2.8);
+        playerLight.position.y = 0.65;
+        player.add(playerLight);
+        player.position.set(0, 0, 4.8);
+        scene.add(player);
+
+        const stationData = [
+          { id: 'waybionic', title: 'WAYBIONIC', copy: 'ROS2 ground station / movement diagnostics', position: [-4.4, -2.2], color: 0x68e0d5, type: 'arm' },
+          { id: 'blackbox', title: 'BLACKBOX', copy: 'Evidence chain / local-first physical AI', position: [0, -4.6], color: 0xd8ed77, type: 'vault' },
+          { id: 'rover', title: 'ROVER', copy: 'Sonar / decision logic / motor control', position: [4.2, -1.8], color: 0x69bced, type: 'rover' },
+          { id: 'hvacsim', title: 'HVAC LAB', copy: 'Comfort calculation / practical delivery', position: [-4.2, 2.8], color: 0xffb38b, type: 'fan' },
+          { id: 'system', title: 'ABOUT AJMAL', copy: 'Profile / resume / contact / next system', position: [4, 3], color: 0xd8ed77, type: 'profile' }
+        ];
+        type Station = { position: InstanceType<typeof THREE.Vector3>; rotation: { y: number }; userData: typeof stationData[number] };
+        const stations: Station[] = [];
+        const stationMaterial = (color: number) => new THREE.MeshStandardMaterial({ color, emissive: color, emissiveIntensity: 0.24, roughness: 0.34, metalness: 0.28 });
+        stationData.forEach((data) => {
+          const group = new THREE.Group();
+          const base = new THREE.Mesh(new THREE.CylinderGeometry(0.62, 0.78, 0.16, 20), new THREE.MeshStandardMaterial({ color: 0x204b5a, roughness: 0.6, metalness: 0.2 }));
+          base.position.y = 0.08;
+          group.add(base);
+          const material = stationMaterial(data.color);
+          if (data.type === 'arm') {
+            const links = [[0, 0.3, 0], [0.45, 0.72, 0], [0.05, 1.1, 0]].map((point) => { const joint = new THREE.Mesh(new THREE.SphereGeometry(0.13, 12, 12), material); joint.position.set(point[0], point[1], point[2]); group.add(joint); return joint; });
+            links.slice(0, -1).forEach((joint, index) => { const next = links[index + 1]; const direction = next.position.clone().sub(joint.position); const link = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.08, direction.length(), 10), material); link.position.copy(joint.position.clone().add(next.position).multiplyScalar(0.5)); link.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), direction.normalize()); group.add(link); });
+          } else if (data.type === 'vault') {
+            const vault = new THREE.Mesh(new THREE.BoxGeometry(0.92, 0.82, 0.82), material); vault.position.y = 0.55; group.add(vault);
+            const seal = new THREE.Mesh(new THREE.TorusGeometry(0.2, 0.035, 8, 20), new THREE.MeshBasicMaterial({ color: 0x0b1722 })); seal.position.set(0, 0.55, 0.43); group.add(seal);
+          } else if (data.type === 'rover') {
+            const body = new THREE.Mesh(new THREE.BoxGeometry(1.05, 0.35, 0.72), material); body.position.y = 0.38; group.add(body);
+            [-0.42, 0.42].forEach((x) => [-0.34, 0.34].forEach((z) => { const wheel = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.14, 0.1, 12), new THREE.MeshStandardMaterial({ color: 0x132b39, roughness: 0.6 })); wheel.rotation.x = Math.PI / 2; wheel.position.set(x, 0.12, z); group.add(wheel); }));
+          } else if (data.type === 'fan') {
+            const housing = new THREE.Mesh(new THREE.CylinderGeometry(0.56, 0.56, 0.2, 20), material); housing.rotation.z = Math.PI / 2; housing.position.y = 0.58; group.add(housing);
+            for (let index = 0; index < 4; index += 1) { const blade = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.38, 0.05), new THREE.MeshStandardMaterial({ color: 0xffd3b8, emissive: 0x6d3023, emissiveIntensity: 0.18 })); blade.position.set(0, 0.58, 0.18); blade.rotation.z = index * Math.PI / 2; group.add(blade); }
+          } else {
+            const core = new THREE.Mesh(new THREE.OctahedronGeometry(0.48, 0), material); core.position.y = 0.58; group.add(core);
+          }
+          group.position.set(data.position[0], 0, data.position[1]);
+          group.userData = data;
+          scene.add(group);
+          stations.push(group as unknown as Station);
+        });
+
+        const keys: Record<string, boolean> = {};
+        let selected: Station | null = null;
+        const setSelected = (station: Station | null) => {
+          selected = station;
+          if (!prompt || !promptTitle || !promptCopy || !status || !openButton) return;
+          if (!station) { prompt.hidden = true; status.textContent = 'WALK TO A STATION'; openButton.dataset.windowOpen = ''; return; }
+          const data = station.userData;
+          prompt.hidden = false;
+          promptTitle.textContent = data.title;
+          promptCopy.textContent = data.copy;
+          status.textContent = `${data.title} / IN RANGE`;
+          openButton.dataset.windowOpen = data.id;
+        };
+        const updateSelection = () => {
+          let nearest: Station | null = null;
+          let distance = 999;
+          stations.forEach((station) => { const nextDistance = station.position.distanceTo(player.position); if (nextDistance < distance) { distance = nextDistance; nearest = station; } });
+          setSelected(distance < 1.65 ? nearest : null);
+        };
+        const inspect = () => { if (selected) document.querySelector<HTMLButtonElement>(`button[data-window-open="${selected.userData.id}"]`)?.click(); };
+        addEventListener('keydown', (event) => { keys[event.key.toLowerCase()] = true; if (event.key.toLowerCase() === 'e') inspect(); });
+        addEventListener('keyup', (event) => { keys[event.key.toLowerCase()] = false; });
+        openButton?.addEventListener('click', inspect);
+        canvas.addEventListener('pointerdown', inspect);
+
+        const resize = () => { const bounds = canvas.getBoundingClientRect(); renderer.setSize(bounds.width, bounds.height, false); camera.aspect = bounds.width / Math.max(bounds.height, 1); camera.updateProjectionMatrix(); };
+        resize();
+        const observer = new ResizeObserver(resize);
+        observer.observe(canvas.parentElement ?? canvas);
+        let lastTime = performance.now();
+        const animate = () => {
+          const now = performance.now();
+          const delta = Math.min((now - lastTime) / 1000, 0.05);
+          lastTime = now;
+          const speed = 2.5 * delta;
+          if (keys.w || keys.arrowup) player.position.z -= speed;
+          if (keys.s || keys.arrowdown) player.position.z += speed;
+          if (keys.a || keys.arrowleft) player.position.x -= speed;
+          if (keys.d || keys.arrowright) player.position.x += speed;
+          player.position.x = Math.max(-5.8, Math.min(5.8, player.position.x));
+          player.position.z = Math.max(-5.8, Math.min(5.8, player.position.z));
+          camera.position.lerp(new THREE.Vector3(player.position.x, 5.2, player.position.z + 6.2), 0.08);
+          camera.lookAt(player.position.x, 0.45, player.position.z - 1.2);
+          stations.forEach((station, index) => { station.rotation.y += delta * (index % 2 ? -0.18 : 0.24); station.position.y = Math.sin(performance.now() * 0.001 + index) * 0.035; });
+          updateSelection();
+          if (coordinates) coordinates.textContent = `SECTOR ${Math.round(player.position.x).toString().padStart(2, '0')} / ${Math.round(player.position.z).toString().padStart(2, '0')}`;
+          renderer.render(scene, camera);
+          requestAnimationFrame(animate);
+        };
+        animate();
+      } catch {
+        if (status) status.textContent = '3D MODULE UNAVAILABLE / USE WINDOWS';
+      }
+    };
+    if (reduced) { if (status) status.textContent = 'REDUCED MOTION / USE WINDOWS'; } else if ('requestIdleCallback' in window) requestIdleCallback(launch); else setTimeout(launch, 500);
+  }
+</script>
