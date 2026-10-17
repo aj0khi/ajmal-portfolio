@@ -22,4 +22,5 @@ const { id, title, icon, class: className = '', open = false } = Astro.props;
   <div class="window-content">
     <slot />
   </div>
+  <footer class="window-statusbar mono"><span>LOCAL / READY</span><span>{id.toUpperCase()} / PUBLIC VIEW</span></footer>
 </section>

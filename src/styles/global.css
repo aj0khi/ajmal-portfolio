@@ -3696,6 +3696,23 @@ body { background: #09121b; }
   content: '';
   pointer-events: none;
 }
+
+.window-statusbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 1.45rem;
+  padding: 0.28rem 0.55rem;
+  border-top: 1px solid #6b858b;
+  color: #5f777d;
+  background: #d5e3de;
+  font-size: 0.45rem;
+  line-height: 1;
+}
+
+.window-statusbar span:last-child {
+  color: #087788;
+}
 .window-kicker, .file-tags, .file-card-top { color: #087788; }
 .explorer-heading h1, .window-content h2 { color: #102436; }
 .explorer-heading h1 em, .window-content h2 em { color: #087788; }

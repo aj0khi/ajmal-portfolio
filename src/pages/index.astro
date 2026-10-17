@@ -210,7 +210,7 @@ Type help for available commands.</div><form data-terminal-form><span>ajmal@work
             <div class="window-kicker mono">MEDIA ARCHIVE / EXTERNAL VIDEO</div>
             <h2>The arm<br /><em>actually moves.</em></h2>
             <video class="arm-video" controls playsinline preload="metadata" poster="/assets/waybionic/engineer-monitor-normal.png"><source src="/assets/waybionic/arm-demo.mp4" type="video/mp4" />Your browser cannot play this MP4 file. Use the Drive fallback below.</video>
-            <div class="window-actions"><a href="/assets/waybionic/arm-demo.mov" download>DOWNLOAD ARM DEMO ↘</a><a href="https://drive.google.com/file/d/1WWgNoo82JjGdWspCLcINrK6-YqnF9omR/view?usp=sharing" target="_blank" rel="noreferrer">OPEN DRIVE FALLBACK ↗</a></div>
+            <div class="window-actions"><a href="/assets/waybionic/arm-demo.mp4" download>DOWNLOAD ARM DEMO / MP4 ↘</a><a href="https://drive.google.com/file/d/1WWgNoo82JjGdWspCLcINrK6-YqnF9omR/view?usp=sharing" target="_blank" rel="noreferrer">OPEN DRIVE FALLBACK ↗</a></div>
           </DesktopWindow>
 
           <DesktopWindow id="restore" title="SYSTEM RESTORE / AJMALOS" icon="↶" class="window-restore">
@@ -316,9 +316,14 @@ Type help for available commands.</div><form data-terminal-form><span>ajmal@work
     const focusWindow = (id: string) => {
       const target = desktop.querySelector<HTMLElement>(`[data-window="${id}"]`);
       if (!target) return;
+      const firstOpen = target.dataset.windowOpened !== 'true';
       target.hidden = false;
       target.dataset.windowOpened = 'true';
       target.dataset.windowMinimized = 'false';
+      if (firstOpen) {
+        const content = target.querySelector<HTMLElement>('.window-content');
+        if (content) content.scrollTop = 0;
+      }
       highestZ += 1;
       target.style.zIndex = String(highestZ);
       desktop.querySelectorAll(`[data-task-window="${id}"]`).forEach((item) => item.classList.add('active'));
@@ -486,6 +491,21 @@ Type help for available commands.</div><form data-terminal-form><span>ajmal@work
         }
         if (calculatorDisplay) calculatorDisplay.textContent = calculatorValue || '0';
       });
+    });
+    const calculatorWindow = desktop.querySelector<HTMLElement>('[data-window="calculator"]');
+    document.addEventListener('keydown', (event) => {
+      if (!calculatorWindow || calculatorWindow.hidden || event.metaKey || event.ctrlKey || event.altKey) return;
+      const keyMap: Record<string, string> = { Enter: '=', Escape: 'C', Backspace: 'BACKSPACE' };
+      const value = keyMap[event.key] ?? (/[0-9.+*/-]/.test(event.key) ? event.key : '');
+      if (!value) return;
+      event.preventDefault();
+      if (value === 'BACKSPACE') {
+        calculatorExpression = calculatorExpression.slice(0, -1);
+        calculatorValue = calculatorExpression;
+      } else {
+        calculatorWindow.querySelector<HTMLButtonElement>(`[data-calculator-key="${value}"]`)?.click();
+      }
+      if (calculatorDisplay) calculatorDisplay.textContent = calculatorValue || '0';
     });
 
     const terminalOutput = desktop.querySelector<HTMLElement>('[data-terminal-output]');
