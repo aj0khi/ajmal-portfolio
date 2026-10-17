@@ -1292,6 +1292,103 @@ body::before {
   margin-top: 0.9rem;
 }
 
+.portfolio-signals {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1.25fr 1fr 1fr;
+  gap: 0.55rem;
+  margin: 1.1rem 0 0;
+  padding: 0.6rem;
+  border: 1px solid #a5b9b4;
+  background: #cfded9;
+}
+
+.signal-card {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 0.3rem;
+  min-height: 5.7rem;
+  padding: 0.7rem;
+  border: 1px solid rgba(47, 111, 134, 0.35);
+  background: rgba(247, 241, 214, 0.78);
+}
+
+.signal-card-primary {
+  color: #f7f1d6;
+  background: #285f70;
+}
+
+.signal-card span {
+  color: #2f6f86;
+  font-size: 0.52rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.signal-card-primary span,
+.signal-card-primary small {
+  color: #b9d7d4;
+}
+
+.signal-card strong {
+  font: 600 1.08rem/1.05 Georgia, serif;
+}
+
+.signal-card small {
+  color: #596272;
+  font: 0.66rem/1.35 var(--mono);
+}
+
+.signal-trace {
+  position: absolute;
+  right: 1.2rem;
+  bottom: 0.5rem;
+  left: 1.2rem;
+  height: 1.4rem;
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.signal-trace::before,
+.signal-trace::after {
+  position: absolute;
+  content: '';
+  background: #2f6f86;
+}
+
+.signal-trace::before {
+  top: 0.62rem;
+  right: 0;
+  left: 0;
+  height: 1px;
+}
+
+.signal-trace::after {
+  top: 0;
+  bottom: 0;
+  left: 48%;
+  width: 1px;
+}
+
+.signal-trace i,
+.signal-trace b {
+  position: absolute;
+  z-index: 1;
+  display: block;
+  width: 0.35rem;
+  height: 0.35rem;
+  border: 1px solid #2f6f86;
+  border-radius: 50%;
+  background: #d7e6e5;
+}
+
+.signal-trace i:nth-child(1) { top: 0.46rem; left: 12%; }
+.signal-trace i:nth-child(2) { top: 0.46rem; left: 31%; }
+.signal-trace i:nth-child(3) { top: 0.46rem; left: 64%; }
+.signal-trace i:nth-child(4) { top: 0.46rem; left: 84%; }
+.signal-trace b { top: 0.46rem; left: 48%; background: #4a97aa; }
+
 .explorer-heading h1 em,
 .window-content h2 em {
   color: #2f6f86;
