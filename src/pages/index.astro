@@ -11,7 +11,6 @@ import OsIcon from '../components/OsIcon.astro';
 import StaleStateLab from '../components/StaleStateLab.astro';
 import SystemRestore from '../components/SystemRestore.astro';
 import SystemMonitor from '../components/SystemMonitor.astro';
-import SystemsWorld from '../components/SystemsWorld.astro';
 import VirtualFileSystem from '../components/VirtualFileSystem.astro';
 import RosGraph from '../components/RosGraph.astro';
 import WayBionic3D from '../components/WayBionic3D.astro';
@@ -27,7 +26,6 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
       <div class="crt-screen" data-desktop>
         <div class="crt-glow" aria-hidden="true"></div>
         <div class="boot-sequence" data-boot-sequence aria-hidden="true"><strong>AJMALOS</strong><span data-boot-message>CHECKING LOCAL ARCHIVE...</span><i></i><small>PRESS ANY KEY TO SKIP</small></div>
-        <div class="world-layer" data-world-layer><SystemsWorld /></div>
         <div class="desktop-wallpaper">
           <AmbientScene />
           <div class="sky-noise" aria-hidden="true"></div>
@@ -45,7 +43,10 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
             <OsIcon window="browser" icon="⌕" label="Browser" src="/icons/browser.png" />
             <OsIcon window="calculator" icon="⊞" label="Calculator" src="/icons/calculator.png" />
             <OsIcon window="recycle" icon="♻" label="Recycle Bin" src="/icons/recycle.png" />
-            <OsIcon window="games" icon="✣" label="Games" src="/icons/games.png" />
+            <a class="desktop-icon" href="/explore/" aria-label="Open Aero Explorer">
+              <span class="desktop-icon-art desktop-icon-image" aria-hidden="true"><img src="/icons/games.png" alt="" /></span>
+              <span>Aero Explorer</span>
+            </a>
             <OsIcon window="system" icon="ⓘ" label="System Info" src="/icons/system-clean.svg" />
             <OsIcon window="work" icon="▥" label="Work History" src="/icons/work.png" />
             <OsIcon window="skills" icon="⌘" label="Skills" src="/icons/skills.png" />
@@ -147,13 +148,6 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
             <div class="fun-facts"><span>✦ Star Wars / Legends + canon</span><span>✦ Cars that are extremely fast and cool</span><span>✦ Valorant / Geometry Dash / Brawl Stars</span><span>✦ Banff trails / Johnston Canyon / Big Beehive / Sarail Ridge</span></div>
           </DesktopWindow>
 
-          <DesktopWindow id="games" title="GAMES / PERSONAL" icon="✣" class="window-games">
-            <div class="window-kicker mono">AFTER HOURS / PERSONAL ARCHIVE</div>
-            <h2>Different systems,<br /><em>same obsession.</em></h2>
-            <div class="games-list"><div><strong>VALORANT</strong><span>Rounds, reads, and clean utility.</span></div><div><strong>GEOMETRY DASH</strong><span>Timing, repetition, and stubbornness.</span></div><div><strong>BRAWL STARS</strong><span>Fast matches and chaotic decisions.</span></div><div><strong>BANFF TRAILS</strong><span>Johnston Canyon / Big Beehive / Sarail Ridge.</span></div></div>
-            <div class="window-actions"><a href="/explore/">OPEN AERO EXPLORER ↗</a></div>
-          </DesktopWindow>
-
           <DesktopWindow id="system" title="SYSTEM INFO / AJMAL KHIDRI" icon="ⓘ" class="window-system">
             <div class="window-kicker mono">PUBLIC PROFILE / RECRUITER VIEW</div>
             <h2>Ajmal Khidri<br /><em>Computer Science student.</em></h2>
@@ -191,7 +185,7 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
           </DesktopWindow>
 
           <DesktopWindow id="field" title="SYSTEMS FIELD / WALKABLE ARCHIVE" icon="✦" class="window-field">
-            <div class="field-return-panel"><div class="window-kicker mono">PRIMARY EXPERIENCE / 3D ARCHIVE</div><h2>The world is ready<br /><em>outside this window.</em></h2><p class="window-copy">Return to the walkable Systems Field to explore the stations, then inspect any project from inside the world.</p><button type="button" data-world-return>RETURN TO SYSTEMS FIELD ↗</button></div>
+            <div class="field-return-panel"><div class="window-kicker mono">PRIMARY EXPERIENCE / AERO EXPLORER</div><h2>The island is ready<br /><em>outside this window.</em></h2><p class="window-copy">Leave the desktop for the full Three.js exploration experience, with the portfolio archive available from interactive landmarks.</p><a href="/explore/">OPEN AERO EXPLORER ↗</a></div>
           </DesktopWindow>
 
           <DesktopWindow id="research" title="RESEARCH / PERSONAL" icon="◉" class="window-research">
@@ -297,14 +291,13 @@ Type help for available commands.</div><form data-terminal-form><span>ajmal@work
 
 <script>
   const desktop = document.querySelector('[data-desktop]');
-  const worldLayer = document.querySelector<HTMLElement>('[data-world-layer]');
   const taskbar = document.querySelector('[data-taskbar]');
   const startMenu = document.querySelector<HTMLElement>('[data-start-menu]');
   const startToggle = document.querySelector('[data-start-toggle]');
   let highestZ = 10;
 
   if (desktop && taskbar && startMenu && startToggle) {
-    (desktop as HTMLElement).dataset.mode = worldLayer ? 'world' : 'desktop';
+    (desktop as HTMLElement).dataset.mode = 'desktop';
     const boot = document.querySelector<HTMLElement>('[data-boot-sequence]');
     const bootMessage = boot?.querySelector<HTMLElement>('[data-boot-message]');
     const bootPhases = ['CHECKING LOCAL ARCHIVE...', 'MOUNTING PROJECTS...', 'STARTING AJMALOS...', 'READY.'];
@@ -320,8 +313,8 @@ Type help for available commands.</div><form data-terminal-form><span>ajmal@work
     const windows = desktop.querySelectorAll<HTMLElement>('[data-window]');
     const portfolioWindow = desktop.querySelector<HTMLElement>('[data-window="portfolio"]');
     if (portfolioWindow) {
-      portfolioWindow.hidden = Boolean(worldLayer);
-      portfolioWindow.dataset.windowOpened = worldLayer ? 'false' : 'true';
+      portfolioWindow.hidden = false;
+      portfolioWindow.dataset.windowOpened = 'true';
     }
     const focusWindow = (id: string) => {
       const target = desktop.querySelector<HTMLElement>(`[data-window="${id}"]`);
@@ -342,17 +335,6 @@ Type help for available commands.</div><form data-terminal-form><span>ajmal@work
       });
       const openCalendar = desktop.querySelector<HTMLElement>('[data-calendar]');
       if (openCalendar) openCalendar.hidden = true;
-    };
-
-    const setWorldMode = (active: boolean) => {
-      if (worldLayer) worldLayer.hidden = !active;
-      (desktop as HTMLElement).dataset.mode = active ? 'world' : 'desktop';
-      if (active && portfolioWindow) {
-        portfolioWindow.hidden = true;
-        portfolioWindow.dataset.windowOpened = 'false';
-      }
-      if (!active) focusWindow('portfolio');
-      rebuildTaskbar();
     };
 
     const toggleMaximize = (windowElement: HTMLElement) => {
@@ -416,12 +398,6 @@ Type help for available commands.</div><form data-terminal-form><span>ajmal@work
       const closer = target.closest<HTMLElement>('[data-window-close]');
       const minimizer = target.closest<HTMLElement>('[data-window-minimize]');
       const maximizer = target.closest<HTMLElement>('[data-window-maximize]');
-      const worldDesktop = target.closest<HTMLElement>('[data-world-desktop]');
-      const worldReturn = target.closest<HTMLElement>('[data-world-return]');
-
-      if (worldDesktop) { setWorldMode(false); return; }
-      if (worldReturn) { setWorldMode(true); return; }
-
       if (opener) {
         focusWindow(opener.dataset.windowOpen ?? '');
         startMenu.hidden = true;

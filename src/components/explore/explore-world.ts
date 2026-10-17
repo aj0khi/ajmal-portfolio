@@ -28,7 +28,7 @@ const CONTROLLER = {
   reducedMoveSpeed: 3,
   playerRadius: 0.48,
   playerHeight: 1.9,
-  islandRadius: { x: 12.2, z: 6.2 },
+  islandRadius: { x: 14.2, z: 7.2 },
   camera: { distance: 15, height: 10, lookHeight: 1.5, smoothing: 8 },
   groundY: 1.3,
 };
@@ -48,7 +48,7 @@ export class ExploreWorld {
   private readonly input: ExploreInput;
   private readonly scene: Three.Scene;
   private readonly camera: Three.PerspectiveCamera;
-  private readonly renderer: Three.WebGLRenderer;
+  private readonly renderer!: Three.WebGLRenderer;
   private readonly player: Three.Group;
   private readonly cameraTarget = new THREE.Vector3();
   private readonly blockers: Blocker[] = [];
@@ -243,26 +243,24 @@ export class ExploreWorld {
     this.scene.add(ocean);
 
     const island = new THREE.Group();
-    const rock = new THREE.Mesh(new THREE.ConeGeometry(8.2, 4.5, 14, 3), new THREE.MeshStandardMaterial({ color: 0x87614f, roughness: 0.95 }));
+    const rock = new THREE.Mesh(new THREE.ConeGeometry(9.2, 4.8, 14, 3), new THREE.MeshStandardMaterial({ color: 0x87614f, roughness: 0.95 }));
     rock.position.y = -1.2;
     island.add(rock);
-    const rockBand = new THREE.Mesh(new THREE.CylinderGeometry(9.5, 8.2, 1.25, 14), new THREE.MeshStandardMaterial({ color: 0xa27459, roughness: 0.9 }));
+    const rockBand = new THREE.Mesh(new THREE.CylinderGeometry(11, 9.5, 1.25, 14), new THREE.MeshStandardMaterial({ color: 0xa27459, roughness: 0.9 }));
     rockBand.position.y = 0.05;
     island.add(rockBand);
-    const grass = new THREE.Mesh(new THREE.CylinderGeometry(12.5, 11.8, 0.65, 14), new THREE.MeshStandardMaterial({ color: 0x55bd70, roughness: 0.78 }));
+    const grass = new THREE.Mesh(new THREE.CylinderGeometry(14.5, 13.8, 0.65, 14), new THREE.MeshStandardMaterial({ color: 0x55bd70, roughness: 0.78 }));
     grass.position.y = 0.95;
     island.add(grass);
     const shoreline = new THREE.Mesh(
-      new THREE.TorusGeometry(11.98, 0.16, 6, 32),
+      new THREE.TorusGeometry(13.98, 0.16, 6, 32),
       new THREE.MeshStandardMaterial({ color: 0xb8f29d, roughness: 0.62, emissive: 0x1b735e, emissiveIntensity: 0.08 }),
     );
     shoreline.rotation.x = Math.PI / 2;
     shoreline.position.y = 1.3;
     island.add(shoreline);
-    const hill = new THREE.Mesh(new THREE.SphereGeometry(5.5, 16, 10), new THREE.MeshStandardMaterial({ color: 0x9fe28a, roughness: 0.8 }));
-    hill.scale.set(1.8, 0.45, 0.9);
-    hill.position.set(-4, 1.65, -1.5);
-    island.add(hill);
+    this.addLowMound(island, -7.2, 1.32, -1.6, 2.1, 0.32);
+    this.addLowMound(island, 7.3, 1.32, 1.5, 1.8, 0.28);
     this.addTree(island, -8, 1.2, -2.5);
     this.addTree(island, 7, 1.2, -3.5);
     this.addTree(island, 4, 1.2, 4);
@@ -273,6 +271,9 @@ export class ExploreWorld {
     this.addPath(island);
     this.addAeroReeds(island, -5.4, 1.25, 2.1);
     this.addAeroReeds(island, 7.4, 1.25, 2.2);
+    this.addGlassArch(island, -1.8, 1.35, -3.7);
+    this.addWindSpinners(island, 10.2, 1.32, -1.2);
+    this.addWindSpinners(island, -10.3, 1.32, 2.8);
     LANDMARKS.filter((landmark) => landmark.island === 'home' && landmark.worldX !== undefined && landmark.worldZ !== undefined)
       .forEach((landmark) => this.addLandmark(island, landmark));
     AERO_ORBS.filter((orb) => orb.island === 'home').forEach((orb) => this.addOrb(island, orb));
@@ -440,6 +441,54 @@ export class ExploreWorld {
     }
   }
 
+  private addLowMound(parent: Three.Group, x: number, y: number, z: number, width: number, height: number) {
+      const mound = new THREE.Mesh(
+        new THREE.SphereGeometry(1, 16, 8),
+        new THREE.MeshStandardMaterial({ color: 0x8fda82, roughness: 0.82 }),
+      );
+      mound.scale.set(width, height, width * 0.72);
+      mound.position.set(x, y + height * 0.65, z);
+      parent.add(mound);
+    }
+
+  private addGlassArch(parent: Three.Group, x: number, y: number, z: number) {
+      const arch = new THREE.Mesh(
+        new THREE.TorusGeometry(1.05, 0.12, 10, 24, Math.PI),
+        new THREE.MeshPhysicalMaterial({ color: 0xb8fff3, emissive: 0x42d9d0, emissiveIntensity: 0.18, roughness: 0.12, clearcoat: 1, transmission: 0.2 }),
+      );
+      arch.rotation.z = Math.PI / 2;
+      arch.position.set(x, y + 1.05, z);
+      parent.add(arch);
+      const base = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.18, 0.24, 1.1, 8),
+        new THREE.MeshStandardMaterial({ color: 0xeafff5, roughness: 0.28, metalness: 0.12 }),
+      );
+      [-1, 1].forEach((side) => {
+        const post = base.clone();
+        post.position.set(x, y + 0.55, z + side * 0.92);
+        parent.add(post);
+      });
+    }
+
+  private addWindSpinners(parent: Three.Group, x: number, y: number, z: number) {
+      const spinner = new THREE.Group();
+      const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.08, 1.3, 6), new THREE.MeshStandardMaterial({ color: 0xe9fff4, roughness: 0.3, metalness: 0.15 }));
+      pole.position.y = 0.65;
+      spinner.add(pole);
+      const hub = new THREE.Mesh(new THREE.SphereGeometry(0.14, 10, 8), new THREE.MeshBasicMaterial({ color: 0xffffc4 }));
+      hub.position.y = 1.3;
+      spinner.add(hub);
+      for (let index = 0; index < 4; index += 1) {
+        const blade = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.52, 0.02), new THREE.MeshBasicMaterial({ color: 0x8df7e4 }));
+        blade.position.y = 1.3;
+        blade.rotation.z = index * Math.PI / 2;
+        spinner.add(blade);
+      }
+      spinner.position.set(x, y, z);
+      parent.add(spinner);
+      this.animatedObjects.push({ object: spinner, baseY: y, speed: 0.35, phase: x, rotation: 1.5 });
+  }
+
   private addAeroReeds(parent: Three.Group, x: number, y: number, z: number) {
     const stemMaterial = new THREE.MeshStandardMaterial({ color: 0x39ad88, roughness: 0.72 });
     const bulbMaterial = new THREE.MeshPhysicalMaterial({ color: 0x9ffff0, emissive: 0x2adbd0, emissiveIntensity: 0.18, roughness: 0.12, clearcoat: 1 });
@@ -597,7 +646,7 @@ export class ExploreWorld {
     this.canvas.removeEventListener('pointermove', this.onCanvasPointerMove);
     window.removeEventListener('resize', this.resizeHandler);
     document.removeEventListener('visibilitychange', this.visibilityHandler);
-    this.scene.traverse((object) => {
+    this.scene.traverse((object: Three.Object3D) => {
       const mesh = object as Three.Mesh;
       mesh.geometry?.dispose();
       if (Array.isArray(mesh.material)) mesh.material.forEach((material) => material.dispose());
