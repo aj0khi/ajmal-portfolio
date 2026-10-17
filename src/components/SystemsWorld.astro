@@ -42,8 +42,8 @@
       try {
         const THREE = await import('three');
         const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x0b1722);
-        scene.fog = new THREE.Fog(0x0b1722, 7, 19);
+        scene.background = new THREE.Color(0x87d9ef);
+        scene.fog = new THREE.Fog(0x87d9ef, 7, 19);
         const camera = new THREE.PerspectiveCamera(58, 1, 0.1, 30);
         const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
         renderer.setPixelRatio(Math.min(devicePixelRatio, 1.35));
@@ -57,15 +57,15 @@
 
         const ground = new THREE.Mesh(
           new THREE.PlaneGeometry(18, 18),
-          new THREE.MeshStandardMaterial({ color: 0x122c3a, roughness: 0.72, metalness: 0.12 })
+          new THREE.MeshStandardMaterial({ color: 0x6dbca4, roughness: 0.72, metalness: 0.12 })
         );
         ground.rotation.x = -Math.PI / 2;
         scene.add(ground);
-        const grid = new THREE.GridHelper(18, 18, 0x2b7780, 0x194653);
+        const grid = new THREE.GridHelper(18, 18, 0x65aeb7, 0x9fe2d1);
         grid.position.y = 0.015;
         scene.add(grid);
 
-        const wallMaterial = new THREE.MeshStandardMaterial({ color: 0x163947, roughness: 0.8 });
+        const wallMaterial = new THREE.MeshStandardMaterial({ color: 0x71c9b0, roughness: 0.8 });
         const wallBack = new THREE.Mesh(new THREE.BoxGeometry(14, 2.2, 0.2), wallMaterial);
         wallBack.position.set(0, 1.1, -7);
         scene.add(wallBack);
