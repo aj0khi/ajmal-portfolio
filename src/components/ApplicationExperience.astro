@@ -1,0 +1,97 @@
+---
+interface Props {
+  id: string;
+}
+
+const { id } = Astro.props;
+---
+
+<section class="application-experience" data-app-experience={id}>
+  <div class="experience-header">
+    <div><span class="mono">LIVE APP MODULE / {id.toUpperCase()}</span><strong data-experience-status>STANDBY</strong></div>
+    <button type="button" data-experience-action>RUN MODULE</button>
+  </div>
+  <div class="experience-stage"><canvas data-experience-canvas aria-label={`${id} interactive conceptual model`}></canvas><span class="experience-crosshair" aria-hidden="true"></span><span class="experience-label mono">CONCEPTUAL / LOCAL SIMULATION</span></div>
+</section>
+
+<script>
+  const experiences = document.querySelectorAll<HTMLElement>('[data-app-experience]:not([data-experience-ready])');
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const palette: Record<string, number> = { hvacsim: 0xffb38b, blackbox: 0xd8ed77, rover: 0x69bced, waybionic: 0x68e0d5, oldarm: 0x68e0d5, research: 0xffb38b, rosgraph: 0x68e0d5, monitor: 0xd8ed77, terminal: 0x8fc66b, browser: 0x69bced, resume: 0xd8ed77, system: 0xd8ed77 };
+  experiences.forEach((host) => {
+    const canvas = host.querySelector<HTMLCanvasElement>('[data-experience-canvas]');
+    const ownerWindow = host.closest<HTMLElement>('[data-window]');
+    const status = host.querySelector<HTMLElement>('[data-experience-status]');
+    const action = host.querySelector<HTMLButtonElement>('[data-experience-action]');
+    const id = host.dataset.appExperience ?? 'app';
+    if (!canvas || !ownerWindow || host.dataset.experienceReady || host.dataset.experienceScheduled) return;
+    host.dataset.experienceScheduled = 'true';
+    let started = false;
+    let runMode = 0;
+    const modes = ['RUN MODULE', 'REPLAY SIGNAL', 'PAUSE MODULE'];
+    const start = async () => {
+      canvas.dataset.experienceReady = 'true';
+      host.dataset.experienceReady = 'true';
+      try {
+        const THREE = await import('three');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 20);
+        camera.position.set(2.8, 1.9, 4.2);
+        camera.lookAt(0, 0.35, 0);
+        const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+        renderer.setPixelRatio(Math.min(devicePixelRatio, 1.25));
+        scene.add(new THREE.HemisphereLight(0xdff8ff, 0x102436, 1.8));
+        const key = new THREE.DirectionalLight(palette[id] ?? 0x68e0d5, 2.6);
+        key.position.set(3, 4, 4);
+        scene.add(key);
+        const group = new THREE.Group();
+        const accent = new THREE.MeshStandardMaterial({ color: palette[id] ?? 0x68e0d5, emissive: palette[id] ?? 0x68e0d5, emissiveIntensity: 0.28, roughness: 0.32, metalness: 0.3 });
+        const dark = new THREE.MeshStandardMaterial({ color: 0x173f52, roughness: 0.52, metalness: 0.24 });
+        const addNode = (x: number, y: number, z: number, size = 0.13) => { const node = new THREE.Mesh(new THREE.SphereGeometry(size, 12, 12), accent); node.position.set(x, y, z); group.add(node); return node; };
+        const addLink = (a: InstanceType<typeof THREE.Vector3>, b: InstanceType<typeof THREE.Vector3>) => { const direction = b.clone().sub(a); const link = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.05, direction.length(), 8), accent); link.position.copy(a.clone().add(b).multiplyScalar(0.5)); link.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), direction.normalize()); group.add(link); };
+
+        if (id === 'hvacsim') {
+          const housing = new THREE.Mesh(new THREE.CylinderGeometry(0.75, 0.75, 0.35, 24), dark); housing.rotation.z = Math.PI / 2; group.add(housing);
+          for (let index = 0; index < 5; index += 1) { const blade = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.6, 0.06), accent); blade.position.z = 0.3; blade.rotation.z = index * Math.PI / 2.5; group.add(blade); }
+          for (let index = 0; index < 8; index += 1) { const particle = addNode(-0.95 + index * 0.25, 0.1 + Math.sin(index) * 0.2, 0.2, 0.035); particle.userData.phase = index; }
+        } else if (id === 'rover') {
+          const body = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.4, 0.9), accent); body.position.y = 0.2; group.add(body);
+          [-0.6, 0.6].forEach((x) => [-0.42, 0.42].forEach((z) => { const wheel = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 0.12, 14), dark); wheel.rotation.x = Math.PI / 2; wheel.position.set(x, -0.2, z); group.add(wheel); }));
+          addNode(0.2, 0.62, 0, 0.13);
+        } else if (id === 'blackbox' || id === 'terminal' || id === 'filesystem') {
+          const box = new THREE.Mesh(new THREE.BoxGeometry(1.25, 1.05, 1.05), dark); group.add(box);
+          const frame = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(1.48, 1.28, 1.28)), new THREE.LineBasicMaterial({ color: palette[id] ?? 0xd8ed77 })); group.add(frame);
+          for (let index = 0; index < 4; index += 1) addNode(Math.cos(index * Math.PI / 2) * 0.9, Math.sin(index * Math.PI / 2) * 0.45, 0.1, 0.07);
+        } else if (id === 'waybionic' || id === 'oldarm' || id === 'media') {
+          const points = [new THREE.Vector3(-0.8, -0.35, 0), new THREE.Vector3(-0.45, 0.35, 0), new THREE.Vector3(0.15, 0.75, 0), new THREE.Vector3(0.7, 1.25, 0)];
+          points.forEach((point) => addNode(point.x, point.y, point.z, 0.11)); points.slice(0, -1).forEach((point, index) => addLink(point, points[index + 1]));
+        } else if (id === 'research') {
+          const torus = new THREE.Mesh(new THREE.TorusGeometry(0.7, 0.08, 12, 32), accent); torus.rotation.x = Math.PI / 2; group.add(torus);
+          for (let index = 0; index < 12; index += 1) addNode(Math.cos(index) * 0.9, Math.sin(index * 1.7) * 0.35, Math.sin(index) * 0.9, 0.04);
+        } else if (id === 'rosgraph' || id === 'monitor' || id === 'skills' || id === 'work' || id === 'notes') {
+          const points = [new THREE.Vector3(-0.9, 0, 0), new THREE.Vector3(0, 0.55, 0), new THREE.Vector3(0.9, 0, 0), new THREE.Vector3(0, -0.45, 0)];
+          points.forEach((point) => addNode(point.x, point.y, point.z)); points.forEach((point, index) => addLink(point, points[(index + 1) % points.length]));
+        } else {
+          const core = new THREE.Mesh(new THREE.OctahedronGeometry(0.55, 1), accent); group.add(core);
+          for (let index = 0; index < 6; index += 1) addNode(Math.cos(index) * 0.9, Math.sin(index * 1.4) * 0.4, Math.sin(index) * 0.9, 0.06);
+        }
+        const base = new THREE.Mesh(new THREE.CylinderGeometry(1.15, 1.15, 0.04, 24), dark); base.position.y = -0.58; group.add(base);
+        scene.add(group);
+        const resize = () => { const bounds = canvas.getBoundingClientRect(); renderer.setSize(bounds.width, bounds.height, false); camera.aspect = bounds.width / Math.max(bounds.height, 1); camera.updateProjectionMatrix(); };
+        resize();
+        const resizeObserver = new ResizeObserver(resize); resizeObserver.observe(host);
+        let lastTime = performance.now();
+        const animate = () => { const now = performance.now(); const delta = Math.min((now - lastTime) / 1000, 0.05); lastTime = now; group.rotation.y += delta * (reduced ? 0 : (runMode === 2 ? 0.02 : 0.22)); group.position.y = reduced ? 0 : Math.sin(now * 0.0012) * 0.035; renderer.render(scene, camera); requestAnimationFrame(animate); };
+        requestAnimationFrame(animate);
+        action?.addEventListener('click', () => { runMode = (runMode + 1) % 3; if (status) status.textContent = runMode === 2 ? 'PAUSED' : modes[runMode].replace(' MODULE', ''); if (action) action.textContent = modes[(runMode + 1) % 3]; });
+        if (status) status.textContent = 'ACTIVE / LOCAL';
+      } catch {
+        if (status) status.textContent = 'FALLBACK / STATIC';
+        host.classList.add('experience-fallback');
+      }
+    };
+    const maybeStart = () => { if (started || ownerWindow.dataset.windowOpened !== 'true' || ownerWindow.hidden || getComputedStyle(ownerWindow).display === 'none' || host.getClientRects().length === 0) return; started = true; if ('requestIdleCallback' in window) requestIdleCallback(start); else setTimeout(start, 500); };
+    const observer = new MutationObserver(maybeStart); observer.observe(ownerWindow, { attributes: true, attributeFilter: ['hidden', 'data-window-opened'] });
+    maybeStart();
+  });
+</script>

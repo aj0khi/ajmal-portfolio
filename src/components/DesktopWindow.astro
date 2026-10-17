@@ -1,5 +1,6 @@
 ---
 import SystemModel from './SystemModel.astro';
+import ApplicationExperience from './ApplicationExperience.astro';
 
 interface Props {
   id: string;
@@ -29,6 +30,7 @@ const model = modelByWindow[id];
     </span>
   </header>
   {model ? <div class="window-model-rail"><SystemModel kind={model} /><span class="window-model-caption mono">CONCEPT MODEL / {model.toUpperCase()} / LIVE VIEW</span></div> : null}
+  {id !== 'field' ? <ApplicationExperience id={id} /> : null}
   <div class="window-content">
     <slot />
   </div>

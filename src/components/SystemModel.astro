@@ -20,6 +20,8 @@ const { kind } = Astro.props;
       const host = canvas.closest<HTMLElement>('[data-system-model]');
       const kind = host?.dataset.systemModel;
       if (!host || !kind) return;
+      if (canvas.dataset.modelScheduled) return;
+      canvas.dataset.modelScheduled = 'true';
       const ownerWindow = host.closest<HTMLElement>('[data-window]');
       let started = false;
 
@@ -98,14 +100,14 @@ const { kind } = Astro.props;
         }
       };
       const maybeStart = () => {
-        if (started || ownerWindow?.hidden || host.getClientRects().length === 0) return;
+        if (started || ownerWindow?.dataset.windowOpened !== 'true' || ownerWindow.hidden || (ownerWindow && getComputedStyle(ownerWindow).display === 'none') || host.getClientRects().length === 0) return;
         started = true;
         if ('requestIdleCallback' in window) requestIdleCallback(start); else setTimeout(start, 500);
       };
       const visibilityObserver = new IntersectionObserver((entries) => { if (entries.some((entry) => entry.isIntersecting)) maybeStart(); });
       visibilityObserver.observe(host);
       const windowObserver = new MutationObserver(maybeStart);
-      if (ownerWindow) windowObserver.observe(ownerWindow, { attributes: true, attributeFilter: ['hidden'] });
+      if (ownerWindow) windowObserver.observe(ownerWindow, { attributes: true, attributeFilter: ['hidden', 'data-window-opened'] });
       maybeStart();
     });
   }
