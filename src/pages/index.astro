@@ -24,7 +24,7 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
       <div class="monitor-brand">AJMAL<span>OS</span></div>
       <div class="crt-screen" data-desktop>
         <div class="crt-glow" aria-hidden="true"></div>
-        <div class="boot-sequence" aria-hidden="true"><strong>AJMALOS</strong><span>RESTORING LOCAL ARCHIVE...</span><i></i></div>
+        <div class="boot-sequence" data-boot-sequence aria-hidden="true"><strong>AJMALOS</strong><span data-boot-message>CHECKING LOCAL ARCHIVE...</span><i></i><small>PRESS ANY KEY TO SKIP</small></div>
         <div class="desktop-wallpaper">
           <div class="sky-noise" aria-hidden="true"></div>
           <div class="hill hill-back" aria-hidden="true"></div>
@@ -193,7 +193,9 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
           </DesktopWindow>
 
           <DesktopWindow id="terminal" title="TERMINAL / AJMALOS" icon=">_" class="window-terminal">
-            <div class="terminal-screen"><p>AJMALOS TERMINAL v1.0</p><p>Last login: local archive</p><p><span>ajmal@workstation:~$</span> npm run check</p><p class="terminal-ok">0 errors · 0 warnings · 0 hints</p><p><span>ajmal@workstation:~$</span> npm run build</p><p class="terminal-ok">static output generated in dist/</p><p><span>ajmal@workstation:~$</span> status</p><p>projects: 04 · systems: moving · next: keep building</p><b>_</b></div>
+            <div class="terminal-screen" data-terminal><div data-terminal-output>AJMALOS TERMINAL v1.0
+Last login: local archive
+Type help for available commands.</div><form data-terminal-form><span>ajmal@workstation:~$</span><input data-terminal-input aria-label="Terminal command" autocomplete="off" /></form></div>
           </DesktopWindow>
 
           <DesktopWindow id="media" title="MEDIA PLAYER / WAYBIONIC" icon="▶" class="window-media">
@@ -285,6 +287,18 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
   let highestZ = 10;
 
   if (desktop && taskbar && startMenu && startToggle) {
+    const boot = document.querySelector<HTMLElement>('[data-boot-sequence]');
+    const bootMessage = boot?.querySelector<HTMLElement>('[data-boot-message]');
+    const bootPhases = ['CHECKING LOCAL ARCHIVE...', 'MOUNTING PROJECTS...', 'STARTING AJMALOS...', 'READY.'];
+    let bootPhase = 0;
+    const skipBoot = () => { if (boot) boot.style.display = 'none'; };
+    const bootTimer = window.setInterval(() => {
+      bootPhase += 1;
+      if (bootMessage) bootMessage.textContent = bootPhases[Math.min(bootPhase, bootPhases.length - 1)];
+      if (bootPhase >= bootPhases.length - 1) window.clearInterval(bootTimer);
+    }, 390);
+    document.addEventListener('keydown', skipBoot, { once: true });
+
     const windows = desktop.querySelectorAll<HTMLElement>('[data-window]');
     const portfolioWindow = desktop.querySelector<HTMLElement>('[data-window="portfolio"]');
     if (portfolioWindow) {
@@ -464,6 +478,31 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
         }
         if (calculatorDisplay) calculatorDisplay.textContent = calculatorValue || '0';
       });
+    });
+
+    const terminalOutput = desktop.querySelector<HTMLElement>('[data-terminal-output]');
+    const terminalForm = desktop.querySelector<HTMLFormElement>('[data-terminal-form]');
+    const terminalInput = desktop.querySelector<HTMLInputElement>('[data-terminal-input]');
+    const terminalCommands: Record<string, string> = {
+      help: 'help  about  projects  skills  contact  whoami  pwd  ls  tree  clear  neofetch',
+      about: 'Ajmal Khidri / CS @ UCalgary / robotics + software systems',
+      projects: 'WayBionic  BlackBox  Rover  HVAC Express  Robotics Roadmap',
+      skills: 'Java  Python  JavaScript  ROS2  RViz  URDF  MuJoCo  Isaac Lab  Nav2/SLAM',
+      contact: 'khidri.ajmal@gmail.com  |  github.com/aj0khi  |  linkedin.com/in/ajmal-khidri',
+      whoami: 'ajmal / builder of systems that move',
+      pwd: '/home/aj',
+      ls: 'projects/  resume/  notes/  README.txt',
+      tree: 'home/aj\n├── projects\n│   ├── waybionic\n│   ├── blackbox\n│   ├── rover\n│   └── hvac-express\n└── resume\n    └── resume.pdf',
+      neofetch: 'AJMALOS\nOS: portfolio workstation\nFocus: robotics + software\nStatus: building',
+      clear: ''
+    };
+    terminalForm?.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const command = terminalInput?.value.trim().toLowerCase() ?? '';
+      const response = terminalCommands[command] ?? `${command}: command not found. Type help.`;
+      if (terminalOutput) terminalOutput.textContent = `${terminalOutput.textContent}\najmal@workstation:~$ ${command}\n${response}`.trim();
+      if (terminalInput) terminalInput.value = '';
+      if (terminalOutput) terminalOutput.scrollTop = terminalOutput.scrollHeight;
     });
 
     const browserForm = desktop.querySelector<HTMLFormElement>('[data-browser-form]');

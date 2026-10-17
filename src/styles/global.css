@@ -939,6 +939,12 @@ body::before {
   letter-spacing: 0.08em;
 }
 
+.boot-sequence small {
+  color: #8fa6a2;
+  font: 0.5rem var(--mono);
+  letter-spacing: 0.08em;
+}
+
 .boot-sequence i {
   position: relative;
   overflow: hidden;
@@ -2421,25 +2427,48 @@ body::before {
 
 .old-arm-joints span {
   color: #2f6f86;
-  font: 0.55rem var(--mono);
+  font: 0.72rem/1.7 var(--mono);
+  white-space: pre-wrap;
 }
 
 .old-arm-joints input {
-  accent-color: #4a97aa;
-}
+.terminal-screen > div {
+  max-height: 15rem;
+  overflow: auto;
+  white-space: pre-wrap;
 
 .vfs-output {
-  min-height: 9rem;
+.terminal-screen span {
   margin-top: 1.5rem;
   padding: 0.8rem;
   white-space: pre-wrap;
-  color: #bdd9ad;
+.terminal-screen .terminal-ok {
   background: #202d2b;
   font: 0.7rem/1.6 var(--mono);
 }
 
 .vfs-form {
   display: flex;
+
+.terminal-screen form {
+  display: flex;
+  gap: 0.4rem;
+  margin-top: 0.35rem;
+}
+
+.terminal-screen form span {
+  flex: 0 0 auto;
+}
+
+.terminal-screen input {
+  min-width: 0;
+  flex: 1;
+  border: 0;
+  color: #bdd9ad;
+  background: transparent;
+  font: inherit;
+  outline: none;
+}
   gap: 0.5rem;
   align-items: center;
   margin-top: 0.6rem;
