@@ -1753,9 +1753,16 @@ body::before {
 }
 
 .window-blackbox {
-  top: 13%;
-  left: 22%;
-  width: min(65%, 760px);
+  top: 8%;
+  left: 14%;
+  width: min(72%, 900px);
+  height: min(84%, 730px);
+  max-height: 88%;
+}
+
+.window-blackbox .window-content > h2 {
+  max-width: 18ch;
+  font-size: clamp(2.2rem, 4vw, 3.7rem);
 }
 
 .window-rover {
