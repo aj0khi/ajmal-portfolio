@@ -119,7 +119,7 @@ export class ExploreWorld {
     this.renderer.shadowMap.enabled = false;
     this.player = this.createPlayer();
     const fallbackPlayerParts = [...this.player.children];
-    this.loadModel('/assets/models/simple_character.glb', this.player, [0, 0, 0], 2.2, Math.PI, () => fallbackPlayerParts.forEach((part) => { part.visible = false; }));
+    this.loadModel('/assets/models/simple_character.glb', this.player, [0, 0, 0], 2.2, Math.PI, () => fallbackPlayerParts.forEach((part) => { part.visible = false; }), true);
     this.createEnvironment();
     this.scene.add(this.player);
     this.resizeHandler = () => this.resize();
@@ -235,7 +235,6 @@ export class ExploreWorld {
     const sun = new THREE.DirectionalLight(0xffffff, 2.2);
     sun.position.set(-8, 14, 8);
     this.scene.add(sun);
-    this.createClouds();
     const ocean = new THREE.Mesh(
       new THREE.PlaneGeometry(70, 70, 28, 28),
       new THREE.MeshStandardMaterial({ color: 0x11b7c1, roughness: 0.2, metalness: 0.08, transparent: true, opacity: 0.92 }),
@@ -263,34 +262,18 @@ export class ExploreWorld {
     shoreline.rotation.x = Math.PI / 2;
     shoreline.position.y = 1.3;
     island.add(shoreline);
-    this.addLowMound(island, -7.2, 1.32, -1.6, 2.1, 0.32);
-    this.addLowMound(island, 7.3, 1.32, 1.5, 1.8, 0.28);
-    this.addTree(island, -8, 1.2, -2.5);
-    this.addTree(island, 7, 1.2, -3.5);
-    this.addTree(island, 4, 1.2, 4);
-    this.addPine(island, -1.5, 1.15, -4.1);
-    this.addStone(island, 2.2, 1.25, -2.8, 0.48);
-    this.addStone(island, -2.7, 1.25, 3.4, 0.35);
-    this.addFlowers(island, 5.1, 1.3, 2.4);
     this.addPath(island);
-    this.addAeroReeds(island, -5.4, 1.25, 2.1);
-    this.addAeroReeds(island, 7.4, 1.25, 2.2);
-    this.addGlassArch(island, -1.8, 1.35, -3.7);
-    this.addWindSpinners(island, 10.2, 1.32, -1.2);
-    this.addWindSpinners(island, -10.3, 1.32, 2.8);
     LANDMARKS.filter((landmark) => landmark.island === 'home' && landmark.worldX !== undefined && landmark.worldZ !== undefined)
       .forEach((landmark) => this.addLandmark(island, landmark));
     AERO_ORBS.filter((orb) => orb.island === 'home').forEach((orb) => this.addOrb(island, orb));
     SECRETS.filter((secret) => secret.island === 'home').forEach((secret) => this.addSecret(island, secret));
-    island.add(this.createGlassSphere(-5, 3.8, -3, 0.7));
-    island.add(this.createGlassSphere(6, 4.2, 1, 0.55));
-    island.add(this.createComputerPod(1.7, 1.8, 3.1));
-    this.addUndersideRocks(island);
     this.scene.add(island);
     this.loadModel('/assets/models/frutiger_aero_buildings.glb', island, [0, 1.3, -3.9], 7.5, 0);
     this.loadModel('/assets/models/bridge.glb', island, [0, 1.35, -1.4], 8.5, 0);
     this.loadModel('/assets/models/palm_trees.glb', island, [5.8, 1.25, 2.1], 3.8, 0.2);
     this.loadModel('/assets/models/stylized_crystal_gems_asset_pack.glb', island, [-4.2, 1.25, 2.6], 2.2, 0);
+    this.loadModel('/assets/models/flowers_pack_1.glb', island, [-5.4, 1.25, 2.1], 2.4, 0);
+    this.loadModel('/assets/models/flowers_pack_4.glb', island, [5.1, 1.25, 2.4], 2.4, 0);
     this.loadModel('/assets/models/small_rocks.glb', island, [3, 1.25, -2.7], 2.2, 0);
     this.loadModel('/assets/models/futuristic_building_props.glb', island, [1.8, 1.25, 3.7], 4.2, 0);
     this.loadModel('/assets/models/clouds.glb', this.scene, [0, 8.5, -10], 8, 0);
@@ -302,7 +285,7 @@ export class ExploreWorld {
     }, 1800);
   }
 
-  private loadModel(path: string, parent: Three.Object3D, position: [number, number, number], targetSize: number, rotationY: number, onLoaded?: () => void) {
+  private loadModel(path: string, parent: Three.Object3D, position: [number, number, number], targetSize: number, rotationY: number, onLoaded?: () => void, upright = false) {
     this.gltfLoader.load(path, (gltf) => {
       const model = gltf.scene;
       const bounds = new THREE.Box3().setFromObject(model);
@@ -312,7 +295,8 @@ export class ExploreWorld {
       const normalizedBounds = new THREE.Box3().setFromObject(model);
       const center = normalizedBounds.getCenter(new THREE.Vector3());
       model.position.set(position[0] - center.x, position[1] - normalizedBounds.min.y, position[2] - center.z);
-      model.rotation.y = rotationY;
+      model.rotation.set(0, rotationY, 0);
+      if (upright) model.rotation.x = 0;
       model.traverse((object) => { object.castShadow = true; object.receiveShadow = true; });
       parent.add(model);
       onLoaded?.();
