@@ -1,4 +1,4 @@
-const CACHE = 'ajmalos-v1';
+const CACHE = 'ajmalos-v2';
 const SHELL = ['/', '/manifest.webmanifest', '/icons/my-work.svg', '/icons/waybionic.svg', '/icons/resume.svg'];
 
 self.addEventListener('install', (event) => {
@@ -7,7 +7,10 @@ self.addEventListener('install', (event) => {
 });
 
 self.addEventListener('activate', (event) => {
-  event.waitUntil(self.clients.claim());
+  event.waitUntil(
+    caches.keys().then((keys) => Promise.all(keys.filter((key) => key !== CACHE).map((key) => caches.delete(key))))
+      .then(() => self.clients.claim())
+  );
 });
 
 self.addEventListener('fetch', (event) => {
