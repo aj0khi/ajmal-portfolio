@@ -9,6 +9,9 @@ const { kind, title } = Astro.props;
 
 <div class={`mock-diagram mock-${kind}`} aria-label={`${title} conceptual diagram`}>
   <div class="mock-diagram-head"><span class="mono">CONCEPTUAL / MOCK DIAGRAM</span><span class="diagram-signal">● SIGNAL PATH</span></div>
+  <div class={`diagram-model model-${kind}`} aria-hidden="true">
+    <div class="model-core"></div><i></i><i></i><i></i>
+  </div>
   {kind === 'waybionic' ? (
     <div class="diagram-flow diagram-flow-wide">
       <div class="diagram-node"><strong>OPERATOR</strong><span>RUN / HOME / STOP</span></div><b>→</b>

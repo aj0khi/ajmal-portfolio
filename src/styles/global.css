@@ -3690,3 +3690,174 @@ body { background: #09121b; }
   .portfolio-signals { grid-template-columns: 1fr; }
   .signal-trace { display: none; }
 }
+
+@keyframes app-reveal {
+  from { opacity: 0; transform: translateY(0.55rem); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes signal-pulse {
+  0%, 100% { opacity: 0.55; transform: scale(0.92); }
+  50% { opacity: 1; transform: scale(1.08); }
+}
+
+@keyframes signal-flow {
+  0%, 100% { opacity: 0.45; transform: translateX(0); }
+  50% { opacity: 1; transform: translateX(0.18rem); }
+}
+
+@keyframes diagram-scan {
+  from { transform: translateY(-140%); }
+  to { transform: translateY(520%); }
+}
+
+@keyframes model-orbit {
+  from { transform: rotateX(58deg) rotateY(0deg) rotateZ(-18deg); }
+  to { transform: rotateX(58deg) rotateY(360deg) rotateZ(-18deg); }
+}
+
+.os-window:not([hidden]) .window-content > * {
+  animation: app-reveal 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.os-window:not([hidden]) .window-content > *:nth-child(2) { animation-delay: 55ms; }
+.os-window:not([hidden]) .window-content > *:nth-child(3) { animation-delay: 100ms; }
+.os-window:not([hidden]) .window-content > *:nth-child(4) { animation-delay: 145ms; }
+.os-window:not([hidden]) .window-content > *:nth-child(5) { animation-delay: 190ms; }
+.os-window:not([hidden]) .window-content > *:nth-child(6) { animation-delay: 235ms; }
+
+.file-card,
+.signal-card,
+.system-grid div,
+.skills-explorer div,
+.research-grid div,
+.blackbox-layers div,
+.diagram-node {
+  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.file-card:hover,
+.signal-card:hover,
+.system-grid div:hover,
+.skills-explorer div:hover,
+.research-grid div:hover,
+.blackbox-layers div:hover,
+.diagram-node:hover {
+  border-color: #68e0d5;
+  transform: translateY(-0.18rem);
+  box-shadow: 0 0.5rem 1rem rgba(16, 36, 54, 0.14);
+}
+
+.diagram-signal {
+  animation: signal-pulse 2.4s ease-in-out infinite;
+}
+
+.diagram-flow > b,
+.diagram-rover-grid > b,
+.diagram-stack > b,
+.diagram-roadmap > b {
+  animation: signal-flow 1.8s ease-in-out infinite;
+}
+
+.mock-diagram {
+  position: relative;
+  overflow: hidden;
+}
+
+.mock-diagram::after {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 0.12rem;
+  content: '';
+  background: rgba(104, 224, 213, 0.48);
+  box-shadow: 0 0 0.7rem rgba(104, 224, 213, 0.6);
+  pointer-events: none;
+  animation: diagram-scan 6s linear infinite;
+}
+
+.diagram-model {
+  position: absolute;
+  top: 0.55rem;
+  right: 0.7rem;
+  z-index: 2;
+  width: 4.3rem;
+  height: 3.1rem;
+  perspective: 12rem;
+  pointer-events: none;
+}
+
+.model-core {
+  position: absolute;
+  top: 0.75rem;
+  left: 1.3rem;
+  width: 1.35rem;
+  height: 1.35rem;
+  border: 1px solid #0b7886;
+  background: rgba(104, 224, 213, 0.28);
+  box-shadow: 0 0 0.9rem rgba(104, 224, 213, 0.28), inset 0 0 0.5rem rgba(216, 237, 119, 0.32);
+  transform-style: preserve-3d;
+  animation: model-orbit 8s linear infinite;
+}
+
+.model-core::before,
+.model-core::after {
+  position: absolute;
+  inset: 0.28rem;
+  border: 1px solid rgba(216, 237, 119, 0.8);
+  content: '';
+}
+
+.model-core::after {
+  transform: translateZ(0.38rem);
+}
+
+.diagram-model i {
+  position: absolute;
+  width: 0.35rem;
+  height: 0.35rem;
+  border: 1px solid #d8ed77;
+  border-radius: 50%;
+  background: #0b5966;
+  box-shadow: 0 0 0.45rem rgba(216, 237, 119, 0.55);
+  animation: signal-pulse 2.1s ease-in-out infinite;
+}
+
+.diagram-model i:nth-of-type(1) { top: 0.15rem; left: 0.3rem; }
+.diagram-model i:nth-of-type(2) { right: 0.2rem; bottom: 0.15rem; animation-delay: 350ms; }
+.diagram-model i:nth-of-type(3) { bottom: 0.15rem; left: 0.65rem; animation-delay: 700ms; }
+
+.mock-waybionic .model-core { border-radius: 50%; }
+.mock-blackbox .model-core { transform: rotateX(58deg) rotateY(0deg) rotateZ(-18deg); }
+.mock-rover .model-core { width: 2.2rem; height: 0.8rem; top: 1.1rem; left: 0.95rem; animation-name: model-orbit; }
+.mock-hvac .model-core { border-radius: 50%; box-shadow: 0 0 0.9rem rgba(104, 224, 213, 0.28), inset 0 0 0.5rem rgba(216, 237, 119, 0.32); }
+.mock-roadmap .model-core { border-style: dashed; transform: rotateX(58deg) rotateY(0deg) rotateZ(-18deg); }
+
+.mock-diagram-head,
+.diagram-stack,
+.diagram-flow,
+.diagram-rover-grid,
+.diagram-roadmap {
+  position: relative;
+  z-index: 1;
+}
+
+@media (max-width: 700px) {
+  .diagram-model { transform: scale(0.85); transform-origin: top right; }
+  .mock-diagram { padding-right: 0.8rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .os-window:not([hidden]) .window-content > *,
+  .diagram-signal,
+  .diagram-flow > b,
+  .diagram-rover-grid > b,
+  .diagram-stack > b,
+  .diagram-roadmap > b,
+  .mock-diagram::after,
+  .model-core,
+  .diagram-model i {
+    animation: none;
+  }
+}
