@@ -22,6 +22,8 @@ The deployable static site is generated in `dist/`.
 
 The original WayBionic arm video was compressed to `public/assets/waybionic/arm-demo.mp4` for web delivery and remains under GitHub's file limit. The Media Player keeps the Drive fallback available.
 
+The Aero Explorer is available at `/explore/`. Its current milestone boots into a client-side Three.js floating-island scene with a fallback path back to the AjmalOS archive.
+
 ## Hosting
 
 Upload the contents of `dist/` to a static host such as Hostinger. The main site is static, while `public/proxy.php` is an optional Hostinger PHP endpoint used by the in-app browser for destinations that block iframe embedding. Keep it behind HTTPS and do not use it for private URLs or authenticated browsing.
