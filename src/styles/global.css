@@ -1732,9 +1732,16 @@ body::before {
 }
 
 .window-waybionic {
-  top: 9%;
-  left: 18%;
-  width: min(70%, 800px);
+  top: 6%;
+  left: 10%;
+  width: min(80%, 980px);
+  height: min(86%, 760px);
+  max-height: 88%;
+}
+
+.window-waybionic .window-content > h2 {
+  max-width: 17ch;
+  font-size: clamp(2.2rem, 4vw, 3.6rem);
 }
 
 .window-portfolio {
