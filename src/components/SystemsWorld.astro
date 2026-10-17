@@ -4,7 +4,7 @@
     <div class="world-reticle" aria-hidden="true"></div>
     <div class="world-hud mono">
       <div><span>AJMALOS / FIELD MODE</span><strong data-world-status>WALK TO A STATION</strong></div>
-      <div class="world-hud-right"><span>WASD MOVE / SPACE JUMP / E INSPECT</span><span data-world-coordinates>SECTOR 00 / 00</span><button type="button" data-world-desktop>OPEN OS DESKTOP</button></div>
+      <div class="world-hud-right"><span>WASD MOVE / SHIFT SPRINT / SPACE JUMP / E INSPECT</span><span data-world-coordinates>SECTOR 00 / 00</span><span data-world-progress>ARCHIVE 0 / 8</span><button type="button" data-world-desktop>OPEN OS DESKTOP</button></div>
     </div>
     <div class="world-prompt" data-world-prompt hidden>
       <span class="mono" data-world-prompt-kicker>STATION DETECTED</span>
@@ -21,6 +21,7 @@
       <div><i class="legend-profile"></i>ABOUT AJMAL</div>
     </div>
     <div class="world-compass mono" aria-hidden="true"><span>N</span><b></b><span>E</span></div>
+    <div class="world-toast mono" data-world-toast hidden>ARCHIVE SHARD RECOVERED</div>
   </div>
   <p class="world-note mono">A walkable archive of systems, experiments, and working notes. No account. No score. Just explore.</p>
 </section>
@@ -34,6 +35,8 @@
   const promptTitle = world?.querySelector<HTMLElement>('[data-world-prompt-title]');
   const promptCopy = world?.querySelector<HTMLElement>('[data-world-prompt-copy]');
   const openButton = world?.querySelector<HTMLButtonElement>('[data-world-open]');
+  const progress = world?.querySelector<HTMLElement>('[data-world-progress]');
+  const toast = world?.querySelector<HTMLElement>('[data-world-toast]');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   if (world && canvas && !world.dataset.initialized) {
@@ -150,10 +153,25 @@
           stations.push(group as unknown as Station);
         });
 
+        const shardPositions = [[-5.2, 0.72, -5.2], [-2.2, 2.05, -2.9], [1.7, 0.6, -4.2], [4.8, 0.7, -3.4], [-5.1, 0.8, 1.8], [0, 1.95, 2.1], [3.6, 0.8, 2.8], [5.3, 0.8, 5.1]];
+        const shards: Array<{ group: InstanceType<typeof THREE.Group>; collected: boolean }> = [];
+        shardPositions.forEach((position, index) => {
+          const shardGroup = new THREE.Group();
+          const shard = new THREE.Mesh(new THREE.OctahedronGeometry(0.14, 0), new THREE.MeshStandardMaterial({ color: index % 2 ? 0xd8ed77 : 0x68e0d5, emissive: index % 2 ? 0x6c7a2d : 0x246f78, emissiveIntensity: 0.5, roughness: 0.22, metalness: 0.35 }));
+          const ring = new THREE.Mesh(new THREE.TorusGeometry(0.26, 0.018, 8, 20), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.75 }));
+          ring.rotation.x = Math.PI / 2;
+          shardGroup.add(shard, ring);
+          shardGroup.position.set(position[0], position[1], position[2]);
+          shardGroup.userData.baseY = position[1];
+          scene.add(shardGroup);
+          shards.push({ group: shardGroup, collected: false });
+        });
+
         const keys: Record<string, boolean> = {};
         let selected: Station | null = null;
         let verticalVelocity = 0;
         let grounded = true;
+        let collectedShards = 0;
         const setSelected = (station: Station | null) => {
           selected = station;
           if (!prompt || !promptTitle || !promptCopy || !status || !openButton) return;
@@ -186,7 +204,7 @@
           const now = performance.now();
           const delta = Math.min((now - lastTime) / 1000, 0.05);
           lastTime = now;
-          const speed = 2.5 * delta;
+          const speed = (keys.shift ? 4.4 : 2.5) * delta;
           if (keys.w || keys.arrowup) player.position.z -= speed;
           if (keys.s || keys.arrowdown) player.position.z += speed;
           if (keys.a || keys.arrowleft) player.position.x -= speed;
@@ -196,6 +214,18 @@
           verticalVelocity -= 12 * delta;
           player.position.y += verticalVelocity * delta;
           if (player.position.y <= 0) { player.position.y = 0; verticalVelocity = 0; grounded = true; }
+          shards.forEach((shard) => {
+            if (shard.collected) return;
+            shard.group.rotation.y += delta * 1.8;
+            shard.group.position.y = shard.group.userData.baseY + Math.sin(now * 0.002 + shard.group.position.x) * 0.08;
+            if (shard.group.position.distanceTo(player.position) < 0.65) {
+              shard.collected = true;
+              shard.group.visible = false;
+              collectedShards += 1;
+              if (progress) progress.textContent = `ARCHIVE ${collectedShards} / ${shards.length}`;
+              if (toast) { toast.hidden = false; toast.textContent = collectedShards === shards.length ? 'ARCHIVE COMPLETE / ALL SHARDS RECOVERED' : 'ARCHIVE SHARD RECOVERED'; window.setTimeout(() => { toast.hidden = true; }, 1400); }
+            }
+          });
           camera.position.lerp(new THREE.Vector3(player.position.x, 5.2 + player.position.y * 0.55, player.position.z + 6.2), 0.08);
           camera.lookAt(player.position.x, 0.45 + player.position.y * 0.4, player.position.z - 1.2);
           stations.forEach((station, index) => { station.rotation.y += delta * (index % 2 ? -0.18 : 0.24); station.position.y = Math.sin(performance.now() * 0.001 + index) * 0.035; station.scale.lerp(new THREE.Vector3(station === selected ? 1.12 : 1, station === selected ? 1.12 : 1, station === selected ? 1.12 : 1), 0.12); });
