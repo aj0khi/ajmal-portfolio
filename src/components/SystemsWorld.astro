@@ -44,6 +44,8 @@
     const launch = async () => {
       try {
         const THREE = await import('three');
+        const { GLTFLoader } = await import('three/addons/loaders/GLTFLoader.js');
+        const glbLoader = new GLTFLoader();
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0x74c4df);
         scene.fog = new THREE.Fog(0x74c4df, 8, 21);
@@ -152,6 +154,22 @@
           }
           group.position.set(data.position[0], 0, data.position[1]);
           group.userData = data;
+          const fallbackPieces = [...group.children];
+          glbLoader.load(`/assets/models/${data.id}.glb`, (gltf) => {
+            const importedModel = gltf.scene;
+            const bounds = new THREE.Box3().setFromObject(importedModel);
+            const size = bounds.getSize(new THREE.Vector3());
+            const largestDimension = Math.max(size.x, size.y, size.z, 0.001);
+            importedModel.scale.setScalar(1.35 / largestDimension);
+            const centeredBounds = new THREE.Box3().setFromObject(importedModel);
+            const center = centeredBounds.getCenter(new THREE.Vector3());
+            importedModel.position.x -= center.x;
+            importedModel.position.z -= center.z;
+            importedModel.position.y -= centeredBounds.min.y;
+            importedModel.traverse((object) => { object.castShadow = true; object.receiveShadow = true; });
+            fallbackPieces.forEach((piece) => { piece.visible = false; });
+            group.add(importedModel);
+          }, undefined, () => undefined);
           scene.add(group);
           stations.push(group as unknown as Station);
         });
