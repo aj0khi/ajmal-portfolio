@@ -1002,6 +1002,17 @@ body::before {
   background: linear-gradient(#147bc9 0%, #66b8e9 56%, #b9e1e8 100%);
 }
 
+.ambient-scene {
+  position: absolute;
+  z-index: 1;
+  inset: 4% 18% 20% 18%;
+  width: 64%;
+  height: 76%;
+  opacity: 0.85;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
 .desktop-wallpaper::before,
 .desktop-wallpaper::after {
   position: absolute;

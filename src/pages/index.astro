@@ -1,5 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
+import AmbientScene from '../components/AmbientScene.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import BlackBoxDemo from '../components/BlackBoxDemo.astro';
 import DesktopWindow from '../components/DesktopWindow.astro';
@@ -26,6 +27,7 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
         <div class="crt-glow" aria-hidden="true"></div>
         <div class="boot-sequence" data-boot-sequence aria-hidden="true"><strong>AJMALOS</strong><span data-boot-message>CHECKING LOCAL ARCHIVE...</span><i></i><small>PRESS ANY KEY TO SKIP</small></div>
         <div class="desktop-wallpaper">
+          <AmbientScene />
           <div class="sky-noise" aria-hidden="true"></div>
           <div class="hill hill-back" aria-hidden="true"></div>
           <div class="hill hill-front" aria-hidden="true"></div>

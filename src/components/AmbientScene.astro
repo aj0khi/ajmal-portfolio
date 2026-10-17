@@ -1,0 +1,41 @@
+<canvas class="ambient-scene" data-ambient-scene aria-hidden="true"></canvas>
+<script>
+  const canvas = document.querySelector<HTMLCanvasElement>('[data-ambient-scene]');
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (canvas && !reduced) {
+    const start = async () => {
+      try {
+        const THREE = await import('three');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 100);
+        camera.position.set(0, 0.4, 6.5);
+        const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+        renderer.setPixelRatio(Math.min(devicePixelRatio, 1.25));
+        const group = new THREE.Group();
+        const ring = new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(
+          Array.from({ length: 48 }, (_, index) => {
+            const angle = (index / 48) * Math.PI * 2;
+            return new THREE.Vector3(Math.cos(angle) * 1.5, Math.sin(angle) * 0.46, 0);
+          })
+        ), new THREE.LineBasicMaterial({ color: 0x8fc6d8, transparent: true, opacity: 0.23 }));
+        group.add(ring);
+        const points = [];
+        for (let index = 0; index < 28; index += 1) {
+          const angle = (index / 28) * Math.PI * 2;
+          points.push(new THREE.Vector3(Math.cos(angle) * (1.1 + (index % 4) * 0.1), Math.sin(angle) * 0.35, (index % 3 - 1) * 0.15));
+        }
+        const pointsGeometry = new THREE.BufferGeometry().setFromPoints(points);
+        group.add(new THREE.Points(pointsGeometry, new THREE.PointsMaterial({ color: 0xe1efd9, size: 0.055, transparent: true, opacity: 0.55 })));
+        scene.add(group);
+        const resize = () => { const box = canvas.getBoundingClientRect(); renderer.setSize(box.width, box.height, false); camera.aspect = box.width / Math.max(box.height, 1); camera.updateProjectionMatrix(); };
+        resize();
+        addEventListener('resize', resize);
+        const animate = (time: number) => { group.rotation.y = time * 0.00008; group.rotation.z = Math.sin(time * 0.00015) * 0.04; renderer.render(scene, camera); requestAnimationFrame(animate); };
+        requestAnimationFrame(animate);
+      } catch {
+        canvas.hidden = true;
+      }
+    };
+    if ('requestIdleCallback' in window) requestIdleCallback(start); else setTimeout(start, 800);
+  }
+</script>
