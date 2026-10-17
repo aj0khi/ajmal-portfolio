@@ -343,23 +343,6 @@ export class ExploreWorld {
     this.animatedObjects.push({ object: marker, baseY: 1.2, speed: 0.45, phase: secret.worldZ, rotation: 0.35 });
   }
 
-  private createClouds() {
-    const cloudMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.9, transparent: true, opacity: 0.82 });
-    const cloudGeometry = new THREE.SphereGeometry(1.5, 12, 8);
-    [[-15, 10, -15, 1.8], [11, 13, -19, 1.35], [18, 8, 5, 1.1]].forEach(([x, y, z, scale], index) => {
-      const cloud = new THREE.Group();
-      for (let puff = 0; puff < 4; puff += 1) {
-        const mesh = new THREE.Mesh(cloudGeometry, cloudMaterial);
-        mesh.position.set((puff - 1.5) * 1.15, Math.sin(puff) * 0.22, Math.cos(puff * 1.7) * 0.28);
-        mesh.scale.setScalar(scale * (puff === 1 ? 1.15 : 0.78));
-        cloud.add(mesh);
-      }
-      cloud.position.set(x, y, z);
-      this.scene.add(cloud);
-      this.animatedObjects.push({ object: cloud, baseY: y, speed: 0.08 + index * 0.025, phase: index * 2, rotation: 0 });
-    });
-  }
-
   private createPlayer() {
     const player = new THREE.Group();
     const shadow = new THREE.Mesh(
@@ -392,24 +375,6 @@ export class ExploreWorld {
       this.limbs.push(limb);
     });
     return player;
-  }
-
-  private addTree(parent: Three.Group, x: number, y: number, z: number) {
-    const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.28, 1.8, 8), new THREE.MeshStandardMaterial({ color: 0x81553c }));
-    trunk.position.set(x, y + 1.8, z);
-    parent.add(trunk);
-    const canopy = new THREE.Mesh(new THREE.IcosahedronGeometry(1.25, 1), new THREE.MeshStandardMaterial({ color: 0x32ae6f, roughness: 0.75 }));
-    canopy.position.set(x, y + 3.2, z);
-    parent.add(canopy);
-    this.blockers.push({ x, z, radius: 0.85 });
-  }
-
-  private createGlassSphere(x: number, y: number, z: number, scale: number) {
-    const sphere = new THREE.Mesh(new THREE.SphereGeometry(0.7, 20, 14), new THREE.MeshPhysicalMaterial({ color: 0x9cfff4, roughness: 0.08, metalness: 0.05, transmission: 0.35, transparent: true, opacity: 0.82, clearcoat: 1 }));
-    sphere.position.set(x, y, z);
-    sphere.scale.setScalar(scale);
-    this.animatedObjects.push({ object: sphere, baseY: y, speed: 0.7, phase: x + z, rotation: 0.35 });
-    return sphere;
   }
 
   private addLandmark(parent: Three.Group, landmark: ExploreLandmark) {
@@ -457,130 +422,6 @@ export class ExploreWorld {
       marker.position.set(index * 1.15, 1.38, 1.1);
       parent.add(marker);
     }
-  }
-
-  private addLowMound(parent: Three.Group, x: number, y: number, z: number, width: number, height: number) {
-      const mound = new THREE.Mesh(
-        new THREE.SphereGeometry(1, 16, 8),
-        new THREE.MeshStandardMaterial({ color: 0x8fda82, roughness: 0.82 }),
-      );
-      mound.scale.set(width, height, width * 0.72);
-      mound.position.set(x, y + height * 0.65, z);
-      parent.add(mound);
-    }
-
-  private addGlassArch(parent: Three.Group, x: number, y: number, z: number) {
-      const arch = new THREE.Mesh(
-        new THREE.TorusGeometry(1.05, 0.12, 10, 24, Math.PI),
-        new THREE.MeshPhysicalMaterial({ color: 0xb8fff3, emissive: 0x42d9d0, emissiveIntensity: 0.18, roughness: 0.12, clearcoat: 1, transmission: 0.2 }),
-      );
-      arch.rotation.z = Math.PI / 2;
-      arch.position.set(x, y + 1.05, z);
-      parent.add(arch);
-      const base = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.18, 0.24, 1.1, 8),
-        new THREE.MeshStandardMaterial({ color: 0xeafff5, roughness: 0.28, metalness: 0.12 }),
-      );
-      [-1, 1].forEach((side) => {
-        const post = base.clone();
-        post.position.set(x, y + 0.55, z + side * 0.92);
-        parent.add(post);
-      });
-    }
-
-  private addWindSpinners(parent: Three.Group, x: number, y: number, z: number) {
-      const spinner = new THREE.Group();
-      const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.08, 1.3, 6), new THREE.MeshStandardMaterial({ color: 0xe9fff4, roughness: 0.3, metalness: 0.15 }));
-      pole.position.y = 0.65;
-      spinner.add(pole);
-      const hub = new THREE.Mesh(new THREE.SphereGeometry(0.14, 10, 8), new THREE.MeshBasicMaterial({ color: 0xffffc4 }));
-      hub.position.y = 1.3;
-      spinner.add(hub);
-      for (let index = 0; index < 4; index += 1) {
-        const blade = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.52, 0.02), new THREE.MeshBasicMaterial({ color: 0x8df7e4 }));
-        blade.position.y = 1.3;
-        blade.rotation.z = index * Math.PI / 2;
-        spinner.add(blade);
-      }
-      spinner.position.set(x, y, z);
-      parent.add(spinner);
-      this.animatedObjects.push({ object: spinner, baseY: y, speed: 0.35, phase: x, rotation: 1.5 });
-  }
-
-  private addAeroReeds(parent: Three.Group, x: number, y: number, z: number) {
-    const stemMaterial = new THREE.MeshStandardMaterial({ color: 0x39ad88, roughness: 0.72 });
-    const bulbMaterial = new THREE.MeshPhysicalMaterial({ color: 0x9ffff0, emissive: 0x2adbd0, emissiveIntensity: 0.18, roughness: 0.12, clearcoat: 1 });
-    for (let index = 0; index < 5; index += 1) {
-      const reed = new THREE.Group();
-      const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.05, 0.85, 6), stemMaterial);
-      stem.position.y = 0.42;
-      const bulb = new THREE.Mesh(new THREE.SphereGeometry(0.13, 8, 6), bulbMaterial);
-      bulb.position.y = 0.9;
-      reed.add(stem, bulb);
-      reed.position.set(x + (index - 2) * 0.22, y, z + Math.cos(index) * 0.16);
-      parent.add(reed);
-      this.animatedObjects.push({ object: reed, baseY: y, speed: 0.5 + index * 0.05, phase: index, rotation: 0.04 });
-    }
-  }
-
-  private addPine(parent: Three.Group, x: number, y: number, z: number) {
-    const material = new THREE.MeshStandardMaterial({ color: 0x198b68, roughness: 0.72 });
-    const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.13, 0.2, 1.4, 7), new THREE.MeshStandardMaterial({ color: 0x79513c }));
-    trunk.position.set(x, y + 0.7, z);
-    parent.add(trunk);
-    for (let layer = 0; layer < 3; layer += 1) {
-      const cone = new THREE.Mesh(new THREE.ConeGeometry(0.8 - layer * 0.13, 1.2, 8), material);
-      cone.position.set(x, y + 1.35 + layer * 0.55, z);
-      parent.add(cone);
-    }
-    this.blockers.push({ x, z, radius: 0.6 });
-  }
-
-  private addStone(parent: Three.Group, x: number, y: number, z: number, size: number) {
-    const stone = new THREE.Mesh(new THREE.DodecahedronGeometry(size, 0), new THREE.MeshStandardMaterial({ color: 0xd2d6c2, roughness: 0.82 }));
-    stone.position.set(x, y, z);
-    stone.scale.y = 0.55;
-    parent.add(stone);
-  }
-
-  private addFlowers(parent: Three.Group, x: number, y: number, z: number) {
-    const stemMaterial = new THREE.MeshStandardMaterial({ color: 0x2a9b63 });
-    const petalMaterial = new THREE.MeshStandardMaterial({ color: 0xfff2a8, emissive: 0x5c4a11, emissiveIntensity: 0.12 });
-    for (let index = 0; index < 4; index += 1) {
-      const flower = new THREE.Group();
-      const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.035, 0.42, 5), stemMaterial);
-      stem.position.y = 0.21;
-      flower.add(stem);
-      const bloom = new THREE.Mesh(new THREE.SphereGeometry(0.13, 8, 6), petalMaterial);
-      bloom.position.y = 0.46;
-      flower.add(bloom);
-      flower.position.set(x + (index - 1.5) * 0.22, y, z + Math.sin(index) * 0.16);
-      parent.add(flower);
-      this.animatedObjects.push({ object: flower, baseY: y, speed: 0.8, phase: index, rotation: 0.1 });
-    }
-  }
-
-  private createComputerPod(x: number, y: number, z: number) {
-    const pod = new THREE.Group();
-    const shell = new THREE.Mesh(new THREE.SphereGeometry(0.9, 16, 10), new THREE.MeshStandardMaterial({ color: 0xf3ffff, roughness: 0.2, metalness: 0.25 }));
-    shell.scale.set(1.25, 0.7, 0.85);
-    pod.add(shell);
-    const display = new THREE.Mesh(new THREE.BoxGeometry(0.72, 0.36, 0.06), new THREE.MeshStandardMaterial({ color: 0x7cefe4, emissive: 0x2baea9, emissiveIntensity: 0.5, roughness: 0.18 }));
-    display.position.set(0, 0.13, -0.71);
-    pod.add(display);
-    pod.position.set(x, y, z);
-    this.animatedObjects.push({ object: pod, baseY: y, speed: 0.45, phase: 1.4, rotation: 0.18 });
-    return pod;
-  }
-
-  private addUndersideRocks(parent: Three.Group) {
-    const material = new THREE.MeshStandardMaterial({ color: 0x6f534b, roughness: 0.98 });
-    [[-5, -2.2, 0.9], [3.8, -2.1, 1.1], [0, -2.9, 0.8]].forEach(([x, y, size]) => {
-      const rock = new THREE.Mesh(new THREE.ConeGeometry(size, 2.7, 7), material);
-      rock.position.set(x, y, 0);
-      rock.rotation.z = x * 0.03;
-      parent.add(rock);
-    });
   }
 
   private animateEnvironment(now: number, delta: number) {
