@@ -823,6 +823,276 @@ h2 em {
   }
 }
 
+/* Final workstation art direction */
+body {
+  background: #09121b;
+}
+
+.crt-monitor {
+  background:
+    radial-gradient(circle at 50% 45%, rgba(61, 116, 120, 0.15), transparent 45%),
+    #09121b;
+}
+
+.monitor-bezel {
+  border-color: #40505b;
+  border-radius: 2.5% 2.5% 4% 4%;
+  background: linear-gradient(135deg, #33434f, #17242e 48%, #263844);
+  box-shadow: 0 2rem 5rem rgba(0, 0, 0, 0.7), inset 0 1px rgba(255, 255, 255, 0.22), inset 0 -1.5rem rgba(0, 0, 0, 0.24);
+}
+
+.monitor-brand {
+  color: #91a5ad;
+}
+
+.monitor-brand span {
+  color: #d8ed77;
+}
+
+.monitor-led {
+  color: #90a4a9;
+}
+
+.monitor-led span {
+  background: #d8ed77;
+  box-shadow: 0 0 0.65rem #d8ed77;
+}
+
+.crt-screen {
+  border-color: #071018;
+  background: #0b1722;
+  box-shadow: inset 0 0 2rem #000, 0 0 0.65rem #05090d, 0 0 2rem rgba(104, 224, 213, 0.1);
+}
+
+.desktop-wallpaper {
+  background:
+    linear-gradient(rgba(104, 224, 213, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(104, 224, 213, 0.08) 1px, transparent 1px),
+    linear-gradient(180deg, #10283d 0%, #14505b 58%, #153e3c 100%);
+  background-size: 3.5rem 3.5rem, 3.5rem 3.5rem, auto;
+}
+
+.desktop-wallpaper::before {
+  top: 18%;
+  left: 7%;
+  width: 86%;
+  height: 1px;
+  border-radius: 0;
+  background: #68e0d5;
+  box-shadow: 0 0 1.4rem rgba(104, 224, 213, 0.65);
+  filter: none;
+  opacity: 0.55;
+  transform: none;
+}
+
+.desktop-wallpaper::after {
+  top: 18%;
+  right: 7%;
+  width: 12%;
+  height: 45%;
+  border: 1px solid rgba(216, 237, 119, 0.38);
+  border-radius: 0;
+  background: linear-gradient(180deg, transparent, rgba(216, 237, 119, 0.08));
+  filter: none;
+  transform: none;
+}
+
+.ambient-scene {
+  opacity: 1;
+  mix-blend-mode: screen;
+}
+
+.hill-back {
+  background: linear-gradient(180deg, #236e6b, #123f43);
+}
+
+.hill-front {
+  background: linear-gradient(180deg, #174f4c, #0b2b31);
+}
+
+.desktop-status {
+  color: #d8ed77;
+  text-shadow: 0 0 0.6rem rgba(216, 237, 119, 0.5);
+}
+
+.desktop-icon {
+  color: #f0f6e9;
+  text-shadow: 0 1px #071018, 0 0 0.5rem rgba(0, 0, 0, 0.35);
+}
+
+.desktop-icon:hover,
+.desktop-icon:focus-visible {
+  border-color: rgba(216, 237, 119, 0.8);
+  background: rgba(104, 224, 213, 0.16);
+  box-shadow: inset 0 0 0 1px rgba(104, 224, 213, 0.16);
+}
+
+.desktop-icon-image {
+  filter: drop-shadow(0 0.35rem 0.35rem rgba(0, 0, 0, 0.35));
+}
+
+.os-window {
+  border-color: #102436;
+  background: #e8eee8;
+  box-shadow: 0.65rem 0.75rem rgba(2, 12, 20, 0.58), 0 0 2rem rgba(104, 224, 213, 0.08);
+}
+
+.window-titlebar {
+  min-height: 2rem;
+  color: #e8f4ec;
+  background: linear-gradient(90deg, #102436, #176577 56%, #27566b);
+  box-shadow: inset 0 -1px rgba(216, 237, 119, 0.45);
+}
+
+.window-title {
+  letter-spacing: 0.04em;
+}
+
+.window-controls button {
+  border-color: #54717a;
+  color: #d8ed77;
+  background: #183746;
+}
+
+.window-content {
+  scrollbar-color: #4b8790 #d0dcd7;
+}
+
+.window-kicker,
+.file-tags,
+.file-card-top {
+  color: #087788;
+}
+
+.explorer-heading h1,
+.window-content h2 {
+  color: #102436;
+}
+
+.explorer-heading h1 em,
+.window-content h2 em {
+  color: #087788;
+}
+
+.featured-strip,
+.portfolio-signals {
+  border-color: #4c9ca0;
+  background: #c7e5df;
+}
+
+.featured-strip button,
+.stale-controls button,
+.ik-start {
+  border-color: #0b7886;
+  color: #0b5966;
+  background: #eef3d7;
+}
+
+.featured-strip button:hover,
+.featured-strip button:focus-visible,
+.stale-controls button:hover,
+.stale-controls button:focus-visible,
+.ik-start:hover,
+.ik-start:focus-visible {
+  color: #071018;
+  background: #d8ed77;
+}
+
+.file-card,
+.system-grid div,
+.skills-explorer div,
+.research-grid div,
+.restore-readout,
+.blackbox-layers div {
+  border-color: #a6bab6;
+  background: #f2f4e9;
+  box-shadow: 0 0.25rem 0 rgba(16, 36, 54, 0.08);
+}
+
+.file-card h2,
+.system-grid span,
+.skills-explorer span,
+.timeline span,
+.research-grid span,
+.notes-list span {
+  color: #344f5e;
+}
+
+.mock-diagram,
+.stale-lab {
+  border-color: #6eaaa9;
+  background: #d7e8e1;
+  box-shadow: inset 0 0 0 3px #c2d8d0;
+}
+
+.diagram-node {
+  border-color: #438a91;
+  background: #eef3d7;
+}
+
+.diagram-node strong,
+.blackbox-layers span,
+.timeline strong {
+  color: #102436;
+}
+
+.waybionic-3d {
+  border-color: #438a91;
+  background: #d1e4df;
+  box-shadow: inset 0 0 1rem rgba(21, 78, 83, 0.12);
+}
+
+.ik-stage {
+  border-color: #0c2837;
+  box-shadow: inset 0 0 1.5rem rgba(0, 0, 0, 0.45);
+}
+
+.taskbar {
+  border-top-color: #6b858b;
+  border-radius: 0.3rem;
+  background: linear-gradient(90deg, #172b38, #253e49 60%, #1a2c36);
+  box-shadow: 0 -0.4rem 1rem rgba(0, 0, 0, 0.18);
+}
+
+.start-button,
+.taskbar-windows button {
+  border-color: #66828b;
+  color: #e8f4ec;
+  background: #294754;
+}
+
+.start-button {
+  color: #d8ed77;
+}
+
+.start-button:active,
+.taskbar-windows button.active {
+  border-color: #d8ed77;
+  background: #0b7886;
+}
+
+.system-tray {
+  border-color: #66828b;
+  color: #c8ded5;
+}
+
+.system-tray button {
+  color: #d8ed77;
+  background: transparent;
+}
+
+.start-menu,
+.command-palette,
+.calendar-popup {
+  border-color: #102436;
+  background: #dce9e2;
+  box-shadow: 0.5rem 0.6rem rgba(0, 0, 0, 0.38), 0 0 1.5rem rgba(104, 224, 213, 0.12);
+}
+
+.start-heading {
+  background: linear-gradient(135deg, #102436, #176577);
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -3343,4 +3613,80 @@ body::before {
     border-top: 1px solid #b7b8ab;
     border-left: 0;
   }
+}
+
+/* Final workstation art direction */
+body { background: #09121b; }
+.crt-monitor {
+  background: radial-gradient(circle at 50% 45%, rgba(61, 116, 120, 0.15), transparent 45%), #09121b;
+}
+.monitor-bezel {
+  border-color: #40505b;
+  background: linear-gradient(135deg, #33434f, #17242e 48%, #263844);
+  box-shadow: 0 2rem 5rem rgba(0, 0, 0, 0.7), inset 0 1px rgba(255, 255, 255, 0.22), inset 0 -1.5rem rgba(0, 0, 0, 0.24);
+}
+.monitor-brand { color: #91a5ad; }
+.monitor-brand span { color: #d8ed77; }
+.monitor-led { color: #90a4a9; }
+.monitor-led span { background: #d8ed77; box-shadow: 0 0 0.65rem #d8ed77; }
+.crt-screen {
+  border-color: #071018;
+  background: #0b1722;
+  box-shadow: inset 0 0 2rem #000, 0 0 0.65rem #05090d, 0 0 2rem rgba(104, 224, 213, 0.1);
+}
+.desktop-wallpaper {
+  background: linear-gradient(rgba(104, 224, 213, 0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(104, 224, 213, 0.08) 1px, transparent 1px), linear-gradient(180deg, #10283d 0%, #14505b 58%, #153e3c 100%);
+  background-size: 3.5rem 3.5rem, 3.5rem 3.5rem, auto;
+}
+.desktop-wallpaper::before {
+  top: 18%; left: 7%; width: 86%; height: 1px; border-radius: 0; background: #68e0d5;
+  box-shadow: 0 0 1.4rem rgba(104, 224, 213, 0.65); filter: none; opacity: 0.55; transform: none;
+}
+.desktop-wallpaper::after {
+  top: 18%; right: 7%; width: 12%; height: 45%; border: 1px solid rgba(216, 237, 119, 0.38); border-radius: 0;
+  background: linear-gradient(180deg, transparent, rgba(216, 237, 119, 0.08)); filter: none; transform: none;
+}
+.ambient-scene { opacity: 1; mix-blend-mode: screen; }
+.hill-back { background: linear-gradient(180deg, #236e6b, #123f43); }
+.hill-front { background: linear-gradient(180deg, #174f4c, #0b2b31); }
+.desktop-status { color: #d8ed77; text-shadow: 0 0 0.6rem rgba(216, 237, 119, 0.5); }
+.desktop-icon { color: #f0f6e9; text-shadow: 0 1px #071018, 0 0 0.5rem rgba(0, 0, 0, 0.35); }
+.desktop-icon:hover,
+.desktop-icon:focus-visible { border-color: rgba(216, 237, 119, 0.8); background: rgba(104, 224, 213, 0.16); box-shadow: inset 0 0 0 1px rgba(104, 224, 213, 0.16); }
+.desktop-icon-image { filter: drop-shadow(0 0.35rem 0.35rem rgba(0, 0, 0, 0.35)); }
+.os-window {
+  border-color: #102436; background: #e8eee8;
+  box-shadow: 0.65rem 0.75rem rgba(2, 12, 20, 0.58), 0 0 2rem rgba(104, 224, 213, 0.08);
+}
+.window-titlebar { min-height: 2rem; color: #e8f4ec; background: linear-gradient(90deg, #102436, #176577 56%, #27566b); box-shadow: inset 0 -1px rgba(216, 237, 119, 0.45); }
+.window-title { letter-spacing: 0.04em; }
+.window-controls button { border-color: #54717a; color: #d8ed77; background: #183746; }
+.window-content { scrollbar-color: #4b8790 #d0dcd7; }
+.window-kicker, .file-tags, .file-card-top { color: #087788; }
+.explorer-heading h1, .window-content h2 { color: #102436; }
+.explorer-heading h1 em, .window-content h2 em { color: #087788; }
+.featured-strip, .portfolio-signals { border-color: #4c9ca0; background: #c7e5df; }
+.signal-card-primary { color: #f7f1d6; background: #285f70; }
+.signal-card-primary span, .signal-card-primary small { color: #b9d7d4; }
+.featured-strip button, .stale-controls button, .ik-start { border-color: #0b7886; color: #0b5966; background: #eef3d7; }
+.featured-strip button:hover, .featured-strip button:focus-visible, .stale-controls button:hover, .stale-controls button:focus-visible, .ik-start:hover, .ik-start:focus-visible { color: #071018; background: #d8ed77; }
+.file-card, .system-grid div, .skills-explorer div, .research-grid div, .restore-readout, .blackbox-layers div { border-color: #a6bab6; background: #f2f4e9; box-shadow: 0 0.25rem 0 rgba(16, 36, 54, 0.08); }
+.file-card h2, .system-grid span, .skills-explorer span, .timeline span, .research-grid span, .notes-list span { color: #344f5e; }
+.mock-diagram, .stale-lab { border-color: #6eaaa9; background: #d7e8e1; box-shadow: inset 0 0 0 3px #c2d8d0; }
+.diagram-node { border-color: #438a91; background: #eef3d7; }
+.diagram-node strong, .blackbox-layers span, .timeline strong { color: #102436; }
+.waybionic-3d { border-color: #438a91; background: #d1e4df; box-shadow: inset 0 0 1rem rgba(21, 78, 83, 0.12); }
+.ik-stage { border-color: #0c2837; box-shadow: inset 0 0 1.5rem rgba(0, 0, 0, 0.45); }
+.taskbar { border-top-color: #6b858b; border-radius: 0.3rem; background: linear-gradient(90deg, #172b38, #253e49 60%, #1a2c36); box-shadow: 0 -0.4rem 1rem rgba(0, 0, 0, 0.18); }
+.start-button, .taskbar-windows button { border-color: #66828b; color: #e8f4ec; background: #294754; }
+.start-button { color: #d8ed77; }
+.start-button:active, .taskbar-windows button.active { border-color: #d8ed77; background: #0b7886; }
+.system-tray { border-color: #66828b; color: #c8ded5; }
+.system-tray button { color: #d8ed77; background: transparent; }
+.start-menu, .command-palette, .calendar-popup { border-color: #102436; background: #dce9e2; box-shadow: 0.5rem 0.6rem rgba(0, 0, 0, 0.38), 0 0 1.5rem rgba(104, 224, 213, 0.12); }
+.start-heading { background: linear-gradient(135deg, #102436, #176577); }
+
+@media (max-width: 700px) {
+  .portfolio-signals { grid-template-columns: 1fr; }
+  .signal-trace { display: none; }
 }

@@ -1,11 +1,11 @@
 :root {
-  --paper: #f3efe6;
-  --paper-deep: #e9e3d7;
-  --ink: #1b1a17;
-  --ink-soft: #625e55;
-  --line: rgba(27, 26, 23, 0.22);
-  --accent: #2f7894;
-  --accent-soft: #d7e6e5;
+  --paper: #e8eee8;
+  --paper-deep: #d5e0dc;
+  --ink: #102436;
+  --ink-soft: #536777;
+  --line: rgba(16, 36, 54, 0.24);
+  --accent: #0b7886;
+  --accent-soft: #c7e5df;
   --serif: 'Fraunces', Georgia, serif;
   --mono: 'IBM Plex Mono', 'Courier New', monospace;
   --shell: min(100% - 3rem, 80rem);
