@@ -1191,6 +1191,23 @@ body {
   text-align: right;
 }
 
+.world-hud-right button {
+  margin-top: 0.2rem;
+  border: 1px solid rgba(216, 237, 119, 0.7);
+  padding: 0.3rem 0.45rem;
+  color: #185d78;
+  background: rgba(255, 255, 255, 0.82);
+  font: 700 0.45rem var(--mono);
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.world-hud-right button:hover,
+.world-hud-right button:focus-visible {
+  color: #ffffff;
+  background: #318fb1;
+}
+
 .world-prompt {
   position: absolute;
   right: 1rem;
@@ -1209,6 +1226,19 @@ body {
 .world-prompt button { border: 1px solid #d8ed77; padding: 0.5rem 0.65rem; color: #0b1722; background: #d8ed77; font: 700 0.52rem var(--mono); cursor: pointer; }
 .world-prompt button:hover, .world-prompt button:focus-visible { color: #f0f6e9; background: #0b7886; }
 .world-note { margin: 0; color: #5f777d; font-size: 0.52rem; }
+
+.world-layer {
+  position: absolute;
+  z-index: 7;
+  inset: 0;
+}
+
+.world-layer[hidden] { display: none; }
+.world-layer .systems-world { height: 100%; min-height: 0; gap: 0; }
+.world-layer .systems-world-stage { height: 100%; min-height: 0; border: 0; }
+.world-layer .systems-world-stage canvas { height: 100%; min-height: 0; }
+.world-layer .world-note { position: absolute; bottom: 3.4rem; left: 1rem; color: rgba(39, 123, 156, 0.88); text-shadow: 0 1px #ffffff; }
+[data-desktop][data-mode='world'] .desktop-icons { opacity: 0; pointer-events: none; }
 
 .world-legend {
   position: absolute;

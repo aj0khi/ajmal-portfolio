@@ -27,6 +27,7 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
       <div class="crt-screen" data-desktop>
         <div class="crt-glow" aria-hidden="true"></div>
         <div class="boot-sequence" data-boot-sequence aria-hidden="true"><strong>AJMALOS</strong><span data-boot-message>CHECKING LOCAL ARCHIVE...</span><i></i><small>PRESS ANY KEY TO SKIP</small></div>
+        <div class="world-layer" data-world-layer><SystemsWorld /></div>
         <div class="desktop-wallpaper">
           <AmbientScene />
           <div class="sky-noise" aria-hidden="true"></div>
@@ -189,7 +190,7 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
           </DesktopWindow>
 
           <DesktopWindow id="field" title="SYSTEMS FIELD / WALKABLE ARCHIVE" icon="✦" class="window-field">
-            <SystemsWorld />
+            <div class="field-return-panel"><div class="window-kicker mono">PRIMARY EXPERIENCE / 3D ARCHIVE</div><h2>The world is ready<br /><em>outside this window.</em></h2><p class="window-copy">Return to the walkable Systems Field to explore the stations, then inspect any project from inside the world.</p><button type="button" data-world-return>RETURN TO SYSTEMS FIELD ↗</button></div>
           </DesktopWindow>
 
           <DesktopWindow id="research" title="RESEARCH / PERSONAL" icon="◉" class="window-research">
@@ -295,12 +296,14 @@ Type help for available commands.</div><form data-terminal-form><span>ajmal@work
 
 <script>
   const desktop = document.querySelector('[data-desktop]');
+  const worldLayer = document.querySelector<HTMLElement>('[data-world-layer]');
   const taskbar = document.querySelector('[data-taskbar]');
   const startMenu = document.querySelector<HTMLElement>('[data-start-menu]');
   const startToggle = document.querySelector('[data-start-toggle]');
   let highestZ = 10;
 
   if (desktop && taskbar && startMenu && startToggle) {
+    (desktop as HTMLElement).dataset.mode = worldLayer ? 'world' : 'desktop';
     const boot = document.querySelector<HTMLElement>('[data-boot-sequence]');
     const bootMessage = boot?.querySelector<HTMLElement>('[data-boot-message]');
     const bootPhases = ['CHECKING LOCAL ARCHIVE...', 'MOUNTING PROJECTS...', 'STARTING AJMALOS...', 'READY.'];
@@ -316,8 +319,8 @@ Type help for available commands.</div><form data-terminal-form><span>ajmal@work
     const windows = desktop.querySelectorAll<HTMLElement>('[data-window]');
     const portfolioWindow = desktop.querySelector<HTMLElement>('[data-window="portfolio"]');
     if (portfolioWindow) {
-      portfolioWindow.hidden = false;
-      portfolioWindow.dataset.windowOpened = 'true';
+      portfolioWindow.hidden = Boolean(worldLayer);
+      portfolioWindow.dataset.windowOpened = worldLayer ? 'false' : 'true';
     }
     const focusWindow = (id: string) => {
       const target = desktop.querySelector<HTMLElement>(`[data-window="${id}"]`);
@@ -338,6 +341,17 @@ Type help for available commands.</div><form data-terminal-form><span>ajmal@work
       });
       const openCalendar = desktop.querySelector<HTMLElement>('[data-calendar]');
       if (openCalendar) openCalendar.hidden = true;
+    };
+
+    const setWorldMode = (active: boolean) => {
+      if (worldLayer) worldLayer.hidden = !active;
+      (desktop as HTMLElement).dataset.mode = active ? 'world' : 'desktop';
+      if (active && portfolioWindow) {
+        portfolioWindow.hidden = true;
+        portfolioWindow.dataset.windowOpened = 'false';
+      }
+      if (!active) focusWindow('portfolio');
+      rebuildTaskbar();
     };
 
     const toggleMaximize = (windowElement: HTMLElement) => {
@@ -401,6 +415,11 @@ Type help for available commands.</div><form data-terminal-form><span>ajmal@work
       const closer = target.closest<HTMLElement>('[data-window-close]');
       const minimizer = target.closest<HTMLElement>('[data-window-minimize]');
       const maximizer = target.closest<HTMLElement>('[data-window-maximize]');
+      const worldDesktop = target.closest<HTMLElement>('[data-world-desktop]');
+      const worldReturn = target.closest<HTMLElement>('[data-world-return]');
+
+      if (worldDesktop) { setWorldMode(false); return; }
+      if (worldReturn) { setWorldMode(true); return; }
 
       if (opener) {
         focusWindow(opener.dataset.windowOpen ?? '');
