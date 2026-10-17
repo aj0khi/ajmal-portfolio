@@ -46,6 +46,23 @@
         const THREE = await import('three');
         const { GLTFLoader } = await import('three/addons/loaders/GLTFLoader.js');
         const glbLoader = new GLTFLoader();
+        const loadImportedModel = (path: string, parent: InstanceType<typeof THREE.Object3D>, position: [number, number, number], targetSize: number, rotationY = 0, onLoaded?: (model: InstanceType<typeof THREE.Object3D>) => void) => {
+          glbLoader.load(path, (gltf) => {
+            const model = gltf.scene;
+            const bounds = new THREE.Box3().setFromObject(model);
+            const size = bounds.getSize(new THREE.Vector3());
+            const largestDimension = Math.max(size.x, size.y, size.z, 0.001);
+            const scale = targetSize / largestDimension;
+            model.scale.setScalar(scale);
+            const centeredBounds = new THREE.Box3().setFromObject(model);
+            const center = centeredBounds.getCenter(new THREE.Vector3());
+            model.position.set(position[0] - center.x, position[1] - centeredBounds.min.y, position[2] - center.z);
+            model.rotation.y = rotationY;
+            model.traverse((object) => { object.castShadow = true; object.receiveShadow = true; });
+            parent.add(model);
+            onLoaded?.(model);
+          }, undefined, () => undefined);
+        };
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0x74c4df);
         scene.fog = new THREE.Fog(0x74c4df, 8, 21);
@@ -120,6 +137,20 @@
         player.add(playerLight);
         player.position.set(0, 0, 4.8);
         scene.add(player);
+        loadImportedModel('/assets/models/simple_character.glb', player, [0, 0, 0], 1.25, Math.PI);
+
+        loadImportedModel('/assets/models/animated_ocean_scene_tutorial_example_1.glb', scene, [0, -0.12, -7], 12, 0);
+        loadImportedModel('/assets/models/frutiger_aero_buildings.glb', scene, [0, 0, -5.8], 7.5, 0);
+        loadImportedModel('/assets/models/futuristic_building_props.glb', scene, [0, 0, -3], 4.8, 0);
+        loadImportedModel('/assets/models/bridge.glb', scene, [0, 1.65, -0.45], 7.5, 0);
+        loadImportedModel('/assets/models/floating_island.glb', scene, [-4.3, 2.7, -4.5], 3.6, 0.3);
+        loadImportedModel('/assets/models/floating_island_paint_test.glb', scene, [4.4, 2.3, -4.1], 2.7, -0.4);
+        loadImportedModel('/assets/models/palm_trees.glb', scene, [-5.1, 0, 2.6], 3.8, 0.2);
+        loadImportedModel('/assets/models/small_rocks.glb', scene, [3.6, 0, 2.8], 2.2, 0);
+        loadImportedModel('/assets/models/stylized_crystal_gems_asset_pack.glb', scene, [0.2, 0, 1.9], 1.6, 0);
+        loadImportedModel('/assets/models/clouds.glb', scene, [0, 4.8, -3.5], 7, 0);
+        const playerVelocity = new THREE.Vector3();
+        let cameraDistance = 4.6;
 
         const stationData = [
           { id: 'waybionic', title: 'WAYBIONIC', copy: 'ROS2 ground station / movement diagnostics', position: [-4.4, -2.2], color: 0x68e0d5, type: 'arm' },
@@ -215,6 +246,7 @@
         addEventListener('keyup', (event) => { keys[event.key.toLowerCase()] = false; });
         openButton?.addEventListener('click', inspect);
         canvas.addEventListener('pointerdown', inspect);
+        canvas.addEventListener('wheel', (event) => { event.preventDefault(); cameraDistance = Math.max(3.2, Math.min(7.2, cameraDistance + event.deltaY * 0.004)); }, { passive: false });
 
         const resize = () => { const bounds = canvas.getBoundingClientRect(); renderer.setSize(bounds.width, bounds.height, false); camera.aspect = bounds.width / Math.max(bounds.height, 1); camera.updateProjectionMatrix(); };
         resize();
@@ -232,14 +264,17 @@
           const now = performance.now();
           const delta = Math.min((now - lastTime) / 1000, 0.05);
           lastTime = now;
-          const speed = (keys.shift ? 4.4 : 2.5) * delta;
-          let deltaX = 0;
-          let deltaZ = 0;
-          if (keys.w || keys.arrowup) deltaZ -= speed;
-          if (keys.s || keys.arrowdown) deltaZ += speed;
-          if (keys.a || keys.arrowleft) deltaX -= speed;
-          if (keys.d || keys.arrowright) deltaX += speed;
-          movePlayer(deltaX, deltaZ);
+          const inputX = Number(Boolean(keys.d || keys.arrowright)) - Number(Boolean(keys.a || keys.arrowleft));
+          const inputZ = Number(Boolean(keys.s || keys.arrowdown)) - Number(Boolean(keys.w || keys.arrowup));
+          const inputLength = Math.hypot(inputX, inputZ) || 1;
+          const maxSpeed = keys.shift ? 4.8 : 2.8;
+          const targetVelocityX = (inputX / inputLength) * maxSpeed;
+          const targetVelocityZ = (inputZ / inputLength) * maxSpeed;
+          const response = Math.min(delta * 12, 1);
+          playerVelocity.x += (targetVelocityX - playerVelocity.x) * response;
+          playerVelocity.z += (targetVelocityZ - playerVelocity.z) * response;
+          if (!inputX && !inputZ) { playerVelocity.x *= Math.max(0, 1 - delta * 10); playerVelocity.z *= Math.max(0, 1 - delta * 10); }
+          movePlayer(playerVelocity.x * delta, playerVelocity.z * delta);
           verticalVelocity -= 12 * delta;
           player.position.y += verticalVelocity * delta;
           if (player.position.y <= 0) { player.position.y = 0; verticalVelocity = 0; grounded = true; }
@@ -255,8 +290,8 @@
               if (toast) { toast.hidden = false; toast.textContent = collectedShards === shards.length ? 'ARCHIVE COMPLETE / ALL SHARDS RECOVERED' : 'ARCHIVE SHARD RECOVERED'; window.setTimeout(() => { toast.hidden = true; }, 1400); }
             }
           });
-          camera.position.lerp(new THREE.Vector3(player.position.x, 5.2 + player.position.y * 0.55, player.position.z + 6.2), 0.08);
-          camera.lookAt(player.position.x, 0.45 + player.position.y * 0.4, player.position.z - 1.2);
+          camera.position.lerp(new THREE.Vector3(player.position.x, 2.8 + player.position.y * 0.35, player.position.z + cameraDistance), 0.12);
+          camera.lookAt(player.position.x, 0.72 + player.position.y * 0.35, player.position.z - 1.25);
           stations.forEach((station, index) => { station.rotation.y += delta * (index % 2 ? -0.18 : 0.24); station.position.y = Math.sin(performance.now() * 0.001 + index) * 0.035; station.scale.lerp(new THREE.Vector3(station === selected ? 1.12 : 1, station === selected ? 1.12 : 1, station === selected ? 1.12 : 1), 0.12); });
           updateSelection();
           if (coordinates) coordinates.textContent = `SECTOR ${Math.round(player.position.x).toString().padStart(2, '0')} / ${Math.round(player.position.z).toString().padStart(2, '0')}`;
