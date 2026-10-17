@@ -2553,16 +2553,22 @@ body::before {
 }
 
 .old-arm-joints input {
+  width: 100%;
+  accent-color: #4a97aa;
+}
+
 .terminal-screen > div {
   max-height: 15rem;
   overflow: auto;
   white-space: pre-wrap;
+}
 
 .vfs-output {
-.terminal-screen span {
   margin-top: 1.5rem;
   padding: 0.8rem;
   white-space: pre-wrap;
+}
+
 .terminal-screen .terminal-ok {
   background: #202d2b;
   font: 0.7rem/1.6 var(--mono);
@@ -2570,6 +2576,11 @@ body::before {
 
 .vfs-form {
   display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-top: 0.6rem;
+  color: #2f6f86;
+}
 
 .terminal-screen form {
   display: flex;
@@ -2589,11 +2600,6 @@ body::before {
   background: transparent;
   font: inherit;
   outline: none;
-}
-  gap: 0.5rem;
-  align-items: center;
-  margin-top: 0.6rem;
-  color: #2f6f86;
 }
 
 .vfs-form input {
