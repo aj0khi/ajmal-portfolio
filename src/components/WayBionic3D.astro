@@ -44,24 +44,37 @@
       camera.lookAt(0, 1.2, 0);
       const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+      scene.add(new THREE.HemisphereLight(0xdfe7e0, 0x14202a, 2.1));
+      const keyLight = new THREE.DirectionalLight(0x8fc6d8, 2.4);
+      keyLight.position.set(3, 4, 5);
+      scene.add(keyLight);
 
       const target = new THREE.Mesh(
         new THREE.SphereGeometry(0.13, 20, 20),
-        new THREE.MeshBasicMaterial({ color: 0xcd752a })
+        new THREE.MeshStandardMaterial({ color: 0x4a97aa, emissive: 0x173f52, emissiveIntensity: 0.5, roughness: 0.35 })
       );
       target.position.set(1.3, 1.9, 0.2);
       scene.add(target);
 
       const segmentLength = 0.48;
       const points = Array.from({ length: 5 }, (_, index) => new THREE.Vector3(0, index * segmentLength, 0));
+      const jointMaterial = new THREE.MeshStandardMaterial({ color: 0xa6b989, roughness: 0.42, metalness: 0.12 });
+      const linkMaterial = new THREE.MeshStandardMaterial({ color: 0xdfe7e0, roughness: 0.55, metalness: 0.18 });
       const joints = points.slice(0, 4).map(() => new THREE.Mesh(
         new THREE.SphereGeometry(0.075, 12, 12),
-        new THREE.MeshBasicMaterial({ color: 0xe5c86e })
+        jointMaterial
       ));
       joints.forEach((joint, index) => { joint.position.copy(points[index]); scene.add(joint); });
+      const segmentMeshes = points.slice(0, 4).map(() => new THREE.Mesh(
+        new THREE.CylinderGeometry(0.055, 0.08, segmentLength, 14),
+        linkMaterial
+      ));
+      segmentMeshes.forEach((segment) => scene.add(segment));
       const armGeometry = new THREE.BufferGeometry().setFromPoints(points);
-      const armLine = new THREE.Line(armGeometry, new THREE.LineBasicMaterial({ color: 0x8fc66b }));
+      const armLine = new THREE.Line(armGeometry, new THREE.LineBasicMaterial({ color: 0x4a97aa, transparent: true, opacity: 0.45 }));
       scene.add(armLine);
+      const baseAxes = new THREE.AxesHelper(0.4);
+      scene.add(baseAxes);
 
       const grid = new THREE.GridHelper(6, 12, 0x496375, 0x2f414b);
       grid.position.y = -0.02;
@@ -90,7 +103,7 @@
           target.position.x = Math.max(-2.5, Math.min(2.5, hit.x));
           target.position.y = Math.max(0.2, Math.min(3.5, hit.y));
           const outOfReach = target.position.length() > 2.9;
-          target.material.color.set(outOfReach ? 0x9a3e32 : 0xcd752a);
+          target.material.color.set(outOfReach ? 0x9a3e32 : 0x4a97aa);
           if (targetLabel) targetLabel.textContent = outOfReach ? 'OUT OF REACH' : 'TRACKING';
           if (limitsLabel) limitsLabel.textContent = outOfReach ? 'LIMIT HIT' : 'NOMINAL';
         }
@@ -125,6 +138,14 @@
         }
         armGeometry.setFromPoints(points);
         joints.forEach((joint, index) => joint.position.copy(points[index]));
+        segmentMeshes.forEach((segment, index) => {
+          const start = points[index];
+          const end = points[index + 1];
+          const midpoint = start.clone().add(end).multiplyScalar(0.5);
+          const direction = end.clone().sub(start);
+          segment.position.copy(midpoint);
+          segment.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), direction.normalize());
+        });
         renderer.render(scene, camera);
         requestAnimationFrame(animate);
       };
