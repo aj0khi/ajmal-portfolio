@@ -3227,6 +3227,14 @@ body::before {
     grid-template-columns: 1fr;
   }
 
+  .portfolio-signals {
+    grid-template-columns: 1fr;
+  }
+
+  .signal-trace {
+    display: none;
+  }
+
   .explorer-heading h1,
   .window-content h2 {
     font-size: 2.3rem;
