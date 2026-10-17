@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import type * as Three from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { AERO_ORBS, LANDMARKS, SECRETS } from './world-data';
 import type { ExploreLandmark, ExploreOrb, ExploreSecret } from './world-data';
 import { ExploreProgress } from './explore-progress';
@@ -24,12 +25,12 @@ interface WorldElements {
 }
 
 const CONTROLLER = {
-  moveSpeed: 4.5,
-  reducedMoveSpeed: 3,
+  moveSpeed: 3.8,
+  reducedMoveSpeed: 2.6,
   playerRadius: 0.48,
   playerHeight: 1.9,
   islandRadius: { x: 14.2, z: 7.2 },
-  camera: { distance: 15, height: 10, lookHeight: 1.5, smoothing: 8 },
+  camera: { distance: 8.2, height: 4.25, lookHeight: 1.45, smoothing: 11 },
   groundY: 1.3,
 };
 
@@ -49,6 +50,7 @@ export class ExploreWorld {
   private readonly scene: Three.Scene;
   private readonly camera: Three.PerspectiveCamera;
   private readonly renderer!: Three.WebGLRenderer;
+  private readonly gltfLoader = new GLTFLoader();
   private readonly player: Three.Group;
   private readonly cameraTarget = new THREE.Vector3();
   private readonly blockers: Blocker[] = [];
@@ -116,6 +118,8 @@ export class ExploreWorld {
     this.renderer.toneMappingExposure = 1.05;
     this.renderer.shadowMap.enabled = false;
     this.player = this.createPlayer();
+    const fallbackPlayerParts = [...this.player.children];
+    this.loadModel('/assets/models/simple_character.glb', this.player, [0, 0, 0], 2.2, Math.PI, () => fallbackPlayerParts.forEach((part) => { part.visible = false; }));
     this.createEnvironment();
     this.scene.add(this.player);
     this.resizeHandler = () => this.resize();
@@ -283,6 +287,36 @@ export class ExploreWorld {
     island.add(this.createComputerPod(1.7, 1.8, 3.1));
     this.addUndersideRocks(island);
     this.scene.add(island);
+    this.loadModel('/assets/models/frutiger_aero_buildings.glb', island, [0, 1.3, -3.9], 7.5, 0);
+    this.loadModel('/assets/models/bridge.glb', island, [0, 1.35, -1.4], 8.5, 0);
+    this.loadModel('/assets/models/palm_trees.glb', island, [5.8, 1.25, 2.1], 3.8, 0.2);
+    this.loadModel('/assets/models/stylized_crystal_gems_asset_pack.glb', island, [-4.2, 1.25, 2.6], 2.2, 0);
+    this.loadModel('/assets/models/small_rocks.glb', island, [3, 1.25, -2.7], 2.2, 0);
+    this.loadModel('/assets/models/futuristic_building_props.glb', island, [1.8, 1.25, 3.7], 4.2, 0);
+    this.loadModel('/assets/models/clouds.glb', this.scene, [0, 8.5, -10], 8, 0);
+    window.setTimeout(() => {
+      this.loadModel('/assets/models/floating_island.glb', this.scene, [-9, 6.2, -12], 6, 0.2);
+      this.loadModel('/assets/models/floating_island_paint_test.glb', this.scene, [10, 5.5, -10], 3.5, -0.3);
+      this.loadModel('/assets/models/animated_ocean_scene_tutorial_example_1.glb', this.scene, [0, -3.2, -16], 12, 0);
+      this.loadModel('/assets/models/easter_island_low_poly.glb', this.scene, [12, 1.1, 4], 3.5, 0.5);
+    }, 1800);
+  }
+
+  private loadModel(path: string, parent: Three.Object3D, position: [number, number, number], targetSize: number, rotationY: number, onLoaded?: () => void) {
+    this.gltfLoader.load(path, (gltf) => {
+      const model = gltf.scene;
+      const bounds = new THREE.Box3().setFromObject(model);
+      const size = bounds.getSize(new THREE.Vector3());
+      const scale = targetSize / Math.max(size.x, size.y, size.z, 0.001);
+      model.scale.setScalar(scale);
+      const normalizedBounds = new THREE.Box3().setFromObject(model);
+      const center = normalizedBounds.getCenter(new THREE.Vector3());
+      model.position.set(position[0] - center.x, position[1] - normalizedBounds.min.y, position[2] - center.z);
+      model.rotation.y = rotationY;
+      model.traverse((object) => { object.castShadow = true; object.receiveShadow = true; });
+      parent.add(model);
+      onLoaded?.();
+    }, undefined, () => undefined);
   }
 
   private addOrb(parent: Three.Group, orb: ExploreOrb) {
