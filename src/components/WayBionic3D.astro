@@ -8,6 +8,7 @@
   </div>
   <div class="ik-stage" data-ik-stage hidden>
     <canvas data-ik-canvas aria-label="Interactive simulated four joint old-arm motion test"></canvas>
+    <div class="ik-overlay mono" aria-hidden="true"><span>FABRIK / 8 PASSES</span><span>LOCAL WEBGL</span></div>
     <div class="ik-readout">
       <div><span>MODE</span><strong data-ik-mode>SIMULATION</strong></div>
       <div><span>JOINTS</span><strong>4 JOINT OLD ARM</strong></div>
@@ -15,7 +16,7 @@
       <div><span>LIMITS</span><strong data-ik-limits>NOMINAL</strong></div>
     </div>
   </div>
-  <p class="ik-note" data-ik-note>Nothing is connected to a robot. This represents the old-arm motion test; the source bridge reports 0–270° physical ranges, while calibration remains a hardware concern.</p>
+  <p class="ik-note" data-ik-note>Nothing is connected to a robot. This represents the old-arm motion test; drag the cyan target to explore reach. The source bridge reports 0–270° physical ranges, while calibration remains a hardware concern.</p>
 </section>
 
 <script>
@@ -55,6 +56,13 @@
       );
       target.position.set(1.3, 1.9, 0.2);
       scene.add(target);
+      const targetReticle = new THREE.Mesh(
+        new THREE.TorusGeometry(0.25, 0.012, 8, 32),
+        new THREE.MeshBasicMaterial({ color: 0x8fc6d8, transparent: true, opacity: 0.75 })
+      );
+      targetReticle.rotation.x = Math.PI / 2;
+      targetReticle.position.copy(target.position);
+      scene.add(targetReticle);
 
       const segmentLength = 0.48;
       const points = Array.from({ length: 5 }, (_, index) => new THREE.Vector3(0, index * segmentLength, 0));
@@ -70,6 +78,17 @@
         linkMaterial
       ));
       segmentMeshes.forEach((segment) => scene.add(segment));
+      const base = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.38, 0.46, 0.16, 24),
+        new THREE.MeshStandardMaterial({ color: 0x496375, roughness: 0.48, metalness: 0.3 })
+      );
+      base.position.y = -0.1;
+      scene.add(base);
+      const endEffector = new THREE.Mesh(
+        new THREE.BoxGeometry(0.22, 0.12, 0.16),
+        new THREE.MeshStandardMaterial({ color: 0x8fc6d8, roughness: 0.35, metalness: 0.25 })
+      );
+      scene.add(endEffector);
       const armGeometry = new THREE.BufferGeometry().setFromPoints(points);
       const armLine = new THREE.Line(armGeometry, new THREE.LineBasicMaterial({ color: 0x4a97aa, transparent: true, opacity: 0.45 }));
       scene.add(armLine);
@@ -102,6 +121,7 @@
         if (raycaster.ray.intersectPlane(dragPlane, hit)) {
           target.position.x = Math.max(-2.5, Math.min(2.5, hit.x));
           target.position.y = Math.max(0.2, Math.min(3.5, hit.y));
+          targetReticle.position.copy(target.position);
           const outOfReach = target.position.length() > 2.9;
           target.material.color.set(outOfReach ? 0x9a3e32 : 0x4a97aa);
           if (targetLabel) targetLabel.textContent = outOfReach ? 'OUT OF REACH' : 'TRACKING';
@@ -113,7 +133,7 @@
       canvas.addEventListener('pointerup', () => { dragging = false; });
 
       startButton.textContent = 'SIMULATION ACTIVE';
-      if (note) note.textContent = 'Drag the orange target. Joint limits are represented visually; this remains a browser-only simulation.';
+      if (note) note.textContent = 'Drag the cyan target. Joint limits are represented visually; this remains a browser-only simulation.';
       const animate = () => {
         const root = points[0].clone();
         const reach = root.distanceTo(target.position);
@@ -146,6 +166,10 @@
           segment.position.copy(midpoint);
           segment.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), direction.normalize());
         });
+        endEffector.position.copy(points[4]);
+        if (points[3].distanceTo(points[4]) > 0.001) {
+          endEffector.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), points[4].clone().sub(points[3]).normalize());
+        }
         renderer.render(scene, camera);
         requestAnimationFrame(animate);
       };
