@@ -15,6 +15,7 @@ import VirtualFileSystem from '../components/VirtualFileSystem.astro';
 import RosGraph from '../components/RosGraph.astro';
 import WayBionic3D from '../components/WayBionic3D.astro';
 import WayBionicDiagram from '../components/WayBionicDiagram.astro';
+import TechLogoRail from '../components/TechLogoRail.astro';
 
 const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
 ---
@@ -70,6 +71,7 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
               <div class="signal-card"><span class="mono">03 / DELIVERY</span><strong>Systems that ship.</strong><small>Websites, client workflows, and practical software.</small></div>
               <div class="signal-trace" aria-hidden="true"><i></i><i></i><i></i><i></i><b></b></div>
             </div>
+            <TechLogoRail />
             <div class="featured-strip"><span class="mono">FEATURED SYSTEMS / OPEN ON ARRIVAL</span><button type="button" data-window-open="waybionic">INITIALIZE 3D ARM ↗</button><button type="button" data-window-open="rosgraph">VIEW ROS2 GRAPH ↗</button><button type="button" data-window-open="blackbox">RUN CHAIN DEMO ↗</button><button type="button" data-window-open="restore">SYSTEM RESTORE ↗</button><button type="button" data-window-open="hvacsim">HVAC LAB ↗</button><button type="button" data-window-open="oldarm">OLD ARM JOINTS ↗</button><button type="button" data-window-open="filesystem">OPEN /HOME/AJ ↗</button><button type="button" data-window-open="system">PROFILES + INFO ↗</button><button type="button" data-tour-start>START RECRUITER TOUR ↗</button></div>
             <StaleStateLab />
             <div class="project-grid">
