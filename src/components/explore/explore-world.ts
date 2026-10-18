@@ -252,12 +252,13 @@ export class ExploreWorld {
     AERO_ORBS.filter((orb) => orb.island === 'home').forEach((orb) => this.addOrb(island, orb));
     SECRETS.filter((secret) => secret.island === 'home').forEach((secret) => this.addSecret(island, secret));
     this.scene.add(island);
-    this.loadModel('/assets/models/bridge.glb', island, [0, 1.35, -1.4], 8.5, 0);
-    this.loadModel('/assets/models/palm_trees.glb', island, [5.8, 1.25, 2.1], 3.8, 0.2);
-    this.loadModel('/assets/models/stylized_crystal_gems_asset_pack.glb', island, [-4.2, 1.25, 2.6], 2.2, 0);
-    this.loadModel('/assets/models/flowers_pack_1.glb', island, [-5.4, 1.25, 2.1], 2.4, 0);
-    this.loadModel('/assets/models/flowers_pack_4.glb', island, [5.1, 1.25, 2.4], 2.4, 0);
-    this.loadModel('/assets/models/small_rocks.glb', island, [3, 1.25, -2.7], 2.2, 0);
+    const placeMany = (path: string, positions: Array<[number, number, number]>, targetSize: number, rotationY = 0) => positions.forEach((position) => this.loadModel(path, island, position, targetSize, rotationY));
+    placeMany('/assets/models/bridge.glb', [[0, 1.35, 3.75]], 5.8, 0);
+    placeMany('/assets/models/palm_trees.glb', [[-6.1, 1.25, 3.6], [-4.8, 1.25, -3.4], [5.7, 1.25, 3.8], [6.2, 1.25, -2.3], [1.8, 1.25, 5.1]], 2.55, 0.2);
+    placeMany('/assets/models/stylized_crystal_gems_asset_pack.glb', [[-4.4, 1.25, 2.4], [-3.3, 1.25, 2.9], [4.2, 1.25, 2.7], [5.1, 1.25, 2.1], [1.8, 1.25, -3.2]], 1.3, 0);
+    placeMany('/assets/models/flowers_pack_1.glb', [[-5.1, 1.25, 1.7], [-3.9, 1.25, 1.3], [4.4, 1.25, 1.2], [5.5, 1.25, 1.9]], 1.45, 0);
+    placeMany('/assets/models/flowers_pack_4.glb', [[-5.8, 1.25, 0.8], [-4.1, 1.25, 0.5], [4.9, 1.25, 0.6], [6.1, 1.25, 1.4]], 1.35, 0);
+    placeMany('/assets/models/small_rocks.glb', [[-6.4, 1.25, -2.4], [-5.4, 1.25, -2.8], [3.1, 1.25, -3.4], [4.2, 1.25, -3.8], [6.2, 1.25, -3.1], [2.8, 1.25, 3.8]], 1.05, 0);
   }
 
   private loadModel(path: string, parent: Three.Object3D, position: [number, number, number], targetSize: number, rotationY: number, onLoaded?: () => void, upright = false, alignTop = false) {
