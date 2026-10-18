@@ -4575,6 +4575,9 @@ body { background: #111111; font-family: Tahoma, 'MS Sans Serif', sans-serif; }
 .window-controls button { width: 1.15rem; height: 1.15rem; border: 2px outset #dfdfdf; border-radius: 0; color: #000000; background: #c0c0c0; font: 700 0.72rem Arial, sans-serif; }
 .window-controls button:hover, .window-controls button:focus-visible { color: #000000; background: #dfdfdf; }
 .window-content { padding: clamp(1rem, 2.5vw, 2rem); color: #111111; background: #ffffff; scrollbar-color: #808080 #c0c0c0; }
+.window-info-strip { display: grid; grid-template-columns: 1fr 1.5fr 1fr; gap: 0.5rem; min-height: 1.35rem; align-items: center; padding: 0.25rem 0.5rem; border-bottom: 1px solid #808080; color: #404040; background: #d4d0c8; font-size: 0.45rem; }
+.window-info-strip span:last-of-type, .window-info-strip strong { color: #000080; }
+.window-info-strip strong { text-align: right; font-size: 0.45rem; }
 .window-statusbar { min-height: 1.25rem; padding: 0.22rem 0.45rem; border-top: 2px inset #dfdfdf; border-radius: 0; color: #404040; background: #c0c0c0; font: 0.48rem 'MS Sans Serif', Tahoma, sans-serif; }
 .window-statusbar span:last-child { color: #000080; }
 .window-kicker, .file-tags, .file-card-top { color: #000080; }

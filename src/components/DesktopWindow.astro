@@ -8,6 +8,32 @@ interface Props {
 }
 
 const { id, title, icon, class: className = '', open = false } = Astro.props;
+const metadata: Record<string, [string, string, string]> = {
+  portfolio: ['ARCHIVE', '04 PROJECTS', 'START HERE'],
+  waybionic: ['ROBOTICS', 'ROS2 / RVIZ', 'ENGINEERING MONITOR'],
+  blackbox: ['PHYSICAL AI', 'EVIDENCE CHAIN', 'LOCAL DEMO'],
+  rover: ['HARDWARE', 'JAVA / SONAR', 'CAPSTONE'],
+  resume: ['CAREER', 'SOFTWARE INTERNSHIP', 'CURRENT PDF'],
+  about: ['PROFILE', 'PERSONAL ARCHIVE', 'OUTSIDE CODE'],
+  browser: ['WEB', 'SEARCH / LINKS', 'EXTERNAL VIEW'],
+  calculator: ['UTILITY', 'LOCAL CALCULATION', 'READY'],
+  recycle: ['UTILITY', 'EMPTY ARCHIVE', '0 OBJECTS'],
+  games: ['PERSONAL', 'AFTER HOURS', 'INTERESTS'],
+  system: ['PROFILE', 'RECRUITER VIEW', 'OPEN TO WORK'],
+  work: ['EXPERIENCE', 'VERIFIED ENTRIES', 'CURRENT'],
+  skills: ['TOOLBOX', 'LANGUAGES / SYSTEMS', 'CURRENT SET'],
+  research: ['STUDY', 'PHYSICS / FEASIBILITY', 'PUBLIC SAFE'],
+  notes: ['ROADMAP', 'BUILD LOG', 'NEXT ITERATION'],
+  terminal: ['SHELL', 'LOCAL COMMANDS', 'READY'],
+  media: ['MEDIA', 'WAYBIONIC / MP4', 'ARCHIVE'],
+  restore: ['TIMELINE', 'SYSTEM STATE', 'BROWSE HISTORY'],
+  hvacsim: ['HVAC', 'ROUGH ESTIMATE', 'NOT A QUOTE'],
+  rosgraph: ['ROS2', 'SIMULATED GRAPH', 'SWAPPABLE'],
+  monitor: ['SYSTEM', 'LOCAL TELEMETRY', 'LIVE VIEW'],
+  oldarm: ['ROBOTICS', 'JOINT PANEL', 'SIMULATION'],
+  filesystem: ['FILES', 'LOCAL VFS', 'HOME / AJ']
+};
+const windowMetadata = metadata[id] ?? ['AJMALOS', 'LOCAL WINDOW', 'PUBLIC VIEW'];
 ---
 
 <section class={`os-window ${className}`} data-window={id} aria-label={`${title} window`} hidden={!open}>
@@ -19,6 +45,7 @@ const { id, title, icon, class: className = '', open = false } = Astro.props;
       <button type="button" data-window-close={id} aria-label={`Close ${title}`}>×</button>
     </span>
   </header>
+  <div class="window-info-strip mono"><span>{windowMetadata[0]}</span><span>{windowMetadata[1]}</span><strong>{windowMetadata[2]}</strong></div>
   <div class="window-content">
     <slot />
   </div>
