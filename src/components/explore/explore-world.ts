@@ -30,7 +30,7 @@ const CONTROLLER = {
   playerRadius: 0.48,
   playerHeight: 1.9,
   islandRadius: { x: 14.2, z: 7.2 },
-  camera: { distance: 8.2, height: 4.25, lookHeight: 1.45, smoothing: 11 },
+  camera: { distance: 7.2, height: 3.8, lookHeight: 1.5, smoothing: 11 },
   groundY: 1.3,
 };
 
@@ -118,8 +118,7 @@ export class ExploreWorld {
     this.renderer.toneMappingExposure = 1.05;
     this.renderer.shadowMap.enabled = false;
     this.player = this.createPlayer();
-    const fallbackPlayerParts = [...this.player.children];
-    this.loadModel('/assets/models/simple_character.glb', this.player, [0, 0, 0], 2.2, Math.PI, () => fallbackPlayerParts.forEach((part) => { part.visible = false; }), true);
+    this.loadModel('/assets/models/simple_character.glb', this.player, [0, 0, 0], 2.2, Math.PI, undefined, true);
     this.createEnvironment();
     this.scene.add(this.player);
     this.resizeHandler = () => this.resize();
@@ -143,7 +142,7 @@ export class ExploreWorld {
 
   start() {
     this.player.position.set(this.playerPosition.x, CONTROLLER.groundY, this.playerPosition.z);
-    this.camera.position.set(0, CONTROLLER.camera.height, -CONTROLLER.camera.distance);
+    this.camera.position.set(0, CONTROLLER.camera.height, CONTROLLER.camera.distance);
     this.camera.lookAt(0, CONTROLLER.camera.lookHeight, 1.5);
     this.input.setMenu(false);
     this.running = true;
@@ -199,8 +198,8 @@ export class ExploreWorld {
   }
 
   private updateCamera(delta: number) {
-    const behindX = Math.sin(this.player.rotation.y) * CONTROLLER.camera.distance;
-    const behindZ = Math.cos(this.player.rotation.y) * CONTROLLER.camera.distance;
+    const behindX = -Math.sin(this.player.rotation.y) * CONTROLLER.camera.distance;
+    const behindZ = -Math.cos(this.player.rotation.y) * CONTROLLER.camera.distance;
     const desired = new THREE.Vector3(
       this.player.position.x + behindX,
       Math.max(CONTROLLER.camera.height, 2.8),
@@ -246,46 +245,30 @@ export class ExploreWorld {
     this.scene.add(ocean);
 
     const island = new THREE.Group();
-    const rock = new THREE.Mesh(new THREE.ConeGeometry(9.2, 4.8, 14, 3), new THREE.MeshStandardMaterial({ color: 0x87614f, roughness: 0.95 }));
-    rock.position.y = -1.2;
-    island.add(rock);
-    const rockBand = new THREE.Mesh(new THREE.CylinderGeometry(11, 9.5, 1.25, 14), new THREE.MeshStandardMaterial({ color: 0xa27459, roughness: 0.9 }));
-    rockBand.position.y = 0.05;
-    island.add(rockBand);
-    const grass = new THREE.Mesh(new THREE.CylinderGeometry(14.5, 13.8, 0.65, 14), new THREE.MeshStandardMaterial({ color: 0x55bd70, roughness: 0.78 }));
-    grass.position.y = 0.95;
-    island.add(grass);
-    const shoreline = new THREE.Mesh(
-      new THREE.TorusGeometry(13.98, 0.16, 6, 32),
-      new THREE.MeshStandardMaterial({ color: 0xb8f29d, roughness: 0.62, emissive: 0x1b735e, emissiveIntensity: 0.08 }),
-    );
-    shoreline.rotation.x = Math.PI / 2;
-    shoreline.position.y = 1.3;
-    island.add(shoreline);
+    this.loadModel('/assets/models/floating_island.glb', island, [0, 1.3, 0], 22, 0, undefined, false, true);
     this.addPath(island);
     LANDMARKS.filter((landmark) => landmark.island === 'home' && landmark.worldX !== undefined && landmark.worldZ !== undefined)
       .forEach((landmark) => this.addLandmark(island, landmark));
     AERO_ORBS.filter((orb) => orb.island === 'home').forEach((orb) => this.addOrb(island, orb));
     SECRETS.filter((secret) => secret.island === 'home').forEach((secret) => this.addSecret(island, secret));
     this.scene.add(island);
-    this.loadModel('/assets/models/frutiger_aero_buildings.glb', island, [0, 1.3, -3.9], 7.5, 0);
+    this.loadModel('/assets/models/frutiger_aero_buildings.glb', island, [0, 1.3, -3.9], 3.1, 0);
     this.loadModel('/assets/models/bridge.glb', island, [0, 1.35, -1.4], 8.5, 0);
     this.loadModel('/assets/models/palm_trees.glb', island, [5.8, 1.25, 2.1], 3.8, 0.2);
     this.loadModel('/assets/models/stylized_crystal_gems_asset_pack.glb', island, [-4.2, 1.25, 2.6], 2.2, 0);
     this.loadModel('/assets/models/flowers_pack_1.glb', island, [-5.4, 1.25, 2.1], 2.4, 0);
     this.loadModel('/assets/models/flowers_pack_4.glb', island, [5.1, 1.25, 2.4], 2.4, 0);
     this.loadModel('/assets/models/small_rocks.glb', island, [3, 1.25, -2.7], 2.2, 0);
-    this.loadModel('/assets/models/futuristic_building_props.glb', island, [1.8, 1.25, 3.7], 4.2, 0);
+    this.loadModel('/assets/models/futuristic_building_props.glb', island, [1.8, 1.25, 3.7], 2.8, 0);
     this.loadModel('/assets/models/clouds.glb', this.scene, [0, 8.5, -10], 8, 0);
     window.setTimeout(() => {
-      this.loadModel('/assets/models/floating_island.glb', this.scene, [-9, 6.2, -12], 6, 0.2);
       this.loadModel('/assets/models/floating_island_paint_test.glb', this.scene, [10, 5.5, -10], 3.5, -0.3);
       this.loadModel('/assets/models/animated_ocean_scene_tutorial_example_1.glb', this.scene, [0, -3.2, -16], 12, 0);
       this.loadModel('/assets/models/easter_island_low_poly.glb', this.scene, [12, 1.1, 4], 3.5, 0.5);
     }, 1800);
   }
 
-  private loadModel(path: string, parent: Three.Object3D, position: [number, number, number], targetSize: number, rotationY: number, onLoaded?: () => void, upright = false) {
+  private loadModel(path: string, parent: Three.Object3D, position: [number, number, number], targetSize: number, rotationY: number, onLoaded?: () => void, upright = false, alignTop = false) {
     this.gltfLoader.load(path, (gltf) => {
       const model = gltf.scene;
       const bounds = new THREE.Box3().setFromObject(model);
@@ -294,7 +277,7 @@ export class ExploreWorld {
       model.scale.setScalar(scale);
       const normalizedBounds = new THREE.Box3().setFromObject(model);
       const center = normalizedBounds.getCenter(new THREE.Vector3());
-      model.position.set(position[0] - center.x, position[1] - normalizedBounds.min.y, position[2] - center.z);
+      model.position.set(position[0] - center.x, position[1] - (alignTop ? normalizedBounds.max.y : normalizedBounds.min.y), position[2] - center.z);
       model.rotation.set(0, rotationY, 0);
       if (upright) model.rotation.x = 0;
       model.traverse((object) => { object.castShadow = true; object.receiveShadow = true; });
