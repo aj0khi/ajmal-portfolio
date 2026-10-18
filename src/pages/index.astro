@@ -70,7 +70,6 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
               <div class="signal-card"><span class="mono">03 / DELIVERY</span><strong>Systems that ship.</strong><small>Websites, client workflows, and practical software.</small></div>
               <div class="signal-trace" aria-hidden="true"><i></i><i></i><i></i><i></i><b></b></div>
             </div>
-            <TechLogoRail />
             <div class="featured-strip"><span class="mono">FEATURED SYSTEMS / OPEN ON ARRIVAL</span><button type="button" data-window-open="waybionic">INITIALIZE 3D ARM ↗</button><button type="button" data-window-open="rosgraph">VIEW ROS2 GRAPH ↗</button><button type="button" data-window-open="blackbox">RUN CHAIN DEMO ↗</button><button type="button" data-window-open="restore">SYSTEM RESTORE ↗</button><button type="button" data-window-open="hvacsim">HVAC LAB ↗</button><button type="button" data-window-open="oldarm">OLD ARM JOINTS ↗</button><button type="button" data-window-open="filesystem">OPEN /HOME/AJ ↗</button><button type="button" data-window-open="system">PROFILES + INFO ↗</button><button type="button" data-tour-start>START RECRUITER TOUR ↗</button></div>
             <StaleStateLab />
             <div class="project-grid">
@@ -89,6 +88,7 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
                 </article>
               ))}
             </div>
+            <TechLogoRail />
           </DesktopWindow>
 
           <DesktopWindow id="waybionic" title="WAYBIONIC / ENGINEERING MONITOR" icon="⚙" class="window-waybionic">
@@ -321,6 +321,7 @@ Type help for available commands.</div><form data-terminal-form><span>ajmal@work
       if (firstOpen) {
         const content = target.querySelector<HTMLElement>('.window-content');
         if (content) content.scrollTop = 0;
+        target.querySelector<HTMLElement>('.window-titlebar button, .window-content a, .window-content button, .window-content input')?.focus({ preventScroll: true });
       }
       highestZ += 1;
       target.style.zIndex = String(highestZ);
