@@ -43,10 +43,6 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
             <OsIcon window="browser" icon="⌕" label="Browser" src="/icons/browser.png" />
             <OsIcon window="calculator" icon="⊞" label="Calculator" src="/icons/calculator.png" />
             <OsIcon window="recycle" icon="♻" label="Recycle Bin" src="/icons/recycle.png" />
-            <a class="desktop-icon" href="/explore/" aria-label="Open Aero Explorer">
-              <span class="desktop-icon-art desktop-icon-image" aria-hidden="true"><img src="/icons/games.png" alt="" /></span>
-              <span>Aero Explorer</span>
-            </a>
             <OsIcon window="system" icon="ⓘ" label="System Info" src="/icons/system-clean.svg" />
             <OsIcon window="work" icon="▥" label="Work History" src="/icons/work.png" />
             <OsIcon window="skills" icon="⌘" label="Skills" src="/icons/skills.png" />
@@ -60,7 +56,6 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
             <OsIcon window="monitor" icon="▥" label="System Monitor" src="/icons/system.png" />
             <OsIcon window="oldarm" icon="◌" label="Old Arm" src="/icons/oldarm-polished.svg" />
             <OsIcon window="filesystem" icon="⌂" label="Files" src="/icons/files-polished.svg" />
-            <OsIcon window="field" icon="✦" label="Systems Field" src="/icons/games.png" />
           </div>
           <DesktopWindow id="portfolio" title="MY WORK / FILE EXPLORER" icon="▣" open class="window-portfolio">
             <div class="file-toolbar mono">FILE &nbsp; EDIT &nbsp; VIEW &nbsp; HELP <span>LOCAL ARCHIVE / 04 ITEMS</span></div>
@@ -75,7 +70,7 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
               <div class="signal-card"><span class="mono">03 / DELIVERY</span><strong>Systems that ship.</strong><small>Websites, client workflows, and practical software.</small></div>
               <div class="signal-trace" aria-hidden="true"><i></i><i></i><i></i><i></i><b></b></div>
             </div>
-            <div class="featured-strip"><span class="mono">FEATURED SYSTEMS / OPEN ON ARRIVAL</span><button type="button" data-window-open="field">ENTER SYSTEMS FIELD ↗</button><button type="button" data-window-open="waybionic">INITIALIZE 3D ARM ↗</button><button type="button" data-window-open="rosgraph">VIEW ROS2 GRAPH ↗</button><button type="button" data-window-open="blackbox">RUN CHAIN DEMO ↗</button><button type="button" data-window-open="restore">SYSTEM RESTORE ↗</button><button type="button" data-window-open="hvacsim">HVAC LAB ↗</button><button type="button" data-window-open="oldarm">OLD ARM JOINTS ↗</button><button type="button" data-window-open="filesystem">OPEN /HOME/AJ ↗</button><button type="button" data-window-open="system">PROFILES + INFO ↗</button><button type="button" data-tour-start>START RECRUITER TOUR ↗</button></div>
+            <div class="featured-strip"><span class="mono">FEATURED SYSTEMS / OPEN ON ARRIVAL</span><button type="button" data-window-open="waybionic">INITIALIZE 3D ARM ↗</button><button type="button" data-window-open="rosgraph">VIEW ROS2 GRAPH ↗</button><button type="button" data-window-open="blackbox">RUN CHAIN DEMO ↗</button><button type="button" data-window-open="restore">SYSTEM RESTORE ↗</button><button type="button" data-window-open="hvacsim">HVAC LAB ↗</button><button type="button" data-window-open="oldarm">OLD ARM JOINTS ↗</button><button type="button" data-window-open="filesystem">OPEN /HOME/AJ ↗</button><button type="button" data-window-open="system">PROFILES + INFO ↗</button><button type="button" data-tour-start>START RECRUITER TOUR ↗</button></div>
             <StaleStateLab />
             <div class="project-grid">
               {projects.map((project, projectIndex) => (
@@ -184,9 +179,6 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
             <VirtualFileSystem />
           </DesktopWindow>
 
-          <DesktopWindow id="field" title="SYSTEMS FIELD / WALKABLE ARCHIVE" icon="✦" class="window-field">
-            <div class="field-return-panel"><div class="window-kicker mono">PRIMARY EXPERIENCE / AERO EXPLORER</div><h2>The island is ready<br /><em>outside this window.</em></h2><p class="window-copy">Leave the desktop for the full Three.js exploration experience, with the portfolio archive available from interactive landmarks.</p><a href="/explore/">OPEN AERO EXPLORER ↗</a></div>
-          </DesktopWindow>
 
           <DesktopWindow id="research" title="RESEARCH / PERSONAL" icon="◉" class="window-research">
             <div class="window-kicker mono">PERSONAL TECHNICAL RESEARCH / PUBLIC STUDY</div>
