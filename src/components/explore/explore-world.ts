@@ -75,7 +75,7 @@ export class ExploreWorld {
   private running = false;
   private walkTime = 0;
   private playerPosition = { x: 0, z: 1.5 };
-  private facing = -Math.PI;
+  private facing = 0;
   private readonly resizeHandler: () => void;
   private readonly visibilityHandler: () => void;
 
@@ -142,8 +142,8 @@ export class ExploreWorld {
 
   start() {
     this.player.position.set(this.playerPosition.x, CONTROLLER.groundY, this.playerPosition.z);
-    this.camera.position.set(0, CONTROLLER.camera.height, CONTROLLER.camera.distance);
-    this.camera.lookAt(0, CONTROLLER.camera.lookHeight, 1.5);
+    this.camera.position.set(0, CONTROLLER.camera.height, CONTROLLER.camera.distance + this.playerPosition.z);
+    this.camera.lookAt(this.playerPosition.x, CONTROLLER.camera.lookHeight, this.playerPosition.z);
     this.input.setMenu(false);
     this.running = true;
     this.lastTime = performance.now();
@@ -183,7 +183,7 @@ export class ExploreWorld {
       };
       this.playerPosition.x = this.canOccupy(next.x, this.playerPosition.z) ? next.x : this.playerPosition.x;
       this.playerPosition.z = this.canOccupy(this.playerPosition.x, next.z) ? next.z : this.playerPosition.z;
-      this.facing = Math.atan2(this.input.state.x, this.input.state.y);
+      this.facing = Math.atan2(this.input.state.x, -this.input.state.y);
       this.walkTime += delta * (this.reduced ? 7 : 10);
     }
     this.player.position.x += (this.playerPosition.x - this.player.position.x) * Math.min(delta * 14, 1);
@@ -198,12 +198,10 @@ export class ExploreWorld {
   }
 
   private updateCamera(delta: number) {
-    const behindX = -Math.sin(this.player.rotation.y) * CONTROLLER.camera.distance;
-    const behindZ = -Math.cos(this.player.rotation.y) * CONTROLLER.camera.distance;
     const desired = new THREE.Vector3(
-      this.player.position.x + behindX,
+      this.player.position.x,
       Math.max(CONTROLLER.camera.height, 2.8),
-      this.player.position.z + behindZ,
+      this.player.position.z + CONTROLLER.camera.distance,
     );
     this.camera.position.lerp(desired, Math.min(delta * CONTROLLER.camera.smoothing, 1));
     this.cameraTarget.set(this.player.position.x, CONTROLLER.camera.lookHeight, this.player.position.z);

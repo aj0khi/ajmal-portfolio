@@ -15,9 +15,11 @@ export class ExploreInput {
     const active = document.activeElement;
     if (active instanceof HTMLInputElement || active instanceof HTMLTextAreaElement || active instanceof HTMLSelectElement || active?.getAttribute('contenteditable') === 'true') return;
     const key = event.key.toLowerCase();
-    if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', 'w', 'a', 's', 'd', 'escape', 'e'].includes(key)) {
+    const code = event.code.toLowerCase();
+    if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', 'w', 'a', 's', 'd', 'escape', 'e'].includes(key) || ['keyw', 'keya', 'keys', 'keyd'].includes(code)) {
       event.preventDefault();
       this.keys.add(key);
+      this.keys.add(code);
       if (key === 'escape') {
         if (!this.state.paused) {
           this.state.menu = !this.state.menu;
@@ -27,7 +29,7 @@ export class ExploreInput {
       if (key === 'e' && !this.state.paused) this.state.interact = true;
     }
   };
-  private readonly onKeyUp = (event: KeyboardEvent) => this.keys.delete(event.key.toLowerCase());
+  private readonly onKeyUp = (event: KeyboardEvent) => { this.keys.delete(event.key.toLowerCase()); this.keys.delete(event.code.toLowerCase()); };
   private readonly onBlur = () => this.keys.clear();
   private readonly onVisibility = () => { if (document.hidden) this.keys.clear(); };
   private readonly onPointerDown = () => this.target.focus();
@@ -43,8 +45,8 @@ export class ExploreInput {
   }
 
   update() {
-    this.state.x = Number(this.keys.has('arrowright') || this.keys.has('d')) - Number(this.keys.has('arrowleft') || this.keys.has('a'));
-    this.state.y = Number(this.keys.has('arrowdown') || this.keys.has('s')) - Number(this.keys.has('arrowup') || this.keys.has('w'));
+    this.state.x = Number(this.keys.has('arrowright') || this.keys.has('d') || this.keys.has('keyd')) - Number(this.keys.has('arrowleft') || this.keys.has('a') || this.keys.has('keya'));
+    this.state.y = Number(this.keys.has('arrowdown') || this.keys.has('s') || this.keys.has('keys')) - Number(this.keys.has('arrowup') || this.keys.has('w') || this.keys.has('keyw'));
   }
 
   consumeInteract() {
