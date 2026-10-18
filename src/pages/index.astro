@@ -57,6 +57,9 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
             <OsIcon window="monitor" icon="▥" label="System Monitor" src="/icons/system.png" />
             <OsIcon window="oldarm" icon="◌" label="Old Arm" src="/icons/oldarm-polished.svg" />
             <OsIcon window="filesystem" icon="⌂" label="Files" src="/icons/files-polished.svg" />
+            <OsIcon window="chinook" icon="✦" label="Chinook Clean" src="/icons/chinook-clean.svg" />
+            <OsIcon window="teachgame" icon="✣" label="Teach to Game" src="/icons/teach-to-game.svg" />
+            <OsIcon window="soccerlab" icon="◉" label="Soccer Lab" src="/icons/soccer-intelligence.svg" />
           </div>
           <DesktopWindow id="portfolio" title="MY WORK / FILE EXPLORER" icon="▣" open class="window-portfolio">
             <div class="file-toolbar mono">FILE &nbsp; EDIT &nbsp; VIEW &nbsp; HELP <span>LOCAL ARCHIVE / 08 ITEMS</span></div>
@@ -119,6 +122,30 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
             <MockDiagram kind="blackbox" title="BlackBox evidence flow" />
             <BlackBoxDemo />
             <div class="window-note mono">PUBLIC VIEW / HIGH-LEVEL ARCHITECTURE ONLY / SENSITIVE DETAILS OMITTED</div>
+          </DesktopWindow>
+
+          <DesktopWindow id="chinook" title="CHINOOK CLEAN / BUSINESS LOG" icon="✦" class="window-chinook">
+            <div class="window-kicker mono">ACTIVE BUSINESS / OWNED + OPERATED / FIELD WORK</div>
+            <h2>A business where<br /><em>the result is visible.</em></h2>
+            <p class="window-copy">Chinook Clean is a power-washing business Ajmal owns and runs. The work is direct, physical, and customer-facing: the operating system is the conversation, the schedule, the equipment, and the finished surface.</p>
+            <div class="business-grid"><div><strong>01 / OWNERSHIP</strong><span>Customer conversations, decisions, and responsibility stay close to the work.</span></div><div><strong>02 / FIELD DELIVERY</strong><span>Service quality is measured on-site by the result the customer can see.</span></div><div><strong>03 / NEXT SYSTEM</strong><span>Build repeatable workflows without losing the human part of the service.</span></div></div>
+            <div class="window-note mono">PUBLIC SUMMARY / ACTIVE BUSINESS / DETAILS INTENTIONALLY COMPACT</div>
+          </DesktopWindow>
+
+          <DesktopWindow id="teachgame" title="TEACH TO GAME / RL LAB" icon="✣" class="window-teachgame">
+            <div class="window-kicker mono">LOCAL REINFORCEMENT LEARNING / PYTHON / PLAYWRIGHT</div>
+            <h2>Teaching an agent<br /><em>what success means.</em></h2>
+            <p class="window-copy">Teach to Game is a local reinforcement-learning lab where goals, target scores, and reward signals are explicit. Snake and runner practice games work on a fresh laptop without sending training data to a cloud service.</p>
+            <div class="rl-pipeline"><span>GAME STATE</span><b>→</b><span>POLICY</span><b>→</b><span>ACTION</span><b>→</b><span>REWARD</span></div>
+            <div class="window-note mono">LOCAL LAB / USER-PROVIDED ADAPTERS / ONLINE ANTI-CHEAT GAMES OUT OF SCOPE</div>
+          </DesktopWindow>
+
+          <DesktopWindow id="soccerlab" title="SOCCER INTELLIGENCE / EVENT LAB" icon="◉" class="window-soccerlab">
+            <div class="window-kicker mono">NEXT.JS / REACT / TYPESCRIPT / SYNTHETIC EVENTS</div>
+            <h2>Turning events into<br /><em>match intelligence.</em></h2>
+            <p class="window-copy">An Azure-ready workspace for turning football-realistic events into explainable match intelligence and personalized stories while keeping raw events, derived state, explanations, and presentation payloads separate.</p>
+            <div class="event-pipeline"><div><strong>EVENTS</strong><span>synthetic stream</span></div><b>→</b><div><strong>STATE</strong><span>metrics + context</span></div><b>→</b><div><strong>STORY</strong><span>grounded insight</span></div></div>
+            <div class="window-note mono">SYNTHETIC DATA / EVIDENCE-GROUNDED NARRATIVE / PROVIDER-NEUTRAL PIPELINE</div>
           </DesktopWindow>
 
           <DesktopWindow id="rover" title="ROVER / CS30 CAPSTONE" icon="▤" class="window-rover">
@@ -251,6 +278,9 @@ Type help for available commands.</div><form data-terminal-form><span>ajmal@work
             <button type="button" data-window-open="system">ⓘ &nbsp; System Info</button>
             <button type="button" data-window-open="work">▥ &nbsp; Work History</button>
             <button type="button" data-window-open="notes">▤ &nbsp; Build Notes</button>
+            <button type="button" data-window-open="chinook">✦ &nbsp; Chinook Clean</button>
+            <button type="button" data-window-open="teachgame">✣ &nbsp; Teach to Game</button>
+            <button type="button" data-window-open="soccerlab">◉ &nbsp; Soccer Lab</button>
             <button type="button" data-window-open="terminal">&gt;_ &nbsp; Terminal</button>
             <button type="button" data-window-open="about">★ &nbsp; About Aj</button>
             <button type="button" data-tour-start>▶ &nbsp; 30-SECOND TOUR</button>
