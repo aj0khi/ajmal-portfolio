@@ -59,7 +59,7 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
             <OsIcon window="filesystem" icon="⌂" label="Files" src="/icons/files-polished.svg" />
           </div>
           <DesktopWindow id="portfolio" title="MY WORK / FILE EXPLORER" icon="▣" open class="window-portfolio">
-            <div class="file-toolbar mono">FILE &nbsp; EDIT &nbsp; VIEW &nbsp; HELP <span>LOCAL ARCHIVE / 04 ITEMS</span></div>
+            <div class="file-toolbar mono">FILE &nbsp; EDIT &nbsp; VIEW &nbsp; HELP <span>LOCAL ARCHIVE / 08 ITEMS</span></div>
             <div class="explorer-heading">
               <p class="window-kicker mono">AJMAL KHIDRI / WORKING SYSTEMS</p>
               <h1>Things I have<br /><em>built or touched.</em></h1>
@@ -244,7 +244,7 @@ Type help for available commands.</div><form data-terminal-form><span>ajmal@work
 
           <div class="start-menu" data-start-menu hidden>
             <div class="start-heading"><strong>AJMAL</strong><span>OS</span></div>
-            <div class="start-menu-summary"><span class="mono">LOCAL ARCHIVE</span><strong>Ajmal Khidri</strong><small>23 public windows / Calgary, AB</small></div>
+            <div class="start-menu-summary"><span class="mono">LOCAL ARCHIVE</span><strong>Ajmal Khidri</strong><small>22 public windows / Calgary, AB</small></div>
             <label class="start-search"><span aria-hidden="true">⌕</span><input type="search" data-start-search placeholder="Search your archive" aria-label="Search your archive" /></label>
             <button type="button" data-window-open="portfolio">▣ &nbsp; My Work</button>
             <button type="button" data-window-open="resume">▧ &nbsp; Resume</button>
@@ -521,13 +521,13 @@ Type help for available commands.</div><form data-terminal-form><span>ajmal@work
     const terminalCommands: Record<string, string> = {
       help: 'help  about  projects  skills  contact  whoami  pwd  ls  tree  clear  neofetch',
       about: 'Ajmal Khidri / CS @ UCalgary / robotics + software systems',
-      projects: 'WayBionic  BlackBox  Rover  HVAC Express  Robotics Roadmap',
+      projects: 'WayBionic  BlackBox  Rover  HVAC Express  Chinook Clean  Teach to Game  Soccer Intelligence  Robotics Roadmap',
       skills: 'Java  Python  JavaScript  ROS2  RViz  URDF  MuJoCo  Isaac Lab  Nav2/SLAM',
       contact: 'khidri.ajmal@gmail.com  |  github.com/aj0khi  |  linkedin.com/in/ajmal-khidri',
       whoami: 'ajmal / builder of systems that move',
       pwd: '/home/aj',
       ls: 'projects/  resume/  notes/  README.txt',
-      tree: 'home/aj\n├── projects\n│   ├── waybionic\n│   ├── blackbox\n│   ├── rover\n│   └── hvac-express\n└── resume\n    └── resume.pdf',
+      tree: 'home/aj\n├── projects\n│   ├── waybionic\n│   ├── blackbox\n│   ├── rover\n│   ├── hvac-express\n│   ├── chinook-clean\n│   ├── teach-to-game\n│   └── soccer-intelligence\n└── resume\n    └── resume.pdf',
       neofetch: 'AJMALOS\nOS: portfolio workstation\nFocus: robotics + software\nStatus: building',
       clear: ''
     };
