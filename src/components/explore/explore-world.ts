@@ -252,7 +252,6 @@ export class ExploreWorld {
     AERO_ORBS.filter((orb) => orb.island === 'home').forEach((orb) => this.addOrb(island, orb));
     SECRETS.filter((secret) => secret.island === 'home').forEach((secret) => this.addSecret(island, secret));
     this.scene.add(island);
-    this.loadModel('/assets/models/frutiger_aero_buildings.glb', island, [0, 1.3, -3.9], 2.35, 0);
     this.loadModel('/assets/models/bridge.glb', island, [0, 1.35, -1.4], 8.5, 0);
     this.loadModel('/assets/models/palm_trees.glb', island, [5.8, 1.25, 2.1], 3.8, 0.2);
     this.loadModel('/assets/models/stylized_crystal_gems_asset_pack.glb', island, [-4.2, 1.25, 2.6], 2.2, 0);
