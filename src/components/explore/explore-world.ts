@@ -262,9 +262,7 @@ export class ExploreWorld {
     this.loadModel('/assets/models/futuristic_building_props.glb', island, [1.8, 1.25, 3.7], 2.8, 0);
     this.loadModel('/assets/models/clouds.glb', this.scene, [0, 8.5, -10], 8, 0);
     window.setTimeout(() => {
-      this.loadModel('/assets/models/floating_island_paint_test.glb', this.scene, [10, 5.5, -10], 3.5, -0.3);
       this.loadModel('/assets/models/animated_ocean_scene_tutorial_example_1.glb', this.scene, [0, -3.2, -16], 12, 0);
-      this.loadModel('/assets/models/easter_island_low_poly.glb', this.scene, [12, 1.1, 4], 3.5, 0.5);
     }, 1800);
   }
 
