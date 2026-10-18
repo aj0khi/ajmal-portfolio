@@ -4409,3 +4409,93 @@ body { background: #b8eaf7; }
     animation: none;
   }
 }
+
+.start-menu {
+  width: min(22rem, calc(100vw - 2rem));
+  padding: 0.45rem;
+  border: 1px solid #72b7c4;
+  border-radius: 0.45rem;
+  background: rgba(234, 255, 255, 0.96);
+  box-shadow: 0 1rem 2.5rem rgba(22, 92, 116, 0.28), inset 0 1px #ffffff;
+  backdrop-filter: blur(1rem);
+}
+
+.start-heading {
+  min-height: 2.6rem;
+  align-items: center;
+  border-radius: 0.25rem;
+  background: linear-gradient(135deg, #197fa0, #65c9dc);
+  box-shadow: inset 0 1px rgba(255,255,255,0.4);
+}
+
+.start-menu-summary {
+  display: grid;
+  gap: 0.18rem;
+  padding: 0.75rem 0.7rem 0.5rem;
+  color: #185d78;
+}
+
+.start-menu-summary span { color: #277b9c; font-size: 0.43rem; }
+.start-menu-summary strong { font: 600 1.05rem/1 Georgia, serif; }
+.start-menu-summary small { color: #5b7d89; font: 0.55rem var(--mono); }
+
+.start-search {
+  display: flex;
+  gap: 0.45rem;
+  align-items: center;
+  margin: 0.15rem 0.35rem 0.45rem;
+  padding: 0.45rem 0.55rem;
+  border: 1px solid #94cbd2;
+  border-radius: 0.22rem;
+  color: #277b9c;
+  background: #ffffff;
+}
+
+.start-search input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  color: #185d78;
+  background: transparent;
+  font: 0.68rem var(--mono);
+}
+
+.start-menu button,
+.start-menu a {
+  margin: 0.08rem 0;
+  border-radius: 0.2rem;
+  color: #185d78;
+  font: 0.68rem var(--mono);
+}
+
+.start-menu button:hover,
+.start-menu a:hover,
+.start-menu button:focus-visible,
+.start-menu a:focus-visible {
+  color: #ffffff;
+  background: #318fb1;
+}
+
+.start-menu button[hidden],
+.start-menu a[hidden] { display: none; }
+
+.taskbar {
+  height: 2.85rem;
+  padding: 0.28rem;
+  border-radius: 0.42rem;
+}
+
+.start-button,
+.taskbar-windows button {
+  min-width: 4.6rem;
+  border-radius: 0.22rem;
+  box-shadow: inset 0 1px #ffffff, 0 0.12rem rgba(35, 117, 139, 0.16);
+}
+
+.taskbar-windows button { min-width: 9rem; text-align: left; }
+
+@media (max-width: 700px) {
+  .start-menu { width: calc(100vw - 1rem); left: 0.2rem; }
+  .taskbar-windows button { min-width: 6rem; }
+}

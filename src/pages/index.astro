@@ -244,6 +244,8 @@ Type help for available commands.</div><form data-terminal-form><span>ajmal@work
 
           <div class="start-menu" data-start-menu hidden>
             <div class="start-heading"><strong>AJMAL</strong><span>OS</span></div>
+            <div class="start-menu-summary"><span class="mono">LOCAL ARCHIVE</span><strong>Ajmal Khidri</strong><small>23 public windows / Calgary, AB</small></div>
+            <label class="start-search"><span aria-hidden="true">⌕</span><input type="search" data-start-search placeholder="Search your archive" aria-label="Search your archive" /></label>
             <button type="button" data-window-open="portfolio">▣ &nbsp; My Work</button>
             <button type="button" data-window-open="resume">▧ &nbsp; Resume</button>
             <button type="button" data-window-open="system">ⓘ &nbsp; System Info</button>
@@ -425,6 +427,14 @@ Type help for available commands.</div><form data-terminal-form><span>ajmal@work
 
     startToggle.addEventListener('click', () => {
       startMenu.hidden = !startMenu.hidden;
+      if (!startMenu.hidden) startMenu.querySelector<HTMLInputElement>('[data-start-search]')?.focus();
+    });
+    const startSearch = startMenu.querySelector<HTMLInputElement>('[data-start-search]');
+    startSearch?.addEventListener('input', () => {
+      const query = startSearch.value.trim().toLowerCase();
+      startMenu.querySelectorAll<HTMLElement>('button[data-window-open], button[data-tour-start], a').forEach((item) => {
+        item.hidden = Boolean(query) && !item.textContent?.toLowerCase().includes(query);
+      });
     });
     document.addEventListener('click', (event) => {
       const target = event.target as Node;
