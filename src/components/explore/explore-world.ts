@@ -252,18 +252,13 @@ export class ExploreWorld {
     AERO_ORBS.filter((orb) => orb.island === 'home').forEach((orb) => this.addOrb(island, orb));
     SECRETS.filter((secret) => secret.island === 'home').forEach((secret) => this.addSecret(island, secret));
     this.scene.add(island);
-    this.loadModel('/assets/models/frutiger_aero_buildings.glb', island, [0, 1.3, -3.9], 3.1, 0);
+    this.loadModel('/assets/models/frutiger_aero_buildings.glb', island, [0, 1.3, -3.9], 2.35, 0);
     this.loadModel('/assets/models/bridge.glb', island, [0, 1.35, -1.4], 8.5, 0);
     this.loadModel('/assets/models/palm_trees.glb', island, [5.8, 1.25, 2.1], 3.8, 0.2);
     this.loadModel('/assets/models/stylized_crystal_gems_asset_pack.glb', island, [-4.2, 1.25, 2.6], 2.2, 0);
     this.loadModel('/assets/models/flowers_pack_1.glb', island, [-5.4, 1.25, 2.1], 2.4, 0);
     this.loadModel('/assets/models/flowers_pack_4.glb', island, [5.1, 1.25, 2.4], 2.4, 0);
     this.loadModel('/assets/models/small_rocks.glb', island, [3, 1.25, -2.7], 2.2, 0);
-    this.loadModel('/assets/models/futuristic_building_props.glb', island, [1.8, 1.25, 3.7], 2.8, 0);
-    this.loadModel('/assets/models/clouds.glb', this.scene, [0, 8.5, -10], 8, 0);
-    window.setTimeout(() => {
-      this.loadModel('/assets/models/animated_ocean_scene_tutorial_example_1.glb', this.scene, [0, -3.2, -16], 12, 0);
-    }, 1800);
   }
 
   private loadModel(path: string, parent: Three.Object3D, position: [number, number, number], targetSize: number, rotationY: number, onLoaded?: () => void, upright = false, alignTop = false) {
