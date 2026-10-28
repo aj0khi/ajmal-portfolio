@@ -1,5 +1,5 @@
-const CACHE = 'ajmalos-v2';
-const SHELL = ['/', '/manifest.webmanifest', '/icons/my-work.svg', '/icons/waybionic.svg', '/icons/resume.svg'];
+const CACHE = 'ajmalos-v3';
+const SHELL = ['/', '/manifest.webmanifest', '/icons/app/portfolio.svg', '/icons/app/waybionic.svg', '/icons/app/resume.svg'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(SHELL)));

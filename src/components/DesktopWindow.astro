@@ -7,7 +7,7 @@ interface Props {
   open?: boolean;
 }
 
-const { id, title, icon, class: className = '', open = false } = Astro.props;
+const { id, title, class: className = '', open = false } = Astro.props;
 const metadata: Record<string, [string, string, string]> = {
   portfolio: ['ARCHIVE', '08 PROJECTS', 'START HERE'],
   waybionic: ['ROBOTICS', 'ROS2 / RVIZ', 'ENGINEERING MONITOR'],
@@ -41,7 +41,7 @@ const windowMetadata = metadata[id] ?? ['AJMALOS', 'LOCAL WINDOW', 'PUBLIC VIEW'
 
 <section class={`os-window ${className}`} data-window={id} role="dialog" aria-modal="false" aria-labelledby={`window-${id}-title`} aria-label={`${title} window`} hidden={!open}>
   <header class="window-titlebar">
-    <span class="window-title" id={`window-${id}-title`}><span aria-hidden="true">{icon}</span>{title}</span>
+    <span class="window-title" id={`window-${id}-title`}><img class="window-app-icon" src={`/icons/app/${id}.svg`} alt="" />{title}</span>
     <span class="window-controls">
       <button type="button" data-window-minimize={id} aria-label={`Minimize ${title}`}>_</button>
       <button type="button" data-window-maximize={id} aria-label={`Maximize ${title}`}>□</button>

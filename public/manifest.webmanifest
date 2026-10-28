@@ -3,8 +3,8 @@
   "short_name": "AjmalOS",
   "start_url": "/",
   "display": "fullscreen",
-  "background_color": "#09121b",
-  "theme_color": "#0b7886",
+  "background_color": "#008080",
+  "theme_color": "#008080",
   "description": "Ajmal Khidri's interactive portfolio archive.",
-  "icons": [{ "src": "/icons/my-work.svg", "sizes": "256x256", "type": "image/svg+xml", "purpose": "any maskable" }]
+  "icons": [{ "src": "/icons/app/portfolio.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
 }

@@ -16,6 +16,7 @@ import RosGraph from '../components/RosGraph.astro';
 import WayBionic3D from '../components/WayBionic3D.astro';
 import WayBionicDiagram from '../components/WayBionicDiagram.astro';
 import TechLogoRail from '../components/TechLogoRail.astro';
+import SnakeRewardLab from '../components/SnakeRewardLab.astro';
 
 const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
 ---
@@ -35,31 +36,31 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
           <div class="hill hill-front" aria-hidden="true"></div>
 
           <div class="desktop-icons" aria-label="Applications">
-            <OsIcon window="portfolio" icon="▣" label="My Work" src="/icons/my-work.png" />
-            <OsIcon window="waybionic" icon="⚙" label="WayBionic" src="/icons/waybionic.png" />
-            <OsIcon window="blackbox" icon="⬢" label="BlackBox" src="/icons/blackbox.png" />
-            <OsIcon window="rover" icon="▤" label="Rover" src="/icons/rover.png" />
-            <OsIcon window="resume" icon="▧" label="Resume" src="/icons/resume.png" />
-            <OsIcon window="about" icon="★" label="About Aj" src="/icons/about-aj.png" />
-            <OsIcon window="browser" icon="⌕" label="Browser" src="/icons/browser.png" />
-            <OsIcon window="calculator" icon="⊞" label="Calculator" src="/icons/calculator.png" />
-            <OsIcon window="recycle" icon="♻" label="Recycle Bin" src="/icons/recycle.png" />
-            <OsIcon window="system" icon="ⓘ" label="System Info" src="/icons/system-clean.svg" />
-            <OsIcon window="work" icon="▥" label="Work History" src="/icons/work.png" />
-            <OsIcon window="skills" icon="⌘" label="Skills" src="/icons/skills.png" />
-            <OsIcon window="research" icon="◉" label="Research" src="/icons/research.png" />
-            <OsIcon window="notes" icon="▤" label="Build Notes" src="/icons/notes.png" />
-            <OsIcon window="terminal" icon=">_" label="Terminal" src="/icons/terminal.png" />
-            <OsIcon window="media" icon="▶" label="Media" src="/icons/media.png" />
-            <OsIcon window="restore" icon="↶" label="Restore" src="/icons/restore.png" />
-            <OsIcon window="hvacsim" icon="⌁" label="HVAC Lab" src="/icons/hvac.png" />
-            <OsIcon window="rosgraph" icon="◎" label="ROS Graph" src="/icons/rosgraph-clean.svg" />
-            <OsIcon window="monitor" icon="▥" label="System Monitor" src="/icons/system.png" />
-            <OsIcon window="oldarm" icon="◌" label="Old Arm" src="/icons/oldarm-polished.svg" />
-            <OsIcon window="filesystem" icon="⌂" label="Files" src="/icons/files-polished.svg" />
-            <OsIcon window="chinook" icon="✦" label="Chinook Clean" src="/icons/chinook-clean.svg" />
-            <OsIcon window="teachgame" icon="✣" label="Teach to Game" src="/icons/teach-to-game.svg" />
-            <OsIcon window="soccerlab" icon="◉" label="Soccer Lab" src="/icons/soccer-intelligence.svg" />
+            <OsIcon window="portfolio" icon="▣" label="My Work" src="/icons/app/portfolio.svg" />
+            <OsIcon window="waybionic" icon="⚙" label="WayBionic" src="/icons/app/waybionic.svg" />
+            <OsIcon window="blackbox" icon="⬢" label="BlackBox" src="/icons/app/blackbox.svg" />
+            <OsIcon window="rover" icon="▤" label="Rover" src="/icons/app/rover.svg" />
+            <OsIcon window="resume" icon="▧" label="Resume" src="/icons/app/resume.svg" />
+            <OsIcon window="about" icon="★" label="About Aj" src="/icons/app/about.svg" />
+            <OsIcon window="browser" icon="⌕" label="Browser" src="/icons/app/browser.svg" />
+            <OsIcon window="calculator" icon="⊞" label="Calculator" src="/icons/app/calculator.svg" />
+            <OsIcon window="recycle" icon="♻" label="Recycle Bin" src="/icons/app/recycle.svg" />
+            <OsIcon window="system" icon="ⓘ" label="System Info" src="/icons/app/system.svg" />
+            <OsIcon window="work" icon="▥" label="Work History" src="/icons/app/work.svg" />
+            <OsIcon window="skills" icon="⌘" label="Skills" src="/icons/app/skills.svg" />
+            <OsIcon window="research" icon="◉" label="Research" src="/icons/app/research.svg" />
+            <OsIcon window="notes" icon="▤" label="Build Notes" src="/icons/app/notes.svg" />
+            <OsIcon window="terminal" icon=">_" label="Terminal" src="/icons/app/terminal.svg" />
+            <OsIcon window="media" icon="▶" label="Media" src="/icons/app/media.svg" />
+            <OsIcon window="restore" icon="↶" label="Restore" src="/icons/app/restore.svg" />
+            <OsIcon window="hvacsim" icon="⌁" label="HVAC Lab" src="/icons/app/hvacsim.svg" />
+            <OsIcon window="rosgraph" icon="◎" label="ROS Graph" src="/icons/app/rosgraph.svg" />
+            <OsIcon window="monitor" icon="▥" label="System Monitor" src="/icons/app/monitor.svg" />
+            <OsIcon window="oldarm" icon="◌" label="Old Arm" src="/icons/app/oldarm.svg" />
+            <OsIcon window="filesystem" icon="⌂" label="Files" src="/icons/app/filesystem.svg" />
+            <OsIcon window="chinook" icon="✦" label="Chinook Clean" src="/icons/app/chinook.svg" />
+            <OsIcon window="teachgame" icon="✣" label="Teach to Game" src="/icons/app/teachgame.svg" />
+            <OsIcon window="soccerlab" icon="◉" label="Soccer Lab" src="/icons/app/soccerlab.svg" />
           </div>
           <DesktopWindow id="portfolio" title="MY WORK / FILE EXPLORER" icon="▣" open class="window-portfolio">
             <div class="file-toolbar mono">FILE &nbsp; EDIT &nbsp; VIEW &nbsp; HELP <span>LOCAL ARCHIVE / 08 ITEMS</span></div>
@@ -67,6 +68,10 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
               <p class="window-kicker mono">AJMAL KHIDRI / WORKING SYSTEMS</p>
               <h1>Things I have<br /><em>built or touched.</em></h1>
               <p class="window-intro">A personal archive of physical systems, software, and the businesses that taught me to keep things running.</p>
+              <div class="recruiter-entry">
+                <div><span class="mono">COMPUTER SCIENCE / UCALGARY / CALGARY, AB</span><strong>Open to software and robotics internships.</strong></div>
+                <div class="recruiter-actions"><a href="/resume/Ajmal_Khidri_Software_Internship.pdf" download>RESUME PDF ↘</a><a href="mailto:khidri.ajmal@gmail.com">EMAIL ↗</a><button type="button" data-tour-start>30-SECOND TOUR ↗</button></div>
+              </div>
             </div>
             <div class="portfolio-signals" aria-label="Portfolio focus areas">
               <div class="signal-card signal-card-primary"><span class="mono">01 / PHYSICAL</span><strong>Systems that move.</strong><small>ROS2, hardware integration, and controlled motion.</small></div>
@@ -137,6 +142,7 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
             <h2>Teaching an agent<br /><em>what success means.</em></h2>
             <p class="window-copy">Teach to Game is a local reinforcement-learning lab where goals, target scores, and reward signals are explicit. Snake and runner practice games work on a fresh laptop without sending training data to a cloud service.</p>
             <div class="rl-pipeline"><span>GAME STATE</span><b>→</b><span>POLICY</span><b>→</b><span>ACTION</span><b>→</b><span>REWARD</span></div>
+            <SnakeRewardLab />
             <div class="window-note mono">LOCAL LAB / USER-PROVIDED ADAPTERS / ONLINE ANTI-CHEAT GAMES OUT OF SCOPE</div>
           </DesktopWindow>
 
@@ -273,16 +279,16 @@ Type help for available commands.</div><form data-terminal-form><span>ajmal@work
             <div class="start-heading"><strong>AJMAL</strong><span>OS</span></div>
             <div class="start-menu-summary"><span class="mono">LOCAL ARCHIVE</span><strong>Ajmal Khidri</strong><small>22 public windows / Calgary, AB</small></div>
             <label class="start-search"><span aria-hidden="true">⌕</span><input type="search" data-start-search placeholder="Search your archive" aria-label="Search your archive" /></label>
-            <button type="button" data-window-open="portfolio">▣ &nbsp; My Work</button>
-            <button type="button" data-window-open="resume">▧ &nbsp; Resume</button>
-            <button type="button" data-window-open="system">ⓘ &nbsp; System Info</button>
-            <button type="button" data-window-open="work">▥ &nbsp; Work History</button>
-            <button type="button" data-window-open="notes">▤ &nbsp; Build Notes</button>
-            <button type="button" data-window-open="chinook">✦ &nbsp; Chinook Clean</button>
-            <button type="button" data-window-open="teachgame">✣ &nbsp; Teach to Game</button>
-            <button type="button" data-window-open="soccerlab">◉ &nbsp; Soccer Lab</button>
-            <button type="button" data-window-open="terminal">&gt;_ &nbsp; Terminal</button>
-            <button type="button" data-window-open="about">★ &nbsp; About Aj</button>
+            <button type="button" data-window-open="portfolio"><img src="/icons/app/portfolio.svg" alt="" /> My Work</button>
+            <button type="button" data-window-open="resume"><img src="/icons/app/resume.svg" alt="" /> Resume</button>
+            <button type="button" data-window-open="system"><img src="/icons/app/system.svg" alt="" /> System Info</button>
+            <button type="button" data-window-open="work"><img src="/icons/app/work.svg" alt="" /> Work History</button>
+            <button type="button" data-window-open="notes"><img src="/icons/app/notes.svg" alt="" /> Build Notes</button>
+            <button type="button" data-window-open="chinook"><img src="/icons/app/chinook.svg" alt="" /> Chinook Clean</button>
+            <button type="button" data-window-open="teachgame"><img src="/icons/app/teachgame.svg" alt="" /> Teach to Game</button>
+            <button type="button" data-window-open="soccerlab"><img src="/icons/app/soccerlab.svg" alt="" /> Soccer Lab</button>
+            <button type="button" data-window-open="terminal"><img src="/icons/app/terminal.svg" alt="" /> Terminal</button>
+            <button type="button" data-window-open="about"><img src="/icons/app/about.svg" alt="" /> About Aj</button>
             <button type="button" data-tour-start>▶ &nbsp; 30-SECOND TOUR</button>
             <a href="mailto:khidri.ajmal@gmail.com">✉ &nbsp; Email Ajmal</a>
           </div>
@@ -411,7 +417,11 @@ Type help for available commands.</div><form data-terminal-form><span>ajmal@work
           const button = document.createElement('button');
           button.type = 'button';
           button.dataset.taskWindow = item.dataset.window ?? '';
-          button.textContent = item.querySelector('.window-title')?.textContent?.trim() ?? 'Window';
+          const icon = document.createElement('img');
+          icon.className = 'taskbar-app-icon';
+          icon.src = `/icons/app/${item.dataset.window ?? ''}.svg`;
+          icon.alt = '';
+          button.append(icon, document.createTextNode(item.querySelector('.window-title')?.textContent?.trim() ?? 'Window'));
           if (item.hidden) button.classList.add('minimized');
           button.addEventListener('click', () => focusWindow(item.dataset.window ?? ''));
           taskbar.append(button);
@@ -710,7 +720,7 @@ Type help for available commands.</div><form data-terminal-form><span>ajmal@work
       if (tourNext) tourNext.textContent = tourStep === tourSteps.length - 1 ? 'FINISH TOUR' : 'NEXT';
       rebuildTaskbar();
     };
-    desktop.querySelector('[data-tour-start]')?.addEventListener('click', () => { if (tourOverlay) tourOverlay.hidden = false; tourStep = -1; advanceTour(); });
+    desktop.querySelectorAll('[data-tour-start]').forEach((button) => button.addEventListener('click', () => { if (tourOverlay) tourOverlay.hidden = false; tourStep = -1; advanceTour(); }));
     tourNext?.addEventListener('click', advanceTour);
     desktop.querySelector('[data-tour-stop]')?.addEventListener('click', () => { if (tourOverlay) tourOverlay.hidden = true; });
     document.addEventListener('keydown', (event) => { if (tourOverlay && !tourOverlay.hidden && event.key === 'Escape') tourOverlay.hidden = true; });

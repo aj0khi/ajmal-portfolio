@@ -1,0 +1,253 @@
+<section class="snake-lab" data-snake-lab>
+  <div class="snake-lab-head">
+    <div><p class="window-kicker mono">INTERACTIVE / TABULAR Q-LEARNING</p><h3>Reward Lab <span>01</span></h3></div>
+    <span class="snake-lab-state mono" data-snake-status aria-live="polite">READY / UNTRAINED</span>
+  </div>
+  <div class="snake-lab-layout">
+    <div class="snake-board-wrap">
+      <div class="snake-board" data-snake-board role="img" aria-label="Snake learning board. Focus this board to use the arrow keys." tabindex="0"></div>
+      <div class="snake-readout mono"><span>SCORE <b data-snake-score>0</b></span><span>BEST <b data-snake-best>0</b></span><span>EPISODES <b data-snake-episodes>0</b></span></div>
+    </div>
+    <div class="snake-lab-controls">
+      <p>The agent earns a reward for reaching food, loses reward for collisions, and learns which turns work. Train it, then watch its current policy.</p>
+      <label class="snake-reward-control"><span>FOOD REWARD <b data-reward-value>+10</b></span><input type="range" min="2" max="20" value="10" data-food-reward aria-label="Food reward"></label>
+      <label class="snake-reward-control"><span>COLLISION COST <b data-cost-value>-10</b></span><input type="range" min="2" max="20" value="10" data-collision-cost aria-label="Collision cost"></label>
+      <div class="snake-actions"><button type="button" data-snake-train>TRAIN 150 EPISODES</button><button type="button" data-snake-run>RUN POLICY</button><button type="button" data-snake-step aria-label="Advance one policy step">STEP</button><button type="button" data-snake-reset aria-label="Reset the Snake board">RESET</button></div>
+      <div class="snake-pad" aria-label="Manual movement controls"><button type="button" data-snake-dir="up" aria-label="Move up">▲</button><button type="button" data-snake-dir="left" aria-label="Move left">◀</button><button type="button" data-snake-dir="down" aria-label="Move down">▼</button><button type="button" data-snake-dir="right" aria-label="Move right">▶</button></div>
+      <div class="snake-learning mono"><span>LAST 10 EPISODES</span><strong data-snake-return>—</strong><small>Mean reward / episode</small></div>
+    </div>
+  </div>
+  <p class="window-note mono">SMALL TEACHING MODEL / REWARD VALUES ARE EDITABLE / TRAINING RUNS LOCALLY IN THIS TAB</p>
+</section>
+
+<script>
+  const lab = document.querySelector<HTMLElement>('[data-snake-lab]');
+  if (lab) {
+    const size = 9;
+    const actions = ['up', 'right', 'down', 'left'] as const;
+    type Direction = typeof actions[number];
+    type Point = { x: number; y: number };
+    type SnakeState = { body: Point[]; direction: Direction; food: Point; score: number; steps: number; alive: boolean };
+    const vectors: Record<Direction, Point> = { up: { x: 0, y: -1 }, right: { x: 1, y: 0 }, down: { x: 0, y: 1 }, left: { x: -1, y: 0 } };
+    const board = lab.querySelector<HTMLElement>('[data-snake-board]');
+    const status = lab.querySelector<HTMLElement>('[data-snake-status]');
+    const scoreNode = lab.querySelector<HTMLElement>('[data-snake-score]');
+    const bestNode = lab.querySelector<HTMLElement>('[data-snake-best]');
+    const episodeNode = lab.querySelector<HTMLElement>('[data-snake-episodes]');
+    const returnNode = lab.querySelector<HTMLElement>('[data-snake-return]');
+    const foodReward = lab.querySelector<HTMLInputElement>('[data-food-reward]');
+    const collisionCost = lab.querySelector<HTMLInputElement>('[data-collision-cost]');
+    const qValues = Array.from({ length: 72 }, () => [0, 0, 0]);
+    let cells: HTMLSpanElement[] = [];
+    let state: SnakeState;
+    let episodes = 0;
+    let best = 0;
+    let learned = false;
+    let interval = 0;
+
+    const randomFood = (body: Point[]): Point => {
+      const available: Point[] = [];
+      for (let y = 0; y < size; y += 1) for (let x = 0; x < size; x += 1) {
+        if (!body.some((part) => part.x === x && part.y === y)) available.push({ x, y });
+      }
+      return available[Math.floor(Math.random() * available.length)] ?? { x: 4, y: 4 };
+    };
+    const freshState = (): SnakeState => {
+      const body = [{ x: 4, y: 4 }, { x: 3, y: 4 }, { x: 2, y: 4 }];
+      return { body, direction: 'right', food: randomFood(body), score: 0, steps: 0, alive: true };
+    };
+    const turn = (direction: Direction, amount: number): Direction => actions[(actions.indexOf(direction) + amount + 4) % 4];
+    const nextPoint = (point: Point, direction: Direction): Point => ({ x: point.x + vectors[direction].x, y: point.y + vectors[direction].y });
+    const blocked = (body: Point[], head: Point, direction: Direction): boolean => {
+      const next = nextPoint(head, direction);
+      return next.x < 0 || next.y < 0 || next.x >= size || next.y >= size || body.slice(0, -1).some((part) => part.x === next.x && part.y === next.y);
+    };
+    const stateIndex = (current: SnakeState): number => {
+      const head = current.body[0];
+      const dx = Math.sign(current.food.x - head.x) + 1;
+      const dy = Math.sign(current.food.y - head.y) + 1;
+      const forward = current.direction;
+      const left = turn(forward, -1);
+      const right = turn(forward, 1);
+      const obstacles = (Number(blocked(current.body, head, forward)) << 2) | (Number(blocked(current.body, head, left)) << 1) | Number(blocked(current.body, head, right));
+      return (dx * 3 + dy) * 8 + obstacles;
+    };
+    const bestAction = (current: SnakeState): number => {
+      const values = qValues[stateIndex(current)];
+      return values.indexOf(Math.max(...values));
+    };
+    const actionDirection = (direction: Direction, action: number): Direction => turn(direction, action === 0 ? 0 : action === 1 ? -1 : 1);
+    const render = () => {
+      if (!board) return;
+      cells.forEach((cell) => cell.className = 'snake-cell');
+      state.body.forEach((part, index) => cells[part.y * size + part.x]?.classList.add(index === 0 ? 'snake-head' : 'snake-body'));
+      cells[state.food.y * size + state.food.x]?.classList.add('snake-food');
+      if (scoreNode) scoreNode.textContent = String(state.score);
+      if (bestNode) bestNode.textContent = String(best);
+    };
+    const stop = () => {
+      window.clearInterval(interval);
+      interval = 0;
+      const runButton = lab.querySelector<HTMLButtonElement>('[data-snake-run]');
+      if (runButton) runButton.textContent = 'RUN POLICY';
+    };
+    const move = (direction: Direction, updateView = true): number => {
+      if (!state.alive) return 0;
+      const head = state.body[0];
+      const previousDistance = Math.abs(state.food.x - head.x) + Math.abs(state.food.y - head.y);
+      const next = nextPoint(head, direction);
+      state.steps += 1;
+      state.direction = direction;
+      if (blocked(state.body, head, direction) || state.steps > 80) {
+        state.alive = false;
+        if (status) status.textContent = 'COLLISION / EPISODE ENDED';
+        if (updateView) render();
+        return -(Number(collisionCost?.value ?? 10));
+      }
+      state.body.unshift(next);
+      let reward = -0.04;
+      if (next.x === state.food.x && next.y === state.food.y) {
+        state.score += 1;
+        reward += Number(foodReward?.value ?? 10);
+        reward += 0.2;
+        state.food = randomFood(state.body);
+      } else {
+        state.body.pop();
+        const nextDistance = Math.abs(state.food.x - next.x) + Math.abs(state.food.y - next.y);
+        reward += (previousDistance - nextDistance) * 0.2;
+      }
+      if (state.score > best) best = state.score;
+      if (updateView) {
+        render();
+        if (status) status.textContent = learned ? 'POLICY ACTIVE / LOCAL' : 'MANUAL PLAY / LOCAL';
+      }
+      return reward;
+    };
+    const endEpisode = () => {
+      episodes += 1;
+      if (episodeNode) episodeNode.textContent = String(episodes);
+      state = freshState();
+      render();
+    };
+    const train = () => {
+      stop();
+      const returns: number[] = [];
+      for (let episode = 0; episode < 150; episode += 1) {
+        state = freshState();
+        let total = 0;
+        for (let step = 0; step < 80 && state.alive; step += 1) {
+          const index = stateIndex(state);
+          const choice = Math.random() < Math.max(0.04, 0.35 - episode * 0.002) ? Math.floor(Math.random() * 3) : bestAction(state);
+          const reward = move(actionDirection(state.direction, choice), false);
+          total += reward;
+          const nextIndex = stateIndex(state);
+          const future = state.alive ? Math.max(...qValues[nextIndex]) : 0;
+          qValues[index][choice] += 0.12 * (reward + 0.88 * future - qValues[index][choice]);
+        }
+        returns.push(total);
+        episodes += 1;
+      }
+      state = freshState();
+      learned = true;
+      if (episodeNode) episodeNode.textContent = String(episodes);
+      if (returnNode) returnNode.textContent = `${(returns.slice(-10).reduce((sum, value) => sum + value, 0) / 10).toFixed(1)} / 10`;
+      if (status) status.textContent = 'TRAINED / READY TO RUN';
+      render();
+    };
+    const runStep = () => {
+      if (!state.alive) { endEpisode(); return; }
+      const action = bestAction(state);
+      move(actionDirection(state.direction, action));
+    };
+
+    if (board) {
+      board.style.setProperty('--snake-size', String(size));
+      cells = Array.from({ length: size * size }, () => {
+        const cell = document.createElement('span');
+        cell.className = 'snake-cell';
+        cell.setAttribute('aria-hidden', 'true');
+        board.append(cell);
+        return cell;
+      });
+    }
+    state = freshState();
+    render();
+    foodReward?.addEventListener('input', () => {
+      const value = lab.querySelector<HTMLElement>('[data-reward-value]');
+      if (value) value.textContent = `+${foodReward.value}`;
+    });
+    collisionCost?.addEventListener('input', () => {
+      const value = lab.querySelector<HTMLElement>('[data-cost-value]');
+      if (value) value.textContent = `-${collisionCost.value}`;
+    });
+    lab.querySelector('[data-snake-train]')?.addEventListener('click', train);
+    lab.querySelector('[data-snake-step]')?.addEventListener('click', runStep);
+    lab.querySelector('[data-snake-run]')?.addEventListener('click', () => {
+      if (interval) { stop(); if (status) status.textContent = 'POLICY PAUSED'; return; }
+      if (!learned) train();
+      const button = lab.querySelector<HTMLButtonElement>('[data-snake-run]');
+      if (button) button.textContent = 'PAUSE';
+      if (status) status.textContent = 'POLICY ACTIVE / LOCAL';
+      interval = window.setInterval(runStep, matchMedia('(prefers-reduced-motion: reduce)').matches ? 450 : 220);
+    });
+    lab.querySelector('[data-snake-reset]')?.addEventListener('click', () => {
+      stop();
+      state = freshState();
+      if (status) status.textContent = learned ? 'TRAINED / RESET' : 'READY / UNTRAINED';
+      render();
+    });
+    lab.querySelectorAll<HTMLButtonElement>('[data-snake-dir]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const direction = button.dataset.snakeDir as Direction;
+        if (direction === turn(state.direction, 2)) return;
+        stop();
+        move(direction);
+      });
+    });
+    board?.addEventListener('keydown', (event) => {
+      if (!['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) return;
+      const direction = event.key.slice(5).toLowerCase() as Direction;
+      if (direction === turn(state.direction, 2)) return;
+      event.preventDefault();
+      stop();
+      move(direction);
+    });
+  }
+</script>
+
+<style>
+  .snake-lab { margin: 24px 0; padding: 18px; color: #172a26; background: #d7e4dc; border: 2px solid #718b7c; box-shadow: inset 1px 1px #fff, inset -2px -2px #a5b6aa; }
+  .snake-lab-head { display: flex; justify-content: space-between; align-items: start; gap: 14px; margin-bottom: 14px; }
+  .snake-lab-head h3 { margin: 4px 0 0; font-size: 23px; line-height: 1; }
+  .snake-lab-head h3 span { color: #26827c; font: 12px monospace; vertical-align: top; }
+  .snake-lab-state { padding: 5px 7px; color: #e5fff3; background: #174f42; font-size: 10px; }
+  .snake-lab-layout { display: grid; grid-template-columns: minmax(210px, .8fr) minmax(250px, 1.2fr); gap: 18px; align-items: start; }
+  .snake-board-wrap { min-width: 0; }
+  .snake-board { display: grid; grid-template-columns: repeat(var(--snake-size), 1fr); aspect-ratio: 1; gap: 2px; padding: 6px; background: #193d35; border: 2px solid #fff; box-shadow: 2px 2px #52645c; }
+  .snake-cell { min-width: 0; background: #d2e7d8; }
+  .snake-cell.snake-body { background: #26a69a; box-shadow: inset 1px 1px #72dfc1, inset -2px -2px #147466; }
+  .snake-cell.snake-head { background: #ffe166; box-shadow: inset 1px 1px #fff2ae, inset -2px -2px #c28d1c; }
+  .snake-cell.snake-food { background: #ef6255; border-radius: 50%; box-shadow: inset 1px 1px #ffb1a4, inset -2px -2px #a7372c; }
+  .snake-readout { display: flex; justify-content: space-between; gap: 5px; margin-top: 9px; font-size: 10px; }
+  .snake-readout span { display: flex; gap: 4px; }
+  .snake-readout b { color: #147466; }
+  .snake-lab-controls > p { margin: 0 0 12px; font-size: 13px; line-height: 1.45; }
+  .snake-reward-control { display: grid; grid-template-columns: 1fr; gap: 3px; margin: 8px 0; font: 10px monospace; }
+  .snake-reward-control span { display: flex; justify-content: space-between; }
+  .snake-reward-control b { color: #147466; }
+  .snake-reward-control input { width: 100%; accent-color: #168a7d; }
+  .snake-actions { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0; }
+  .snake-actions button, .snake-pad button { min-height: 32px; padding: 5px 8px; border: 1px solid #6c8377; border-radius: 0; color: #102d26; background: #e8eee8; box-shadow: inset 1px 1px #fff, 1px 1px #89998e; font: 10px monospace; cursor: pointer; }
+  .snake-actions button:hover, .snake-pad button:hover { background: #fff; }
+  .snake-actions button:focus-visible, .snake-pad button:focus-visible { outline: 3px solid #e25843; outline-offset: 2px; }
+  .snake-pad { display: grid; grid-template-columns: repeat(3, 34px); grid-template-rows: repeat(2, 32px); justify-content: start; gap: 4px; }
+  .snake-pad [data-snake-dir="up"] { grid-column: 2; grid-row: 1; }
+  .snake-pad [data-snake-dir="left"] { grid-column: 1; grid-row: 2; }
+  .snake-pad [data-snake-dir="down"] { grid-column: 2; grid-row: 2; }
+  .snake-pad [data-snake-dir="right"] { grid-column: 3; grid-row: 2; }
+  .snake-learning { display: grid; gap: 3px; margin-top: 12px; padding: 8px; border-left: 3px solid #259c88; background: #e7eee7; font-size: 10px; }
+  .snake-learning strong { font-size: 16px; }
+  .snake-learning small { color: #4a6155; }
+  @media (max-width: 600px) { .snake-lab { padding: 12px; } .snake-lab-layout { grid-template-columns: 1fr; } .snake-board-wrap { width: min(100%, 300px); margin-inline: auto; } }
+  @media (prefers-reduced-motion: reduce) { .snake-lab *, .snake-lab *::before, .snake-lab *::after { scroll-behavior: auto !important; } }
+</style>

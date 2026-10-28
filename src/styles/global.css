@@ -4662,4 +4662,16 @@ body { background: #111111; font-family: Tahoma, 'MS Sans Serif', sans-serif; }
 .rl-pipeline { display: flex; align-items: center; justify-content: space-around; gap: 0.45rem; margin-top: 1.4rem; padding: 1rem; border: 1px dashed #000080; color: #000080; font: 700 0.58rem var(--mono); }
 .rl-pipeline b, .event-pipeline > b { font-size: 1.1rem; }
 .event-pipeline { grid-template-columns: 1fr auto 1fr auto 1fr; align-items: center; }
-@media (max-width: 700px) { .business-grid { grid-template-columns: 1fr; } .event-pipeline { grid-template-columns: 1fr; } .event-pipeline > b { transform: rotate(90deg); } .rl-pipeline { flex-direction: column; } }
+.recruiter-entry { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 0.8rem; margin-top: 0.9rem; padding: 0.65rem 0; border-top: 1px solid #808080; border-bottom: 1px solid #808080; }
+.recruiter-entry > div:first-child { display: grid; gap: 0.3rem; }
+.recruiter-entry .mono { color: #000080; font-size: 0.52rem; }
+.recruiter-entry strong { font: 600 0.88rem Georgia, serif; }
+.recruiter-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0.35rem; }
+.recruiter-actions a, .recruiter-actions button { min-height: 2rem; padding: 0.4rem 0.55rem; border: 2px outset #dfdfdf; border-radius: 0; color: #111111; background: #c0c0c0; font: 700 0.52rem var(--mono); text-decoration: none; cursor: pointer; }
+.recruiter-actions a:hover, .recruiter-actions a:focus-visible, .recruiter-actions button:hover, .recruiter-actions button:focus-visible { color: #ffffff; background: #000080; }
+.window-app-icon { width: 18px; height: 18px; flex: 0 0 18px; image-rendering: pixelated; }
+.start-menu button[data-window-open] { display: flex; align-items: center; gap: 0.45rem; }
+.start-menu button[data-window-open] img { width: 24px; height: 24px; flex: 0 0 24px; image-rendering: pixelated; }
+.taskbar-windows button { display: flex; align-items: center; gap: 0.35rem; }
+.taskbar-app-icon { width: 16px; height: 16px; flex: 0 0 16px; image-rendering: pixelated; }
+@media (max-width: 700px) { .business-grid { grid-template-columns: 1fr; } .event-pipeline { grid-template-columns: 1fr; } .event-pipeline > b { transform: rotate(90deg); } .rl-pipeline { flex-direction: column; } .recruiter-entry { grid-template-columns: 1fr; } .recruiter-actions { justify-content: flex-start; } }
