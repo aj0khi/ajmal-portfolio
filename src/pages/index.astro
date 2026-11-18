@@ -63,14 +63,14 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
             <OsIcon window="soccerlab" icon="◉" label="Soccer Lab" src="/icons/app/soccerlab.svg" />
           </div>
           <DesktopWindow id="portfolio" title="MY WORK / FILE EXPLORER" icon="▣" open class="window-portfolio">
-            <div class="file-toolbar mono">FILE &nbsp; EDIT &nbsp; VIEW &nbsp; HELP <span>LOCAL ARCHIVE / 08 ITEMS</span></div>
+            <div class="file-toolbar mono">FILE &nbsp; EDIT &nbsp; VIEW &nbsp; HELP <span>LOCAL ARCHIVE / 09 ITEMS</span></div>
             <div class="explorer-heading">
               <p class="window-kicker mono">AJMAL KHIDRI / WORKING SYSTEMS</p>
               <h1>Things I have<br /><em>built or touched.</em></h1>
               <p class="window-intro">A personal archive of physical systems, software, and the businesses that taught me to keep things running.</p>
               <div class="recruiter-entry">
                 <div><span class="mono">COMPUTER SCIENCE / UCALGARY / CALGARY, AB</span><strong>Open to software and robotics internships.</strong></div>
-                <div class="recruiter-actions"><a href="/resume/Ajmal_Khidri_Software_Internship.pdf" download>RESUME PDF ↘</a><a href="mailto:khidri.ajmal@gmail.com">EMAIL ↗</a><button type="button" data-tour-start>30-SECOND TOUR ↗</button></div>
+                <div class="recruiter-actions"><a href="/resume/Ajmal_Khidri_Software_Internship.pdf" download>RESUME PDF ↘</a><a href="mailto:khidri.ajmal@gmail.com">EMAIL ↗</a><a href="https://github.com/aj0khi" target="_blank" rel="noreferrer">GITHUB ↗</a><a href="https://www.linkedin.com/in/ajmal-khidri/" target="_blank" rel="noreferrer">LINKEDIN ↗</a><button type="button" data-tour-start>30-SECOND TOUR ↗</button></div>
               </div>
             </div>
             <div class="portfolio-signals" aria-label="Portfolio focus areas">
@@ -93,7 +93,16 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
                   {project.data.title === 'Personal Robotics Roadmap' ? <MockDiagram kind="roadmap" title="Robotics learning roadmap" /> : null}
                   {project.data.title === 'Autonomous Obstacle-Avoiding Rover' ? <MockDiagram kind="rover" title="Rover control loop" /> : null}
                   {project.data.title === 'HVAC Express' ? <MockDiagram kind="hvac" title="HVAC Express delivery flow" /> : null}
-                  {project.data.link ? <a href={project.data.link} target="_blank" rel="noreferrer">OPEN SOURCE ↗</a> : null}
+                  <details class="project-case-study">
+                    <summary>OPEN CASE STUDY</summary>
+                    <dl>
+                      {project.data.problem ? <div><dt>PROBLEM</dt><dd>{project.data.problem}</dd></div> : null}
+                      {project.data.system ? <div><dt>{project.data.status === 'IN PROGRESS' ? 'CURRENT DESIGN' : project.data.status === 'PROTOTYPE' ? 'PROTOTYPE SCOPE' : 'SYSTEM'}</dt><dd>{project.data.system}</dd></div> : null}
+                      {project.data.decision ? <div><dt>KEY DECISION</dt><dd>{project.data.decision}</dd></div> : null}
+                      {project.data.next ? <div><dt>NEXT MILESTONE</dt><dd>{project.data.next}</dd></div> : null}
+                    </dl>
+                  </details>
+                  {project.data.link ? <a href={project.data.link} target="_blank" rel="noreferrer">{project.data.linkLabel ?? 'VIEW PROJECT'} ↗</a> : null}
                 </article>
               ))}
             </div>
@@ -108,6 +117,7 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
               <figure><img src="/assets/waybionic/engineer-monitor-normal.png" alt="WayBionic Engineering Monitor in a mock normal state." loading="lazy" /><figcaption class="mono">MOCK NORMAL / RVIZ</figcaption></figure>
               <figure><img src="/assets/waybionic/engineer-monitor-fault.png" alt="WayBionic Engineering Monitor showing a mock fault state." loading="lazy" /><figcaption class="mono">MOCK FAULT / STALE STATE</figcaption></figure>
             </div>
+            <p class="window-note mono">EVIDENCE BOUNDARY / These captures show mock RViz states. The stale-data lab uses scripted samples, and the 3D arm is browser-only; neither connects to ROS nor sends commands to hardware.</p>
             <WayBionic3D />
             <MockDiagram kind="waybionic" title="WayBionic control loop" />
             <div class="joint-panel"><WayBionicDiagram /></div>
@@ -117,7 +127,7 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
           <DesktopWindow id="blackbox" title="BLACKBOX / PROJECT NOTES" icon="⬢" class="window-blackbox">
             <div class="window-kicker mono">PHYSICAL AI / VERSION 3 DRAFT / SEPTEMBER 2026</div>
             <h2>A local-first evidence stack<br /><em>for physical AI systems.</em></h2>
-            <p class="window-copy">BlackBox is a tamper-evident recorder concept and working Python project for capturing what an AI system was told, what it commanded, and what physically happened.</p>
+            <p class="window-copy">BlackBox is a local-first evidence recorder project for capturing what a physical AI system was told, what it commanded, and what was observed. The browser interaction below is only a hash-chain illustration; it is not verification evidence for the Python project.</p>
             <div class="blackbox-layers">
               <div><strong>01</strong><span>Evidence core</span><small>Canonical records, hash chains, sealing, signatures, validation.</small></div>
               <div><strong>02</strong><span>Owner portal</span><small>Device-bound local monitoring, protected uploads, hidden evidence storage.</small></div>
@@ -140,7 +150,7 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
           <DesktopWindow id="teachgame" title="TEACH TO GAME / RL LAB" icon="✣" class="window-teachgame">
             <div class="window-kicker mono">LOCAL REINFORCEMENT LEARNING / PYTHON / PLAYWRIGHT</div>
             <h2>Teaching an agent<br /><em>what success means.</em></h2>
-            <p class="window-copy">Teach to Game is a local reinforcement-learning lab where goals, target scores, and reward signals are explicit. Snake and runner practice games work on a fresh laptop without sending training data to a cloud service.</p>
+            <p class="window-copy">The Python project uses Gymnasium and PPO for its runner and supports seeded-baseline evaluation. The interactive Snake panel here is a separate, browser-only tabular Q-learning model; its short stochastic runs are not benchmark results.</p>
             <div class="rl-pipeline"><span>GAME STATE</span><b>→</b><span>POLICY</span><b>→</b><span>ACTION</span><b>→</b><span>REWARD</span></div>
             <SnakeRewardLab />
             <div class="window-note mono">LOCAL LAB / USER-PROVIDED ADAPTERS / ONLINE ANTI-CHEAT GAMES OUT OF SCOPE</div>
@@ -149,7 +159,7 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
           <DesktopWindow id="soccerlab" title="SOCCER INTELLIGENCE / EVENT LAB" icon="◉" class="window-soccerlab">
             <div class="window-kicker mono">NEXT.JS / REACT / TYPESCRIPT / SYNTHETIC EVENTS</div>
             <h2>Turning events into<br /><em>match intelligence.</em></h2>
-            <p class="window-copy">An Azure-ready workspace for turning football-realistic events into explainable match intelligence and personalized stories while keeping raw events, derived state, explanations, and presentation payloads separate.</p>
+            <p class="window-copy">A provider-neutral pipeline derives match state, bounded Poisson-style estimates, and evidence-linked stories from synthetic events. An optional server-side Azure Event Hubs adapter is available; the probability model is not calibrated against real matches.</p>
             <div class="event-pipeline"><div><strong>EVENTS</strong><span>synthetic stream</span></div><b>→</b><div><strong>STATE</strong><span>metrics + context</span></div><b>→</b><div><strong>STORY</strong><span>grounded insight</span></div></div>
             <div class="window-note mono">SYNTHETIC DATA / EVIDENCE-GROUNDED NARRATIVE / PROVIDER-NEUTRAL PIPELINE</div>
           </DesktopWindow>
@@ -232,7 +242,7 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
           <DesktopWindow id="terminal" title="TERMINAL / AJMALOS" icon=">_" class="window-terminal">
             <div class="terminal-screen" data-terminal><div data-terminal-output>AJMALOS TERMINAL v1.0
 Last login: local archive
-Type help for available commands.</div><form data-terminal-form><span>ajmal@workstation:~$</span><input data-terminal-input aria-label="Terminal command" autocomplete="off" /></form></div>
+Type help for available commands.</div><form data-terminal-form aria-label="Run terminal command"><span>ajmal@workstation:~$</span><input name="command" data-terminal-input aria-label="Terminal command" autocomplete="off" enterkeyhint="go" /><button type="submit">RUN</button></form></div>
           </DesktopWindow>
 
           <DesktopWindow id="media" title="MEDIA PLAYER / WAYBIONIC" icon="▶" class="window-media">
@@ -411,7 +421,7 @@ Type help for available commands.</div><form data-terminal-form><span>ajmal@work
     });
 
     const rebuildTaskbar = () => {
-      taskbar.innerHTML = '';
+      taskbar.replaceChildren();
       windows.forEach((item) => {
         if (item.dataset.windowOpened === 'true') {
           const button = document.createElement('button');
@@ -496,7 +506,7 @@ Type help for available commands.</div><form data-terminal-form><span>ajmal@work
       const days = new Date(year, month + 1, 0).getDate();
       calendarMonth.textContent = today.toLocaleDateString([], { month: 'long', year: 'numeric' }).toUpperCase();
       calendarFooter.textContent = `${Intl.DateTimeFormat().resolvedOptions().timeZone} / ${today.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' })}`;
-      calendarGrid.innerHTML = '';
+      calendarGrid.replaceChildren();
       for (let blank = 0; blank < firstDay; blank += 1) calendarGrid.append(document.createElement('span'));
       for (let day = 1; day <= days; day += 1) {
         const cell = document.createElement('span');
@@ -541,7 +551,7 @@ Type help for available commands.</div><form data-terminal-form><span>ajmal@work
     });
     const calculatorWindow = desktop.querySelector<HTMLElement>('[data-window="calculator"]');
     document.addEventListener('keydown', (event) => {
-      if (!calculatorWindow || calculatorWindow.hidden || event.metaKey || event.ctrlKey || event.altKey) return;
+      if (!calculatorWindow || calculatorWindow.hidden || !(event.target instanceof Node) || !calculatorWindow.contains(event.target) || event.metaKey || event.ctrlKey || event.altKey) return;
       const keyMap: Record<string, string> = { Enter: '=', Escape: 'C', Backspace: 'BACKSPACE' };
       const value = keyMap[event.key] ?? (/[0-9.+*/-]/.test(event.key) ? event.key : '');
       if (!value) return;
@@ -648,7 +658,7 @@ Type help for available commands.</div><form data-terminal-form><span>ajmal@work
     const renderPaletteResults = () => {
       if (!paletteResults) return;
       const query = paletteInput?.value.toLowerCase() ?? '';
-      paletteResults.innerHTML = '';
+      paletteResults.replaceChildren();
       const matches = [...windows].filter((item) => {
         const id = item.dataset.window ?? '';
         const title = item.querySelector('.window-title')?.textContent?.trim() ?? id;
@@ -689,7 +699,7 @@ Type help for available commands.</div><form data-terminal-form><span>ajmal@work
       }
       if (event.key === 'Escape' && palette) palette.hidden = true;
       if (event.altKey && ['ArrowLeft', 'ArrowRight'].includes(event.key)) {
-        const focusedWindow = [...windows].sort((left, right) => Number(right.style.zIndex || 0) - Number(left.style.zIndex || 0))[0];
+        const focusedWindow = Array.from(windows).toSorted((left, right) => Number(right.style.zIndex || 0) - Number(left.style.zIndex || 0))[0];
         if (focusedWindow) {
           focusedWindow.classList.remove('is-snapped-left', 'is-snapped-right');
           focusedWindow.classList.add(event.key === 'ArrowLeft' ? 'is-snapped-left' : 'is-snapped-right');

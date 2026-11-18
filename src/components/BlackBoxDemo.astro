@@ -1,38 +1,95 @@
 <section class="blackbox-demo" data-blackbox-demo>
-  <div class="window-kicker mono">LOCAL DEMO / SHA-256 CHAIN</div>
+  <div class="window-kicker mono">LOCAL DEMO / SHA-256 HASH-CHAIN ILLUSTRATION</div>
   <h2>Change one record.<br /><em>Watch the chain notice.</em></h2>
-  <div class="chain-records"><div data-chain-record="0"><span class="mono">01 / SENSOR EVENT</span><strong>motor_current = 0.85A</strong><small>hash: <code data-chain-hash="0">pending</code></small></div><div data-chain-record="1"><span class="mono">02 / COMMAND EVENT</span><strong>motion_test = HOME</strong><small>prev: <code data-chain-prev="1">pending</code></small></div><div data-chain-record="2"><span class="mono">03 / REVIEW EVENT</span><strong>operator_ack = true</strong><small>prev: <code data-chain-prev="2">pending</code></small></div></div>
-  <div class="chain-actions"><button type="button" data-chain-run>SEAL DEMO CHAIN</button><button type="button" data-chain-mutate>SIMULATE MUTATION</button><strong data-chain-status>UNSEALED</strong></div>
-  <p class="window-note mono">Conceptual browser demo. Not production evidence and not a cryptographic claim about this website.</p>
+  <div class="chain-records">
+    <div data-chain-record="0"><span class="mono">01 / SENSOR EVENT</span><strong data-chain-payload="0">motor_current = 0.85A</strong><small>SHA-256 prefix: <code data-chain-hash="0">not sealed</code></small></div>
+    <div data-chain-record="1"><span class="mono">02 / COMMAND EVENT</span><strong data-chain-payload="1">motion_test = HOME</strong><small>previous hash: <code data-chain-prev="1">not sealed</code></small><small>SHA-256 prefix: <code data-chain-hash="1">not sealed</code></small></div>
+    <div data-chain-record="2"><span class="mono">03 / REVIEW EVENT</span><strong data-chain-payload="2">operator_ack = true</strong><small>previous hash: <code data-chain-prev="2">not sealed</code></small><small>SHA-256 prefix: <code data-chain-hash="2">not sealed</code></small></div>
+  </div>
+  <div class="chain-actions">
+    <button type="button" data-chain-run>CREATE BASELINE HASHES</button>
+    <button type="button" data-chain-mutate aria-pressed="false">SIMULATE MUTATION</button>
+    <button type="button" data-chain-verify>VERIFY AGAINST BASELINE</button>
+    <strong data-chain-status role="status" aria-live="polite">NO BASELINE</strong>
+  </div>
+  <p class="window-note mono">Hash chaining links event order; changed content can be detected only when compared with a trusted checkpoint. This illustration uses an in-memory baseline, shows truncated hash prefixes, and has no signatures, persistent storage, or trusted timestamps. It does not establish security properties of the Python project.</p>
 </section>
 <script>
   const chainDemo = document.querySelector<HTMLElement>('[data-blackbox-demo]');
   if (chainDemo) {
-    let sealed = false;
     let mutated = false;
+    let baselineHashes: string[] | undefined;
     const status = chainDemo.querySelector<HTMLElement>('[data-chain-status]');
+    const mutateButton = chainDemo.querySelector<HTMLButtonElement>('[data-chain-mutate]');
+    const records = [
+      { type: 'SENSOR EVENT', value: 'motor_current = 0.85A' },
+      { type: 'COMMAND EVENT', value: 'motion_test = HOME' },
+      { type: 'REVIEW EVENT', value: 'operator_ack = true' }
+    ];
     const hash = async (value: string) => {
+      if (!globalThis.crypto?.subtle) throw new Error('Web Crypto is unavailable in this browser context.');
       const bytes = new TextEncoder().encode(value);
-      const digest = await crypto.subtle.digest('SHA-256', bytes);
-      return [...new Uint8Array(digest)].map((item) => item.toString(16).padStart(2, '0')).join('').slice(0, 16);
+      const digest = await globalThis.crypto.subtle.digest('SHA-256', bytes);
+      return [...new Uint8Array(digest)].map((item) => item.toString(16).padStart(2, '0')).join('');
     };
-    const seal = async () => {
+    const createChain = async (updateDisplay = true) => {
       let previous = 'GENESIS';
-      for (let index = 0; index < 3; index += 1) {
-        const record = chainDemo.querySelector(`[data-chain-record="${index}"]`);
-        const text = record?.textContent ?? '';
-        const current = await hash(`${previous}:${text}:${mutated && index === 1 ? 'changed' : ''}`);
-        const hashNode = record?.querySelector('[data-chain-hash]') ?? record?.querySelector(`[data-chain-prev="${index}"]`);
-        if (hashNode) hashNode.textContent = current;
-        const previousNode = record?.querySelector(`[data-chain-prev="${index}"]`);
-        if (previousNode) previousNode.textContent = previous;
+      const hashes: string[] = [];
+
+      for (const [index, record] of records.entries()) {
+        const value = index === 1 && mutated ? `${record.value} (changed)` : record.value;
+        const recordElement = chainDemo.querySelector<HTMLElement>(`[data-chain-record="${index}"]`);
+        const payloadNode = recordElement?.querySelector<HTMLElement>(`[data-chain-payload="${index}"]`);
+        const previousNode = recordElement?.querySelector<HTMLElement>(`[data-chain-prev="${index}"]`);
+        const hashNode = recordElement?.querySelector<HTMLElement>(`[data-chain-hash="${index}"]`);
+        const current = await hash(`${previous}:${record.type}:${value}`);
+
+        if (payloadNode) payloadNode.textContent = value;
+        if (updateDisplay && previousNode) previousNode.textContent = previous.slice(0, 16);
+        if (updateDisplay && hashNode) hashNode.textContent = current.slice(0, 16);
+        hashes.push(current);
         previous = current;
       }
-      sealed = true;
-      if (status) status.textContent = mutated ? 'MUTATION DETECTED' : 'CHAIN SEALED';
-      chainDemo.dataset.state = mutated ? 'mutated' : 'sealed';
+
+      return hashes;
     };
-    chainDemo.querySelector('[data-chain-run]')?.addEventListener('click', seal);
-    chainDemo.querySelector('[data-chain-mutate]')?.addEventListener('click', () => { mutated = true; if (sealed) seal(); else if (status) status.textContent = 'READY TO SEAL'; });
+    const reportHashError = (error: unknown) => {
+      if (status) status.textContent = error instanceof Error ? `HASH ERROR: ${error.message}` : 'HASH ERROR: UNKNOWN FAILURE';
+      chainDemo.dataset.state = 'error';
+    };
+
+    chainDemo.querySelector('[data-chain-run]')?.addEventListener('click', () => {
+      void createChain().then((hashes) => {
+        baselineHashes = hashes;
+        if (status) status.textContent = 'BASELINE CREATED IN MEMORY';
+        chainDemo.dataset.state = 'baseline';
+      }).catch(reportHashError);
+    });
+
+    mutateButton?.addEventListener('click', () => {
+      mutated = !mutated;
+      mutateButton.setAttribute('aria-pressed', String(mutated));
+      mutateButton.textContent = mutated ? 'RESTORE COMMAND RECORD' : 'SIMULATE MUTATION';
+      if (status) status.textContent = baselineHashes ? 'RECORD CHANGED — VERIFY BASELINE' : 'RECORD CHANGED — CREATE BASELINE';
+      chainDemo.dataset.state = 'changed';
+    });
+
+    chainDemo.querySelector('[data-chain-verify]')?.addEventListener('click', () => {
+      if (!baselineHashes) {
+        if (status) status.textContent = 'CREATE A BASELINE FIRST';
+        return;
+      }
+
+      void createChain(false).then((computedHashes) => {
+        const mismatch = computedHashes.findIndex((value, index) => value !== baselineHashes?.[index]);
+        if (mismatch === -1) {
+          if (status) status.textContent = 'CHAIN MATCHES BASELINE';
+          chainDemo.dataset.state = 'baseline';
+        } else {
+          if (status) status.textContent = `MUTATION DETECTED / EVENT ${String(mismatch + 1).padStart(2, '0')}`;
+          chainDemo.dataset.state = 'mutated';
+        }
+      }).catch(reportHashError);
+    });
   }
 </script>

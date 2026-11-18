@@ -9,4 +9,6 @@ problem: Make a hardware system detect obstacles and respond without relying on 
 system: A Java program using the Phidgets SDK, independent motor control, sonar sensing, configurable acceleration modes, and closed-loop obstacle response.
 decision: Separate movement, sensing, acceleration, and challenge logic into a class hierarchy so the hardware-control problem remained testable and understandable.
 next: The resume records this as a completed capstone project.
+link: https://github.com/aj0khi/CS30/tree/main/RoverProejct
+linkLabel: VIEW ROVER SOURCE
 ---

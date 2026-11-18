@@ -1,0 +1,50 @@
+# Decisions and Session Log
+
+## 2026-11-18 — Discovery and first corrections
+
+- **Repository:** `main` at `4371e59`; changes remain local and unpushed.
+- **Scope searched:** the current portfolio checkout and bounded name searches in the standard `~/projects`, `~/dev`, and `~/code` roots. No related project repository paths were returned; no broader folders were scanned.
+- **Phase 0 findings:**
+  - The build generates `/` and `/404.html`; there is no `/explore/` route. The README's Aero Explorer walkthrough was stale, and a local request to `/explore/` returned 404.
+  - Project-card links ignored `linkLabel`, so the HVAC Express live-site link was presented as `OPEN SOURCE`.
+  - WayBionic's local UI includes a scripted stale/future-state sample lab and a lazy-loaded browser-only 3D simulation. Neither connects to ROS or sends hardware commands.
+  - The BlackBox browser demo hashed changing DOM text, displayed truncated hashes, and labeled a mutation without verifying against a stable baseline. Its interface did not clearly explain the limits of the illustration.
+  - The two existing mock RViz captures were JPEG bytes under `.png` names and exposed a machine-local path in their title bars. The working copies were cropped to remove that title bar and re-encoded as PNG; the remote version has not been changed.
+  - No `docs/` directory existed in the checkout. This log and `asset-register.csv` record sanitized repository-relative references only.
+- **Implemented locally:**
+  - Project-card links now use authored labels; recruiter actions expose the existing GitHub and LinkedIn destinations alongside resume, email, and the tour.
+  - WayBionic's mock/simulation boundary is explicit in the project window.
+  - The BlackBox interaction now hashes fixed event records, verifies later edits against an in-memory baseline, reports the first mismatching event, and describes its security limitations.
+  - DOM containers use `replaceChildren()`, and the window animation stagger uses `sibling-index()` with the prior `:nth-child()` timings as a fallback.
+  - README route claims now reflect the generated routes.
+- **Baseline:** Node `v22.23.3`, npm `10.9.9`; dependencies were already installed, so `npm ci` was not run. `npm run check` passed with 0 errors, 0 warnings, and 0 hints. `npm run build` passed and emitted the existing >500 kB chunk advisory.
+- **Browser QA:** Firefox was installed for interactive testing. The integrated browser verified BlackBox baseline/mutation/restoration states, the WayBionic evidence boundary and image loads, stale/future diagnostics, recruiter links, command palette, calendar, calculator, and 320/390 px layouts without document-level horizontal overflow.
+- **Evidence/permissions still needed:** WayBionic team approval for public screenshots/video; current resume approval/freshness; retained training runs before publishing performance claims; hardware validation before claiming Aircade motion controls work end-to-end.
+- **Next task:** continue case-study improvements only where local source or permission-cleared evidence supports the claims; retain local-only changes until explicitly approved for publication.
+
+## 2026-11-18 — Keyboard and terminal follow-up
+
+- **Issue found:** with both Calculator and Terminal open, the document-level calculator key handler intercepted Enter regardless of focus. The terminal form also lacked a submit button, so Enter could not trigger its command handler through native implicit form submission.
+- **Fix:** calculator keyboard controls now run only when the event target is inside the Calculator window. The terminal has an accessible, visible `RUN` submit button and supports Enter-to-submit while preserving the existing command handler.
+- **Verification:** in the integrated browser, with both windows open, Calculator keyboard input `1 + 2 Enter` displayed `3`; Terminal `help` submitted with Enter, `about` submitted with the `RUN` button, and the input cleared after submission. `npm run check` passed with 0 errors, warnings, or hints; `npm run build` passed with the existing >500 kB chunk advisory; `git diff --check` passed.
+- **Dev-server note:** browser navigation produced an existing Vite `Outdated Optimize Dep` 504 for the Three.js development dependency. It did not prevent the tested form interactions or successful production build.
+- **Deployment:** all changes remain local; nothing was pushed or deployed.
+
+## 2026-11-18 — Project case-study expansion
+
+- **Content source:** the eight existing Markdown project records already contain problem, system, decision, and next-step fields. The portfolio now exposes those fields in a native, keyboard-operable case-study disclosure on every project card, showing in-progress systems as **CURRENT DESIGN** rather than implying completion.
+- **Link and claim cleanup:** the Rover card now uses the source link already present in its project window. The BlackBox card summary describes it as a local-first evidence recorder without asserting that the ongoing project is already secure.
+- **Implementation:** shared case-study markup lives in `src/pages/index.astro`; styling lives in `src/styles/global.css`; Rover and BlackBox card metadata are in `src/content/projects/autonomous-rover.md` and `src/content/projects/physical-ai-blackbox.md`.
+- **Verification:** generated HTML contains eight case-study disclosures and the Rover source link. Browser QA confirmed a project disclosure opens with Enter, definitions remain within the card at 390/320 px (with subpixel rounding only), and those widths have no document-level horizontal overflow. `npm run check`, `npm run build`, and `git diff --check` passed; the build retains its existing >500 kB chunk advisory.
+- **Evidence boundary:** no new project metrics, completion claims, team artifacts, or training results were added. Source repositories, permission-cleared media, and current resume approval remain open evidence tasks.
+- **Next build increment:** strengthen project-specific engineering narratives only when corroborated by authorized source code or approved records; make the existing status/architecture fields more precise where needed.
+
+## 2026-11-18 — Source-backed project detail
+
+- **Teach to Game:** checked the public repository README, `learner/runner_training.py`, and its training test. The project record now describes the Gymnasium/Stable-Baselines3 PPO runner, CSV episode logs, deterministic evaluation, and seeded random baseline; the test's target is not presented as a measured result.
+- **Snake demo boundary:** the portfolio's 9×9, 72-state tabular Q-learning widget is explicitly distinguished from the repository's Python PPO runner. Its disclosure documents the three relative actions, update settings, reward components, 80-step cap, and that the displayed mean is from the final 10 training episodes—not held-out evaluation—and is not persisted.
+- **Soccer Intelligence:** checked the public repository's event pipeline, state aggregation, bounded Poisson-style estimate, evidence-linked insights, tests, and optional Event Hubs adapter. The project record marks input as synthetic and estimates as uncalibrated; no real-match accuracy claim is made.
+- **WayBionic:** refined the project record to describe the five-joint RViz digital twin, simulation-default drive path, and monitoring-only mock/live diagnostics panel. It separates commanded/estimated motion from measured physical feedback.
+- **Aircade:** added the ninth project using the public team repository and its source/pitch materials. The record describes the five browser games and the Swift CoreMotion/WebSocket components as prototype scope; end-to-end motion control remains explicitly unvalidated and keyboard play remains the reliable fallback.
+- **Implementation:** added the `PROTOTYPE` status and updated archive counts; aligned the Teach to Game and Soccer project windows with their evidence limits; documented content provenance and boundaries in README. Existing card contribution summaries remain visible alongside the expanded case-study details. No external project code or media was copied.
+- **Validation:** `npm run check` passed with 0 errors, warnings, or hints; `npm run build` passed with the existing >500 kB chunk advisory; `git diff --check` passed. Generated HTML assertions confirmed nine project cards/disclosures and current counts. Playwright browser checks verified keyboard operation of the Aircade and Snake disclosures, Aircade/Soccer/Teach to Game evidence boundaries, no document overflow at 390 px, and zero page errors. All changes remain local.
