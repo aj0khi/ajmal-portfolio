@@ -11,4 +11,12 @@ decision: Keep simulation as the default; keep the diagnostics panel monitoring-
 next: Validate actuator names, units, and position feedback against the approved robot model before presenting simulated or estimated state as measured hardware state.
 link: https://github.com/Waybionic/waybionic_ground_station
 linkLabel: VIEW PUBLIC REPOSITORY
+group: robotics
+year: "2026"
+role: Ground-station contributor, UCalgary club
+highlights:
+  - "Five-joint RViz digital twin with controller teleoperation."
+  - "Joint-limit and collision checks before any motion command."
+  - "MKS CAN drives simulated by default; live hardware is opt-in."
+  - "Diagnostics panel with mock and live sources that flags stale and future-dated joint samples."
 ---

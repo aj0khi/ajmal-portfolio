@@ -10,4 +10,12 @@ system: The company site and infrastructure at calgaryhvacexpress.ca, built and 
 decision: Own the technical side while also doing direct sales, pairing build-it responsibility with customer conversations.
 link: https://calgaryhvacexpress.ca/
 linkLabel: VISIT LIVE SITE
+group: business
+year: "2024"
+role: Technical lead, end to end
+highlights:
+  - "Migrated a fragmented CSS system to a token-based design architecture."
+  - "Configured multi-domain hosting on Hostinger."
+  - "Found a hardcoded credential committed to source and moved credentials to environment config."
+  - "Ran an SEO strategy with keyword research, competitor analysis, and Search Console."
 ---

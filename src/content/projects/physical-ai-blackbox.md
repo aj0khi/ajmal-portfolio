@@ -8,4 +8,11 @@ problem: Physical AI needs an evidence trail that can be reviewed offline withou
 system: A typed evidence core, canonical records, hash chaining, sealing and signature verification, a local owner portal, an investigator workbench, and a lightweight witness ledger.
 decision: Use established cryptography and deterministic CBOR libraries instead of implementing cryptographic primitives from scratch.
 next: Continue hardening the local owner, investigator, verifier, and release-packet workflows.
+group: robotics
+year: "2026"
+role: Solo project
+highlights:
+  - "Canonical CBOR records linked by a hash chain, then sealed and signed."
+  - "Separate owner portal, investigator workbench, and witness ledger."
+  - "Established cryptography libraries only; no home-made primitives."
 ---

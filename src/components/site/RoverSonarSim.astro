@@ -1,0 +1,156 @@
+<div class="instrument rover-sim" data-rover-sim>
+  <div class="instrument-head">
+    <span class="instrument-title">Obstacle avoidance, re-created</span>
+    <span class="instrument-chip" data-rover-mode>cruise</span>
+  </div>
+  <canvas data-rover-canvas width="640" height="360" aria-label="Top-down simulation of a two-motor rover using a forward sonar to steer around obstacles. Click or tap to place an obstacle."></canvas>
+  <dl class="instrument-stats">
+    <div><dt>sonar</dt><dd data-rover-sonar>-- cm</dd></div>
+    <div><dt>left motor</dt><dd data-rover-left>--</dd></div>
+    <div><dt>right motor</dt><dd data-rover-right>--</dd></div>
+    <div><dt>avoidances</dt><dd data-rover-count>0</dd></div>
+  </dl>
+  <div class="instrument-actions">
+    <button type="button" data-rover-toggle>Pause</button>
+    <button type="button" data-rover-reset>Clear obstacles</button>
+  </div>
+  <p class="instrument-note">Click the arena to drop an obstacle. This browser sketch re-creates the capstone's behaviour (sonar in, differential motor speeds out); it is not the original Java code.</p>
+</div>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-rover-sim]');
+  const canvas = root?.querySelector<HTMLCanvasElement>('[data-rover-canvas]');
+  const context = canvas?.getContext('2d');
+  if (root && canvas && context) {
+    const W = canvas.width;
+    const H = canvas.height;
+    const CM_PER_PX = 0.5;
+    const AVOID_AT = 70;
+    type Box = { x: number; y: number; w: number; h: number };
+    const seed: Box[] = [
+      { x: 180, y: 90, w: 60, h: 60 },
+      { x: 400, y: 210, w: 80, h: 44 },
+      { x: 470, y: 60, w: 36, h: 70 }
+    ];
+    let boxes: Box[] = seed.map((box) => ({ ...box }));
+    const rover = { x: 80, y: 280, heading: -0.6, left: 0, right: 0 };
+    let mode: 'cruise' | 'avoid' = 'cruise';
+    let turnFor = 0;
+    let avoidances = 0;
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let running = !reduced;
+
+    const blocked = (x: number, y: number) => x < 6 || y < 6 || x > W - 6 || y > H - 6 || boxes.some((box) => x > box.x && x < box.x + box.w && y > box.y && y < box.y + box.h);
+    const castRay = (angle: number) => {
+      for (let distance = 0; distance < 260; distance += 2) {
+        if (blocked(rover.x + Math.cos(angle) * distance, rover.y + Math.sin(angle) * distance)) return distance;
+      }
+      return 260;
+    };
+    const sonar = () => Math.min(castRay(rover.heading - 0.22), castRay(rover.heading), castRay(rover.heading + 0.22));
+
+    const setText = (selector: string, text: string) => { const node = root.querySelector<HTMLElement>(selector); if (node) node.textContent = text; };
+
+    const step = () => {
+      const distance = sonar();
+      if (mode === 'cruise' && distance < AVOID_AT) {
+        mode = 'avoid';
+        turnFor = 24 + Math.floor(Math.random() * 18);
+        avoidances += 1;
+      }
+      if (mode === 'avoid') {
+        rover.left = -0.45;
+        rover.right = 0.65;
+        turnFor -= 1;
+        if (turnFor <= 0 && distance > AVOID_AT + 10) mode = 'cruise';
+      } else {
+        rover.left = 1;
+        rover.right = 1;
+      }
+      // Differential drive: the speed difference turns the rover, the mean moves it.
+      const speed = ((rover.left + rover.right) / 2) * 1.6;
+      rover.heading += (rover.right - rover.left) * 0.045 * -1;
+      const nx = rover.x + Math.cos(rover.heading) * speed;
+      const ny = rover.y + Math.sin(rover.heading) * speed;
+      if (!blocked(nx, ny)) { rover.x = nx; rover.y = ny; }
+      setText('[data-rover-sonar]', `${Math.round(distance * CM_PER_PX)} cm`);
+      setText('[data-rover-left]', `${Math.round(rover.left * 100)}%`);
+      setText('[data-rover-right]', `${Math.round(rover.right * 100)}%`);
+      setText('[data-rover-count]', String(avoidances));
+      setText('[data-rover-mode]', mode);
+      root.dataset.mode = mode;
+      return distance;
+    };
+
+    const draw = (distance: number) => {
+      const styles = getComputedStyle(root);
+      const ink = styles.getPropertyValue('--inst-ink').trim() || '#dce3ea';
+      const accent = styles.getPropertyValue('--inst-data').trim() || '#5cc8d6';
+      const tag = styles.getPropertyValue('--inst-tag').trim() || '#ffc72c';
+      context.clearRect(0, 0, W, H);
+      context.strokeStyle = 'rgba(220,227,234,0.07)';
+      context.lineWidth = 1;
+      for (let x = 0; x < W; x += 20) { context.beginPath(); context.moveTo(x, 0); context.lineTo(x, H); context.stroke(); }
+      for (let y = 0; y < H; y += 20) { context.beginPath(); context.moveTo(0, y); context.lineTo(W, y); context.stroke(); }
+      context.fillStyle = 'rgba(220,227,234,0.16)';
+      context.strokeStyle = 'rgba(220,227,234,0.4)';
+      boxes.forEach((box) => { context.fillRect(box.x, box.y, box.w, box.h); context.strokeRect(box.x + 0.5, box.y + 0.5, box.w - 1, box.h - 1); });
+      // sonar cone
+      context.save();
+      context.translate(rover.x, rover.y);
+      context.rotate(rover.heading);
+      context.fillStyle = mode === 'avoid' ? 'rgba(255,199,44,0.18)' : 'rgba(92,200,214,0.14)';
+      context.beginPath();
+      context.moveTo(0, 0);
+      context.arc(0, 0, distance, -0.22, 0.22);
+      context.closePath();
+      context.fill();
+      context.strokeStyle = mode === 'avoid' ? tag : accent;
+      context.beginPath();
+      context.arc(0, 0, distance, -0.22, 0.22);
+      context.stroke();
+      // chassis and wheels
+      context.fillStyle = ink;
+      context.fillRect(-14, -10, 28, 20);
+      context.fillStyle = tag;
+      context.fillRect(-11, -14, 16, 4);
+      context.fillRect(-11, 10, 16, 4);
+      context.fillStyle = accent;
+      context.fillRect(10, -3, 5, 6);
+      context.restore();
+    };
+
+    let frameId = 0;
+    const loop = () => {
+      draw(step());
+      if (running) frameId = requestAnimationFrame(loop);
+    };
+    draw(sonar());
+    step();
+
+    const visibility = new IntersectionObserver(([entry]) => {
+      cancelAnimationFrame(frameId);
+      if (entry.isIntersecting && running) frameId = requestAnimationFrame(loop);
+    });
+    visibility.observe(canvas);
+
+    const toggle = root.querySelector<HTMLButtonElement>('[data-rover-toggle]');
+    if (toggle) toggle.textContent = running ? 'Pause' : 'Run';
+    toggle?.addEventListener('click', () => {
+      running = !running;
+      toggle.textContent = running ? 'Pause' : 'Run';
+      cancelAnimationFrame(frameId);
+      if (running) frameId = requestAnimationFrame(loop);
+    });
+    root.querySelector('[data-rover-reset]')?.addEventListener('click', () => { boxes = seed.map((box) => ({ ...box })); draw(sonar()); });
+    canvas.addEventListener('click', (event) => {
+      const bounds = canvas.getBoundingClientRect();
+      const x = ((event.clientX - bounds.left) / bounds.width) * W;
+      const y = ((event.clientY - bounds.top) / bounds.height) * H;
+      if (Math.hypot(x - rover.x, y - rover.y) < 40) return;
+      boxes.push({ x: x - 20, y: y - 20, w: 40, h: 40 });
+      if (boxes.length > 14) boxes.splice(seed.length, 1);
+      draw(sonar());
+    });
+  }
+</script>

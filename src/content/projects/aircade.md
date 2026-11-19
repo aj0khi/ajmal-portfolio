@@ -11,4 +11,11 @@ decision: Keep keyboard play as the reliable fallback and label AirPods motion e
 next: Validate pairing, permissions, calibration, relay connectivity, and each claimed motion/game mapping; publish only combinations verified in a live run.
 link: https://github.com/aj0khi/aircade-mru-hacks
 linkLabel: VIEW TEAM REPOSITORY
+group: software
+year: "2026"
+role: Motion-input contributor, hackathon team
+highlights:
+  - "Five browser games: Pong, Snake, Breakout, Bowling, Tanks."
+  - "Swift CoreMotion sender and sample normaliser."
+  - "Local WebSocket relay between phone, AirPods, and browser."
 ---

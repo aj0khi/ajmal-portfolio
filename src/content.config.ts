@@ -15,6 +15,10 @@ const projects = defineCollection({
     system: z.string().optional(),
     decision: z.string().optional(),
     next: z.string().optional(),
+    group: z.enum(['robotics', 'software', 'business']).optional(),
+    year: z.string().optional(),
+    role: z.string().optional(),
+    highlights: z.array(z.string()).optional(),
     link: z.url().optional(),
     linkLabel: z.string().optional()
   })

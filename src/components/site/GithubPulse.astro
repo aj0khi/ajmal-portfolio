@@ -1,0 +1,75 @@
+---
+import { githubSnapshot, contact } from '../../data/profile';
+---
+
+<div class="pulse-panel" data-gh-pulse>
+  <div class="pulse-head">
+    <p class="pulse-source" data-gh-source>Snapshot from {githubSnapshot.takenAt}</p>
+    <a href={contact.github} target="_blank" rel="noreferrer">github.com/aj0khi</a>
+  </div>
+  <div class="pulse-totals">
+    <div><strong data-gh-count>{githubSnapshot.publicRepos}</strong><span>original public repositories</span></div>
+    <div><strong>{githubSnapshot.since}</strong><span>on GitHub since</span></div>
+    <div><strong data-gh-recent>{githubSnapshot.pushedLast60Days}</strong><span>pushed in the last 60 days</span></div>
+  </div>
+  <ol class="pulse-list" data-gh-list>
+    {githubSnapshot.repos.map((repo) => (
+      <li><a href={`${contact.github}/${repo.name}`} target="_blank" rel="noreferrer">{repo.name}</a><span>{repo.language}</span><time datetime={repo.pushed}>{repo.pushed}</time></li>
+    ))}
+  </ol>
+</div>
+
+<script>
+  const panel = document.querySelector<HTMLElement>('[data-gh-pulse]');
+  type Repo = { name: string; language: string | null; pushed_at: string; html_url: string; fork: boolean };
+  const relative = (iso: string) => {
+    const days = Math.round((Date.now() - new Date(iso).getTime()) / 86_400_000);
+    if (days <= 0) return 'today';
+    if (days === 1) return 'yesterday';
+    if (days < 60) return `${days} days ago`;
+    return new Date(iso).toLocaleDateString('en-CA', { month: 'short', year: 'numeric' });
+  };
+  const refresh = async () => {
+    if (!panel) return;
+    const list = panel.querySelector<HTMLElement>('[data-gh-list]');
+    // Upgrade the static snapshot with live data; on any failure the snapshot stays as-is.
+    try {
+      const response = await fetch('https://api.github.com/users/aj0khi/repos?per_page=100&sort=pushed', { headers: { Accept: 'application/vnd.github+json' } });
+      if (!response.ok) throw new Error(String(response.status));
+      const repos = ((await response.json()) as Repo[]).filter((repo) => !repo.fork);
+      const recent = repos.filter((repo) => Date.now() - new Date(repo.pushed_at).getTime() < 60 * 86_400_000);
+      const count = panel.querySelector('[data-gh-count]');
+      const recentNode = panel.querySelector('[data-gh-recent]');
+      if (count) count.textContent = String(repos.length);
+      if (recentNode) recentNode.textContent = String(recent.length);
+      list?.replaceChildren(...repos.filter((repo) => repo.language).slice(0, 6).map((repo) => {
+        const item = document.createElement('li');
+        const link = document.createElement('a');
+        link.href = repo.html_url;
+        link.target = '_blank';
+        link.rel = 'noreferrer';
+        link.textContent = repo.name;
+        const language = document.createElement('span');
+        language.textContent = repo.language ?? '';
+        const time = document.createElement('time');
+        time.dateTime = repo.pushed_at;
+        time.textContent = relative(repo.pushed_at);
+        item.append(link, language, time);
+        return item;
+      }));
+      const source = panel.querySelector('[data-gh-source]');
+      if (source) source.textContent = 'Live from the GitHub API';
+      panel.dataset.live = 'true';
+    } catch {
+      panel.querySelectorAll<HTMLTimeElement>('time').forEach((time) => { time.textContent = relative(time.dateTime); });
+    }
+  };
+  if (panel) {
+    new IntersectionObserver((entries, observer) => {
+      if (entries.some((entry) => entry.isIntersecting)) {
+        observer.disconnect();
+        void refresh();
+      }
+    }, { rootMargin: '300px' }).observe(panel);
+  }
+</script>

@@ -1,10 +1,17 @@
 {
-  "name": "AjmalOS — Ajmal Khidri",
-  "short_name": "AjmalOS",
+  "name": "Ajmal Khidri \u2014 Systems that move",
+  "short_name": "Ajmal Khidri",
   "start_url": "/",
-  "display": "fullscreen",
-  "background_color": "#008080",
-  "theme_color": "#008080",
-  "description": "Ajmal Khidri's interactive portfolio archive.",
-  "icons": [{ "src": "/icons/app/portfolio.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+  "display": "standalone",
+  "background_color": "#0a1322",
+  "theme_color": "#0a1322",
+  "description": "Robotics software, web infrastructure, and real businesses.",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
 }

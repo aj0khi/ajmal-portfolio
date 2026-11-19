@@ -22,7 +22,11 @@ The deployable static site is generated in `dist/`.
 
 The original WayBionic arm video was compressed to `public/assets/waybionic/arm-demo.mp4` for web delivery and remains under GitHub's file limit. The Media Player keeps the Drive fallback available.
 
-The current static build contains the portfolio at `/` and the not-found page at `/404.html`. There is no `/explore/` route in this checkout; earlier Aero Explorer instructions in this README were stale.
+The static build has three routes:
+
+- `/`: the main portfolio ("Workcell"), a scrolling page with a live Three.js robot arm in the hero.
+- `/os/`: the classic AjmalOS desktop, kept as-is and linked from the contact section and the terminal (`os`).
+- `/404.html`: the not-found page.
 
 ## Hosting
 
@@ -30,7 +34,15 @@ Upload the contents of `dist/` to a static host such as Hostinger. The main site
 
 ## Content
 
-Project entries live in `src/content/projects/`; the schema is defined in `src/content.config.ts`. Authored contributions appear on each card; problem, system, key decision, and next milestone appear in a native disclosure. Status labels distinguish active work from prototypes and shipped projects.
+Project entries live in `src/content/projects/`; the schema is defined in `src/content.config.ts`. Entries with a `group` (`robotics`, `software`, `business`) appear on the main page with their problem, system, key decision, contribution, next step, and `highlights`. Status labels distinguish active work from prototypes and shipped projects.
+
+Everything that is not a project (roles, education, awards, certifications, skills mapped to projects, roadmap, coursework, GitHub snapshot) lives in `src/data/profile.ts`. Every skill lists the project ids where it was used, and the Toolbox section links to those projects.
+
+## Design system
+
+`src/styles/site.css` defines the tokens: night navy `#0a1322`, drafting-film paper `#e6eaec`, safety-tape yellow `#ffc72c` (status and primary actions only), and telemetry cyan `#5cc8d6` (live data only). Type is Big Shoulders Display (headlines), Instrument Sans (body), and IBM Plex Mono (data only). Interactive demos sit in dark "instrument" panels.
+
+The hero arm (`src/components/site/WorkcellHero.astro`) is built from primitives with no model files. It solves closed-form inverse kinematics toward the pointer: base yaw from the target bearing, a two-link planar solve for the wrist centre, and a wrist angle that holds the tool pitch. A critically damped spring drives each joint toward the solution. The scene renders only while the hero is on screen, caps the pixel ratio at 2 (1.5 on narrow screens), and skips the power-up and idle sweep when reduced motion is requested.
 
 Technical claims are limited to inspected source or approved records. The portfolio's Snake Reward Lab is a separate, browser-only tabular Q-learning demonstration; it is not the Python PPO runner in Teach to Game. Its reward readout is a stochastic training metric, not a held-out result, and neither its policy nor score is saved. Aircade motion controls remain labeled experimental until the full device-to-game path has been tested on hardware.
 

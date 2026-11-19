@@ -9,4 +9,10 @@ problem: Build and operate a service business where reliability, communication, 
 system: A small field-operations business shaped by customer requests, scheduling, equipment, on-site work, and follow-through.
 decision: Keep the operation close to the customer and outcome rather than hiding behind a purely digital surface.
 next: Keep building repeatable service workflows and a stronger local operating system.
+group: business
+year: "Ongoing"
+role: Owner and operator
+highlights:
+  - "Quotes, schedules, and completes jobs directly with customers."
+  - "Owns equipment, field execution, and follow-up."
 ---

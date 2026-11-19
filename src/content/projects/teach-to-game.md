@@ -11,4 +11,11 @@ decision: Make objectives, rewards, and adapter controls explicit; keep training
 next: Retain and review reproducible training logs before publishing results or learning curves; keep third-party game adapters user-owned and outside online or anti-cheat games.
 link: https://github.com/aj0khi/teach-to-game
 linkLabel: VIEW SOURCE + TESTS
+group: robotics
+year: "2026"
+role: Learning-flow and dashboard contributor
+highlights:
+  - "Gymnasium environment with a Stable-Baselines3 PPO runner."
+  - "Episode reward and length logged to CSV; checkpoints saved."
+  - "Deterministic evaluation against a seeded random baseline."
 ---

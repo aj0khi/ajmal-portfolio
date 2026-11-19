@@ -1,0 +1,65 @@
+<dialog class="term" data-term aria-label="Command terminal">
+  <div class="term-bar"><span>aj@workcell: ~</span><button type="button" data-term-close aria-label="Close terminal">Close</button></div>
+  <pre class="term-out" data-term-out aria-live="polite">Type help to list commands.</pre>
+  <form class="term-form" data-term-form>
+    <label for="term-input">$</label>
+    <input id="term-input" data-term-input autocomplete="off" spellcheck="false" enterkeyhint="go" />
+  </form>
+</dialog>
+
+<button type="button" class="term-launch" data-term-open aria-keyshortcuts="Control+K">
+  <span>Terminal</span><kbd>Ctrl K</kbd>
+</button>
+
+<script>
+  import { contact } from '../../data/profile';
+
+  const dialog = document.querySelector<HTMLDialogElement>('[data-term]');
+  const output = dialog?.querySelector<HTMLElement>('[data-term-out]');
+  const form = dialog?.querySelector<HTMLFormElement>('[data-term-form]');
+  const input = dialog?.querySelector<HTMLInputElement>('[data-term-input]');
+  const sections = [...document.querySelectorAll('[data-term-target]')].map((node) => node.id);
+
+  const commands: Record<string, (arg?: string) => string> = {
+    help: () => 'whoami  projects  goto <section>  resume  email  github  linkedin  os  clear',
+    whoami: () => 'Ajmal Khidri. CS at the University of Calgary. Robotics software, web infrastructure, two real businesses.',
+    projects: () => [...document.querySelectorAll('[data-case-title]')].map((node) => `- ${node.textContent?.trim()}`).join('\n'),
+    goto: (target = '') => {
+      const id = sections.find((section) => section.startsWith(target.toLowerCase()));
+      if (!id) return `sections: ${sections.join('  ')}`;
+      dialog?.close();
+      document.getElementById(id)?.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+      return `jumped to ${id}`;
+    },
+    resume: () => { window.open(contact.resume, '_blank'); return 'opening resume.pdf'; },
+    email: () => { location.href = `mailto:${contact.email}`; return contact.email; },
+    github: () => { window.open(contact.github, '_blank', 'noopener'); return contact.github; },
+    linkedin: () => { window.open(contact.linkedin, '_blank', 'noopener'); return contact.linkedin; },
+    os: () => { location.href = '/os'; return 'booting classic AjmalOS...'; },
+    clear: () => ''
+  };
+
+  const open = () => {
+    if (!dialog || dialog.open) return;
+    dialog.showModal();
+    input?.focus();
+  };
+  document.querySelector('[data-term-open]')?.addEventListener('click', open);
+  dialog?.querySelector('[data-term-close]')?.addEventListener('click', () => dialog.close());
+  document.addEventListener('keydown', (event) => {
+    if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+      event.preventDefault();
+      if (dialog?.open) dialog.close(); else open();
+    }
+  });
+  form?.addEventListener('submit', (event) => {
+    event.preventDefault();
+    if (!output || !input) return;
+    const [name = '', ...args] = input.value.trim().split(/\s+/);
+    const run = commands[name.toLowerCase()];
+    const result = run ? run(args[0]) : `${name}: not found. Try help.`;
+    output.textContent = name.toLowerCase() === 'clear' ? '' : `${output.textContent}\n$ ${input.value}\n${result}`.trim();
+    output.scrollTop = output.scrollHeight;
+    input.value = '';
+  });
+</script>

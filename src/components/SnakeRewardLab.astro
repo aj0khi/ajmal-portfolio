@@ -226,7 +226,7 @@
 </script>
 
 <style>
-  .snake-lab { margin: 24px 0; padding: 18px; color: #172a26; background: #d7e4dc; border: 2px solid #718b7c; box-shadow: inset 1px 1px #fff, inset -2px -2px #a5b6aa; }
+  .snake-lab { margin: 24px 0; padding: 18px; color: var(--snake-ink, #172a26); background: var(--snake-bg, #d7e4dc); border: var(--snake-border, 2px solid #718b7c); box-shadow: var(--snake-shadow, inset 1px 1px #fff, inset -2px -2px #a5b6aa); }
   .snake-lab-head { display: flex; justify-content: space-between; align-items: start; gap: 14px; margin-bottom: 14px; }
   .snake-lab-head h3 { margin: 4px 0 0; font-size: 23px; line-height: 1; }
   .snake-lab-head h3 span { color: #26827c; font: 12px monospace; vertical-align: top; }
@@ -240,12 +240,12 @@
   .snake-cell.snake-food { background: #ef6255; border-radius: 50%; box-shadow: inset 1px 1px #ffb1a4, inset -2px -2px #a7372c; }
   .snake-readout { display: flex; justify-content: space-between; gap: 5px; margin-top: 9px; font-size: 10px; }
   .snake-readout span { display: flex; gap: 4px; }
-  .snake-readout b { color: #147466; }
+  .snake-readout b { color: var(--snake-data, #147466); }
   .snake-lab-controls > p { margin: 0 0 12px; font-size: 13px; line-height: 1.45; }
   .snake-reward-control { display: grid; grid-template-columns: 1fr; gap: 3px; margin: 8px 0; font: 10px monospace; }
   .snake-reward-control span { display: flex; justify-content: space-between; }
-  .snake-reward-control b { color: #147466; }
-  .snake-reward-control input { width: 100%; accent-color: #168a7d; }
+  .snake-reward-control b { color: var(--snake-data, #147466); }
+  .snake-reward-control input { width: 100%; accent-color: var(--snake-accent, #168a7d); }
   .snake-actions { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0; }
   .snake-actions button, .snake-pad button { min-height: 32px; padding: 5px 8px; border: 1px solid #6c8377; border-radius: 0; color: #102d26; background: #e8eee8; box-shadow: inset 1px 1px #fff, 1px 1px #89998e; font: 10px monospace; cursor: pointer; }
   .snake-actions button:hover, .snake-pad button:hover { background: #fff; }
@@ -255,16 +255,16 @@
   .snake-pad [data-snake-dir="left"] { grid-column: 1; grid-row: 2; }
   .snake-pad [data-snake-dir="down"] { grid-column: 2; grid-row: 2; }
   .snake-pad [data-snake-dir="right"] { grid-column: 3; grid-row: 2; }
-  .snake-learning { display: grid; gap: 3px; margin-top: 12px; padding: 8px; border-left: 3px solid #259c88; background: #e7eee7; font-size: 10px; }
+  .snake-learning { display: grid; gap: 3px; margin-top: 12px; padding: 8px; border-left: 3px solid var(--snake-data, #259c88); background: var(--snake-panel, #e7eee7); font-size: 10px; }
   .snake-learning strong { font-size: 16px; }
-  .snake-learning small { color: #4a6155; }
-  .snake-method { margin-top: 12px; border-top: 1px solid #a6b8aa; }
-  .snake-method summary { padding: 9px 0; color: #174f42; font: 700 10px/1.4 monospace; cursor: pointer; }
+  .snake-learning small { color: var(--snake-dim, #4a6155); }
+  .snake-method { margin-top: 12px; border-top: 1px solid var(--snake-rule, #a6b8aa); }
+  .snake-method summary { padding: 9px 0; color: var(--snake-strong, #174f42); font: 700 10px/1.4 monospace; cursor: pointer; }
   .snake-method summary:focus-visible { outline: 3px solid #e25843; outline-offset: 2px; }
   .snake-method dl { display: grid; gap: 8px; margin: 0 0 10px; }
   .snake-method dl div { display: grid; grid-template-columns: 58px minmax(0, 1fr); gap: 8px; }
-  .snake-method dt { color: #174f42; font: 700 9px/1.45 monospace; }
-  .snake-method dd { margin: 0; color: #344a40; font-size: 12px; line-height: 1.45; overflow-wrap: anywhere; }
+  .snake-method dt { color: var(--snake-strong, #174f42); font: 700 9px/1.45 monospace; }
+  .snake-method dd { margin: 0; color: var(--snake-dim, #344a40); font-size: 12px; line-height: 1.45; overflow-wrap: anywhere; }
   @media (max-width: 600px) { .snake-lab { padding: 12px; } .snake-lab-layout { grid-template-columns: 1fr; } .snake-board-wrap { width: min(100%, 300px); margin-inline: auto; } }
   @media (prefers-reduced-motion: reduce) { .snake-lab *, .snake-lab *::before, .snake-lab *::after { scroll-behavior: auto !important; } }
 </style>

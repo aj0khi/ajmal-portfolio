@@ -1,0 +1,90 @@
+<div class="instrument poisson" data-poisson>
+  <div class="instrument-head">
+    <span class="instrument-title">Expected goals in, outcomes out</span>
+    <span class="instrument-chip">illustration</span>
+  </div>
+  <div class="poisson-controls">
+    <label><span>Home expected goals <b data-poisson-home-value>1.6</b></span><input type="range" min="0.2" max="3.5" step="0.1" value="1.6" data-poisson-home /></label>
+    <label><span>Away expected goals <b data-poisson-away-value>1.1</b></span><input type="range" min="0.2" max="3.5" step="0.1" value="1.1" data-poisson-away /></label>
+  </div>
+  <div class="poisson-outcomes" data-poisson-outcomes>
+    <div data-outcome="home"><span>Home win</span><strong>--</strong><i></i></div>
+    <div data-outcome="draw"><span>Draw</span><strong>--</strong><i></i></div>
+    <div data-outcome="away"><span>Away win</span><strong>--</strong><i></i></div>
+  </div>
+  <div class="poisson-grid-wrap">
+    <span class="poisson-axis">home goals down, away goals across</span>
+    <div class="poisson-grid" data-poisson-grid role="img" aria-label="Probability of each scoreline from 0–0 to 5–5"></div>
+    <p class="poisson-likely">Most likely score <b data-poisson-likely>--</b></p>
+  </div>
+  <p class="instrument-note">Independent Poisson goals, truncated at ten and renormalised. This shows the model family the project uses; it is not the repository's code, and like the project's estimates it is uncalibrated against real matches.</p>
+</div>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-poisson]');
+  if (root) {
+    const MAX = 10;
+    const home = root.querySelector<HTMLInputElement>('[data-poisson-home]');
+    const away = root.querySelector<HTMLInputElement>('[data-poisson-away]');
+    const grid = root.querySelector<HTMLElement>('[data-poisson-grid]');
+    const cells = Array.from({ length: 36 }, () => {
+      const cell = document.createElement('span');
+      grid?.append(cell);
+      return cell;
+    });
+    const pmf = (lambda: number) => {
+      const values: number[] = [];
+      let term = Math.exp(-lambda);
+      for (let k = 0; k <= MAX; k += 1) {
+        values.push(term);
+        term *= lambda / (k + 1);
+      }
+      const total = values.reduce((sum, value) => sum + value, 0);
+      return values.map((value) => value / total);
+    };
+    const update = () => {
+      const lh = Number(home?.value ?? 1.6);
+      const la = Number(away?.value ?? 1.1);
+      const ph = pmf(lh);
+      const pa = pmf(la);
+      let win = 0;
+      let draw = 0;
+      let loss = 0;
+      let best = { p: 0, label: '0–0' };
+      for (let h = 0; h <= MAX; h += 1) {
+        for (let a = 0; a <= MAX; a += 1) {
+          const p = ph[h] * pa[a];
+          if (h > a) win += p; else if (h === a) draw += p; else loss += p;
+          if (p > best.p) best = { p, label: `${h}–${a}` };
+        }
+      }
+      const outcomes: Record<string, number> = { home: win, draw, away: loss };
+      Object.entries(outcomes).forEach(([key, value]) => {
+        const node = root.querySelector<HTMLElement>(`[data-outcome="${key}"]`);
+        node?.style.setProperty('--share', value.toFixed(4));
+        const strong = node?.querySelector('strong');
+        if (strong) strong.textContent = `${(value * 100).toFixed(1)}%`;
+      });
+      const peak = ph[Math.floor(lh)] * pa[Math.floor(la)];
+      cells.forEach((cell, index) => {
+        const h = Math.floor(index / 6);
+        const a = index % 6;
+        const p = ph[h] * pa[a];
+        const heat = Math.min(1, p / (peak || 1));
+        cell.style.setProperty('--p', String(heat));
+        cell.dataset.hot = String(heat > 0.55);
+        cell.textContent = p >= 0.01 ? String(Math.round(p * 100)) : '';
+        cell.title = `${h}–${a}: ${(p * 100).toFixed(1)}%`;
+      });
+      const likely = root.querySelector<HTMLElement>('[data-poisson-likely]');
+      if (likely) likely.textContent = `${best.label} (${(best.p * 100).toFixed(1)}%)`;
+      const hv = root.querySelector<HTMLElement>('[data-poisson-home-value]');
+      const av = root.querySelector<HTMLElement>('[data-poisson-away-value]');
+      if (hv) hv.textContent = lh.toFixed(1);
+      if (av) av.textContent = la.toFixed(1);
+    };
+    home?.addEventListener('input', update);
+    away?.addEventListener('input', update);
+    update();
+  }
+</script>

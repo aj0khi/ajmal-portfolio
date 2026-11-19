@@ -11,4 +11,11 @@ decision: Separate movement, sensing, acceleration, and challenge logic into a c
 next: The resume records this as a completed capstone project.
 link: https://github.com/aj0khi/CS30/tree/main/RoverProejct
 linkLabel: VIEW ROVER SOURCE
+group: robotics
+year: High school
+role: Programmer, CS30 capstone
+highlights:
+  - "Independent left and right DC motor control."
+  - "Sonar distance sensing with closed-loop obstacle response."
+  - "Configurable acceleration modes behind a class hierarchy."
 ---

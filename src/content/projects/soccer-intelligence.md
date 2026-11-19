@@ -11,4 +11,12 @@ decision: Keep raw events, derived state, model outputs, explanations, and prese
 next: Validate event handling and model calibration with licensed real match data before presenting probability outputs as predictive.
 link: https://github.com/aj0khi/soccer-hackathon-project
 linkLabel: VIEW SOURCE + ARCHITECTURE
+group: software
+year: "2026"
+role: Pipeline and model contributor, hackathon team
+highlights:
+  - "Provider-neutral event source with validation."
+  - "Derived match state feeding a bounded Poisson outcome model."
+  - "Evidence-linked insights and audience-specific recaps."
+  - "Optional Azure Event Hubs source using DefaultAzureCredential."
 ---
