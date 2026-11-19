@@ -4,3 +4,10 @@ dist/
 .DS_Store
 *.log
 public/assets/waybionic/arm-demo.mov
+
+# Local agent notes (not part of the site)
+AjmalOS_AGENT_MASTER_INSTRUCTIONS.md
+AjmalOS_Complete_Agent_Pack/
+
+# Windows download metadata
+*:Zone.Identifier

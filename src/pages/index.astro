@@ -444,6 +444,13 @@ const rooms = [{ id: 'entrance', name: 'Entrance' }, { id: 'thread', name: 'The 
   addEventListener('scroll', syncBar, { passive: true });
   syncBar();
 
+  // Placards scroll with the page rather than inside themselves (an inner scroller swallows the
+  // wheel and stalls the walk). A placard taller than the view pins once its bottom is visible.
+  const placardSize = new ResizeObserver((entries) => entries.forEach(({ target, borderBoxSize }) => {
+    (target as HTMLElement).style.setProperty('--placard-h', `${Math.round(borderBoxSize[0].blockSize)}px`);
+  }));
+  document.querySelectorAll('.placard').forEach((placard) => placardSize.observe(placard));
+
   // Arm controls drive the real URDF model in the hall.
   document.querySelectorAll<HTMLInputElement>('[data-arm-joint]').forEach((input) => {
     input.addEventListener('input', () => {

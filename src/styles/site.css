@@ -248,13 +248,11 @@ html.over-curtain, html.over-curtain body { cursor: pointer; }
 /* Placards: gallery-white cards, like the labels beside real museum pieces. */
 .placard {
   position: sticky;
-  top: 5.5rem;
+  /* --placard-h comes from a ResizeObserver; a tall placard pins by its bottom edge instead. */
+  top: min(5.5rem, calc(100vh - var(--placard-h, 0px) - 1.5rem));
   width: min(29rem, 40vw);
-  max-height: calc(100vh - 7rem);
   margin: 62vh 0 0 clamp(1rem, 4vw, 3.5rem);
   padding: 1.6rem 1.6rem 1.4rem;
-  overflow: auto;
-  overscroll-behavior: contain;
   --ink: #f1e6d2;
   --ink-dim: #c9b59b;
   color: var(--ink);
@@ -262,7 +260,6 @@ html.over-curtain, html.over-curtain body { cursor: pointer; }
   border-radius: 0;
   /* A double gilt rule, like the mount on an old exhibition label. */
   box-shadow: inset 0 0 0 1px #b8913e, inset 0 0 0 6px #120c0c, inset 0 0 0 7px rgba(184, 145, 62, 0.6), 0 30px 80px -20px rgba(0, 0, 0, 0.7);
-  scrollbar-width: thin;
   transition: opacity 500ms var(--ease), transform 500ms var(--ease);
 }
 .js .museum.is-live .room:not(.is-active) .placard { opacity: 0.5; transform: translateX(-8px); }
@@ -435,7 +432,7 @@ html.over-curtain, html.over-curtain body { cursor: pointer; }
 @media (max-width: 899px) {
   .museum-vignette { background: linear-gradient(180deg, transparent 0%, transparent 35%, rgba(12, 9, 6, 0.55) 70%, rgba(12, 9, 6, 0.85) 100%); }
   .room { min-height: 200vh; }
-  .placard { width: auto; margin: 75vh 1rem 0; top: 40svh; max-height: 57svh; padding: 1.2rem; }
+  .placard { width: auto; margin: 75vh 1rem 0; top: min(40svh, calc(100svh - var(--placard-h, 0px) - 1rem)); padding: 1.2rem; }
   .entrance-copy { align-content: end; padding-bottom: 2.5rem; }
   .entrance-title { font-size: clamp(3.6rem, 17vw, 6rem); }
   .readout { display: none; }

@@ -8,6 +8,7 @@ import { barrier, hashChain, ikArm, moonGlobe, motorBus, roverLoop, snakeBoard, 
 const SPACING = 10;
 const HALF_WIDTH = 5;
 const HEIGHT = 5.2;
+const CORRIDOR_LOOKAHEAD = 9;
 
 type Stop = { camera: THREE.Vector3; look: THREE.Vector3; focus: THREE.Vector3; wall?: { centre: THREE.Vector3; side: number; width: number } };
 type Room = {
@@ -421,16 +422,22 @@ export async function startMuseum(root: HTMLElement) {
     return { camera: cameraPosition.add(shift), look: look.add(shift) };
   });
 
-  const metrics = { tops: [] as number[], heights: [] as number[], vh: innerHeight };
+  // Sizes come from the canvas's own CSS box (100lvh), not innerHeight: on phones innerHeight
+  // changes every time the URL bar slides, which would rebuild the renderer and jolt the camera.
+  const metrics = { tops: [] as number[], heights: [] as number[], vh: canvas.clientHeight || innerHeight };
   const measure = () => {
-    metrics.vh = innerHeight;
+    metrics.vh = canvas.clientHeight || innerHeight;
     metrics.tops = roomElements.map((room) => room.getBoundingClientRect().top + scrollY);
     metrics.heights = roomElements.map((room) => room.offsetHeight);
   };
 
+  let sized = '';
   const resize = () => {
-    const width = innerWidth;
-    const height = innerHeight;
+    const width = canvas.clientWidth || innerWidth;
+    const height = canvas.clientHeight || innerHeight;
+    const key = `${width}x${height}@${devicePixelRatio}`;
+    if (key === sized) { measure(); return; }
+    sized = key;
     const narrow = width / height < 0.9;
     renderer.setPixelRatio(Math.min(devicePixelRatio, narrow ? 1.5 : 2));
     renderer.setSize(width, height, false);
@@ -438,8 +445,18 @@ export async function startMuseum(root: HTMLElement) {
     camera.fov = narrow ? 64 : 50;
     camera.updateProjectionMatrix();
     const poses = framed(width / height, narrow);
-    curveCamera = new THREE.CatmullRomCurve3(poses.map((pose) => pose.camera), false, 'centripetal');
-    curveLook = new THREE.CatmullRomCurve3(poses.map((pose) => pose.look), false, 'centripetal');
+    // Consecutive rooms face opposite walls, so a straight blend would drag the eye through
+    // its own look target and spin the view. A corridor pose between each pair keeps the
+    // visitor facing down the hall mid-walk: turn from one wall, walk, turn to the next.
+    const path = poses.flatMap((pose, index) => {
+      const next = poses[index + 1];
+      if (!next) return [pose];
+      const camera = pose.camera.clone().lerp(next.camera, 0.5).setX(0);
+      const look = camera.clone().add(new THREE.Vector3(0, 0, -CORRIDOR_LOOKAHEAD));
+      return [pose, { camera, look }];
+    });
+    curveCamera = new THREE.CatmullRomCurve3(path.map((pose) => pose.camera), false, 'centripetal');
+    curveLook = new THREE.CatmullRomCurve3(path.map((pose) => pose.look), false, 'centripetal');
     measure();
   };
   resize();
@@ -468,7 +485,7 @@ export async function startMuseum(root: HTMLElement) {
   let pointerSeen = -Infinity;
   let pointerActive = false;
   addEventListener('pointermove', (event) => {
-    pointer.set((event.clientX / innerWidth) * 2 - 1, -(event.clientY / innerHeight) * 2 + 1);
+    pointer.set((event.clientX / canvas.clientWidth) * 2 - 1, -(event.clientY / canvas.clientHeight) * 2 + 1);
     pointerSeen = performance.now();
     pointerActive = true;
   }, { passive: true });
@@ -479,7 +496,7 @@ export async function startMuseum(root: HTMLElement) {
   const curtainMeshes = rooms.flatMap((room) => room.curtains.flatMap((curtain) => curtain.meshes));
   const hoverRay = new THREE.Raycaster();
   const curtainAt = (clientX: number, clientY: number) => {
-    hoverRay.setFromCamera(new THREE.Vector2((clientX / innerWidth) * 2 - 1, -(clientY / innerHeight) * 2 + 1), camera);
+    hoverRay.setFromCamera(new THREE.Vector2((clientX / canvas.clientWidth) * 2 - 1, -(clientY / canvas.clientHeight) * 2 + 1), camera);
     const hit = hoverRay.intersectObjects(curtainMeshes, false)[0];
     return hit && hit.distance < 14 ? rooms[hit.object.userData.room as number] : undefined;
   };
