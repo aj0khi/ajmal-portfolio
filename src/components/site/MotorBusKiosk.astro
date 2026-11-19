@@ -1,0 +1,64 @@
+<div class="instrument bus-kiosk" data-bus-kiosk>
+  <div class="instrument-head">
+    <span class="instrument-title">Plan the arm bus</span>
+    <span class="instrument-chip">rules from the integration study</span>
+  </div>
+  <div class="bus-options">
+    <fieldset>
+      <legend>Bus mode</legend>
+      <label><input type="radio" name="bus-mode" value="classic" checked /> Classic CAN, 1 Mb/s</label>
+      <label><input type="radio" name="bus-mode" value="fd" /> CAN-FD, 5 Mb/s</label>
+    </fieldset>
+    <fieldset>
+      <legend>Wrist motor (DM-J4340P)</legend>
+      <label><input type="radio" name="bus-wrist" value="48" checked /> 48 V variant</label>
+      <label><input type="radio" name="bus-wrist" value="24" /> 24 V variant</label>
+    </fieldset>
+    <fieldset>
+      <legend>Power</legend>
+      <label><input type="radio" name="bus-power" value="single" checked /> One 48 V rail</label>
+      <label><input type="radio" name="bus-power" value="branch" /> 48 V rail plus a protected 24 V branch</label>
+    </fieldset>
+    <fieldset>
+      <legend>Termination</legend>
+      <label><input type="radio" name="bus-term" value="both" checked /> 120 Ω at both ends</label>
+      <label><input type="radio" name="bus-term" value="one" /> One end only</label>
+    </fieldset>
+  </div>
+  <ul class="bus-checks" data-bus-checks aria-live="polite"></ul>
+  <p class="instrument-note">The checks restate the team document's constraints; nothing here talks to hardware.</p>
+</div>
+
+<script>
+  const kiosk = document.querySelector<HTMLElement>('[data-bus-kiosk]');
+  if (kiosk) {
+    const list = kiosk.querySelector<HTMLElement>('[data-bus-checks]');
+    const value = (name: string) => kiosk.querySelector<HTMLInputElement>(`input[name="${name}"]:checked`)?.value;
+    const render = () => {
+      const checks: [boolean, string][] = [];
+      checks.push(value('bus-mode') === 'classic'
+        ? [true, 'All three motors share classic CAN at 1 Mb/s, the one protocol they have in common.']
+        : [false, 'The elbow and wrist motors are standard CAN only. Running the shared bus as 5 Mb/s FD would drop them; the shoulder’s FD support does not set the bus speed.']);
+      const wrist24 = value('bus-wrist') === '24';
+      const branch = value('bus-power') === 'branch';
+      checks.push(!wrist24
+        ? [true, 'Shoulder (48 V), elbow (24–48 V), and a 48 V wrist can share one 48 V rail.']
+        : branch
+          ? [true, 'The 24 V wrist gets its own converter and branch protection.']
+          : [false, 'A 24 V wrist must not sit on the 48 V rail. Sharing a bus is not sharing a supply.']);
+      checks.push(value('bus-term') === 'both'
+        ? [true, '120 Ω termination at both physical ends of the bus.']
+        : [false, 'A CAN bus needs 120 Ω termination at both ends; one end only invites reflections and errors.']);
+      checks.push([true, 'Every motor gets a unique command ID (ESC_ID) and feedback ID (MST_ID).']);
+      list?.replaceChildren(...checks.map(([ok, text]) => {
+        const item = document.createElement('li');
+        item.dataset.ok = String(ok);
+        item.textContent = text;
+        return item;
+      }));
+      kiosk.dataset.ok = String(checks.every(([ok]) => ok));
+    };
+    kiosk.addEventListener('change', render);
+    render();
+  }
+</script>

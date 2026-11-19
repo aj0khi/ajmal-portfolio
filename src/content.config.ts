@@ -19,6 +19,8 @@ const projects = defineCollection({
     year: z.string().optional(),
     role: z.string().optional(),
     highlights: z.array(z.string()).optional(),
+    team: z.string().optional(),
+    lesson: z.string().optional(),
     link: z.url().optional(),
     linkLabel: z.string().optional()
   })

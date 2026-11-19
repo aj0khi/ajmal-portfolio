@@ -1,224 +1,247 @@
 ---
 import { getCollection } from 'astro:content';
 import SiteLayout from '../layouts/SiteLayout.astro';
-import WorkcellHero from '../components/site/WorkcellHero.astro';
 import RoverSonarSim from '../components/site/RoverSonarSim.astro';
 import PoissonExplorer from '../components/site/PoissonExplorer.astro';
 import GithubPulse from '../components/site/GithubPulse.astro';
 import SiteTerminal from '../components/site/SiteTerminal.astro';
+import MotorBusKiosk from '../components/site/MotorBusKiosk.astro';
+import SignatureKiosk from '../components/site/SignatureKiosk.astro';
 import StaleStateLab from '../components/StaleStateLab.astro';
 import BlackBoxDemo from '../components/BlackBoxDemo.astro';
 import SnakeRewardLab from '../components/SnakeRewardLab.astro';
 import HvacSimulator from '../components/HvacSimulator.astro';
-import { awards, certifications, contact, coursework, education, offline, roadmap, roles, skills } from '../data/profile';
+import { awards, certifications, contact, coursework, education, offline, pastSocieties, roadmap, roles, skills, societies } from '../data/profile';
+import { tour } from '../data/exhibits';
 
-const all = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
-const projects = all.filter((entry) => entry.data.group);
-
-const groups = [
-  { id: 'robotics', name: 'Robotics and physical systems', blurb: 'Software that commands, watches, or records something in the real world.' },
-  { id: 'software', name: 'Software and data', blurb: 'Hackathon builds and data products, each scoped honestly as a prototype.' },
-  { id: 'business', name: 'Businesses', blurb: 'Two operations where the customer sees the result the same day.' }
-] as const;
+const entries = new Map((await getCollection('projects')).map((entry) => [entry.id, entry]));
+const exhibits = tour.map((exhibit) => ({ ...exhibit, entry: entries.get(exhibit.id)! }));
 
 const statusWord: Record<string, string> = { ACTIVE: 'Active', 'IN PROGRESS': 'In progress', PROTOTYPE: 'Prototype', SHIPPED: 'Shipped' };
-const titleCase = (stack: string) => stack.split(' / ').map((item) => item.trim());
+const stackList = (stack: string) => stack.split(' / ').map((item) => item.trim());
 const shortTitle = (title: string) => title.split(' — ')[0];
+const sentence = (label: string) => label.toLowerCase().replace(/^\w/, (c) => c.toUpperCase());
+const skillsFor = (id: string) => skills.filter((skill) => skill.used.includes(id) && !skill.learning);
 
-const projectNames: Record<string, string> = Object.fromEntries(all.map((entry) => [entry.id, shortTitle(entry.data.title)]));
+const projectNames: Record<string, string> = Object.fromEntries([...entries].map(([id, entry]) => [id, shortTitle(entry.data.title)]));
 projectNames.portfolio = 'This site';
 projectNames.coursework = 'Coursework';
 projectNames['robotics-roadmap'] = 'Roadmap';
+const onTour = new Set(tour.map((exhibit) => exhibit.id));
 
-const skillGroups = [...new Set(skills.map((skill) => skill.group))].map((group) => ({
-  group,
-  items: skills.filter((skill) => skill.group === group)
-}));
+const skillGroups = [...new Set(skills.map((skill) => skill.group))].map((group) => ({ group, items: skills.filter((skill) => skill.group === group) }));
 
-const facts = [
-  { value: String(projects.length), label: 'projects documented on this page' },
-  { value: String(roles.length), label: 'current and past roles' },
-  { value: '$10k+', label: 'in scholarships and grants' },
-  { value: '2', label: "Dean's Lists, at two universities" }
+const armJoints = [
+  { name: 'old_arm_base_yaw_joint', label: 'base_yaw', min: -0.585, max: 4.128, value: 1.2 },
+  { name: 'old_arm_shoulder_pitch_joint', label: 'shoulder_pitch', min: 0, max: 1.963, value: 0.6 },
+  { name: 'old_arm_elbow_pitch_joint', label: 'elbow_pitch', min: -1.073, max: 2.068, value: 0.6 },
+  { name: 'old_arm_wrist_roll_joint', label: 'wrist_roll', min: -0.48, max: 4.232, value: 1.5 }
 ];
+const rooms = [{ id: 'entrance', name: 'Entrance' }, { id: 'thread', name: 'The thread' }, { id: 'societies', name: 'The Societies Room' }, ...exhibits.map((exhibit) => ({ id: exhibit.id, name: shortTitle(exhibit.entry.data.title) })), { id: 'next-wing', name: 'The next wing' }];
 ---
 
-<SiteLayout>
+<SiteLayout title="Ajmal Khidri — The Collection" description="Ajmal Khidri's work as a night-time museum: robotics software, hackathon builds, and two real businesses, each exhibit running in your browser.">
   <header class="topbar" data-topbar>
-    <a class="mark" href="#top" aria-label="Back to top">AK</a>
+    <a class="mark" href="#entrance" aria-label="Back to the entrance">AK</a>
     <nav aria-label="Sections">
-      <a href="#work">Work</a>
+      <a href="#waybionic-ground-station">Collection</a>
       <a href="#thinking">Thinking</a>
       <a href="#experience">Experience</a>
       <a href="#toolbox">Toolbox</a>
-      <a href="#next">Next</a>
       <a href="#contact">Contact</a>
     </nav>
     <a class="btn btn-small" href={contact.resume} download>Resume</a>
   </header>
 
-  <main id="top">
-    <WorkcellHero />
+  <nav class="floorplan" aria-label="Museum floor plan">
+    <p class="floorplan-count" data-floor-count aria-hidden="true">00 / {String(rooms.length - 1).padStart(2, '0')}</p>
+    <ol>
+      {rooms.map((room) => <li><a href={`#${room.id}`} data-floor-link><span>{room.name}</span></a></li>)}
+    </ol>
+  </nav>
 
-    <section class="thread paper" id="thread" data-term-target aria-labelledby="thread-title">
-      <div class="shell thread-grid">
-        <h2 id="thread-title" class="thread-title" data-reveal>Compressors.<br />Nozzles.<br />Joints.</h2>
-        <div class="thread-copy" data-reveal>
-          <p class="lead">Most student portfolios are a list of apps. Mine keeps returning to machines that have to keep running while someone depends on them.</p>
-          <ol class="thread-list">
-            <li><strong>HVAC Express</strong><span>Since March 2024 I've run the website, hosting, and lead generation for a family heating and cooling company, and sold its service face to face.</span></li>
-            <li><strong>Chinook Clean</strong><span>I own a power-washing business: pumps, nozzles, quotes, schedules, and a result the customer judges on the spot.</span></li>
-            <li><strong>WayBionic Robotics</strong><span>Since August 2026 I've written movement-test panels and diagnostics for a ROS 2 ground station that drives a surgical arm.</span></li>
-          </ol>
+  <main>
+    <div class="museum" data-museum>
+      <canvas class="museum-canvas" data-museum-canvas aria-hidden="true"></canvas>
+      <div class="museum-vignette" aria-hidden="true"></div>
+
+      <section class="room room-entrance" id="entrance" data-room="entrance" data-term-target aria-labelledby="entrance-title">
+        <div class="entrance-copy shell">
+          <p class="entrance-kicker" data-rise>The Ajmal Khidri Collection. Open after hours.</p>
+          <h1 id="entrance-title" class="entrance-title" data-rise>Systems<br />that move.</h1>
+          <p class="entrance-lede" data-rise>Computer Science at the University of Calgary. Robotics software at WayBionic and the Schulich Space Rover Team, Junior Executive at the UCalgary Cybersecurity Club, the tech behind a Calgary HVAC company, and a power-washing business I run myself. Every exhibit here is real, and most of them still run.</p>
+          <div class="entrance-actions" data-rise>
+            <a class="btn btn-primary" href="#thread">Enter the collection</a>
+            <a class="btn btn-ghost" href={contact.resume} download>Download resume</a>
+          </div>
+          <p class="entrance-hint" data-rise>Scroll to walk the hall. Move your cursor to carry a torch, and the arm on the plinth will reach for it.</p>
         </div>
-        <dl class="facts" data-reveal>
-          {facts.map((fact) => <div><dt>{fact.label}</dt><dd>{fact.value}</dd></div>)}
-        </dl>
-      </div>
-    </section>
+        <aside class="readout" aria-label="Live joint readout from the entrance arm" data-readout>
+          <div class="readout-head"><span>/joint_states</span><span class="readout-state" data-ik-state>idle sweep</span></div>
+          <dl class="readout-joints">
+            <div><dt>base_yaw</dt><dd data-joint>0.0°</dd></div>
+            <div><dt>shoulder</dt><dd data-joint>0.0°</dd></div>
+            <div><dt>elbow</dt><dd data-joint>0.0°</dd></div>
+            <div><dt>wrist_pitch</dt><dd data-joint>0.0°</dd></div>
+          </dl>
+          <p class="readout-note">Inverse kinematics solved in your browser every frame. A demo arm, not the WayBionic robot; that one is further in.</p>
+        </aside>
+      </section>
 
-    <section class="work paper" id="work" data-term-target aria-labelledby="work-title">
-      <div class="shell work-head" data-reveal>
-        <h2 id="work-title" class="section-title">The work</h2>
-        <p class="section-intro">Every entry states the problem, the system, the decision that shaped it, and what's next. Status labels are honest: a prototype says prototype. Six of them include something you can run right here.</p>
-      </div>
+      <section class="room room-wall" id="thread" data-room="thread" data-wall="Compressors.|Nozzles.|Joints." data-accession="Wall text" aria-labelledby="thread-title">
+        <article class="placard placard-wall">
+          <h2 id="thread-title">Compressors. Nozzles. Joints.</h2>
+          <p class="placard-summary">Most student portfolios are a list of apps. This one keeps returning to machines that have to keep running while someone depends on them.</p>
+          <ul class="thread-list">
+            <li><strong>HVAC Express</strong> Since March 2024: the website, hosting, and lead generation for a family heating and cooling company, plus selling its service face to face.</li>
+            <li><strong>Chinook Clean</strong> A power-washing business I own: pumps, nozzles, quotes, schedules, and a result the customer judges on the spot.</li>
+            <li><strong>WayBionic and the Schulich Space Rover Team</strong> Since August 2026: diagnostics and ground-station software for a surgical arm, and controls for a Mars-style rover's arm.</li>
+          </ul>
+          <p class="placard-fine">Fourteen rooms ahead. Most have controls on the placard and a kiosk you can open.</p>
+        </article>
+      </section>
 
-      <div class="shell work-layout">
-        <nav class="rail" aria-label="Projects">
-          {groups.map((group) => (
-            <div class="rail-group">
-              <p>{group.name}</p>
-              <ul>
-                {projects.filter((entry) => entry.data.group === group.id).map((entry) => (
-                  <li><a href={`#${entry.id}`} data-rail-link={entry.id}><span>{shortTitle(entry.data.title)}</span><em data-status={entry.data.status}>{statusWord[entry.data.status]}</em></a></li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </nav>
+      <section class="room" id="societies" data-room="societies" data-term-target data-wall="The Societies|Room" data-accession="Gallery II" data-plaques={JSON.stringify(societies.map(({ title, role, when }) => ({ title, role, when })))} aria-labelledby="societies-title">
+        <article class="placard">
+          <header class="placard-head"><p class="accession">Gallery II</p><span class="tag" data-status="ACTIVE">Current</span></header>
+          <h2 id="societies-title">The Societies Room</h2>
+          <p class="placard-summary">The teams I build with and the weekends I spent building. Each brass plaque on the wall is one of them.</p>
+          <ul class="society-list">
+            {societies.map((item) => (
+              <li>
+                <p class="society-when">{item.when}</p>
+                <p class="society-name">{item.link ? <a href={item.link}>{item.title}</a> : item.title}<span>{item.role}</span></p>
+                <p class="society-detail">{item.detail}</p>
+              </li>
+            ))}
+          </ul>
+          <details class="notes">
+            <summary>Earlier volunteering</summary>
+            <ul class="society-list">{pastSocieties.map((item) => <li><p class="society-when">{item.when}</p><p class="society-name">{item.title}<span>{item.role}</span></p></li>)}</ul>
+          </details>
+        </article>
+      </section>
 
-        <div class="cases">
-          {groups.map((group) => (
-            <div class="case-group" id={`group-${group.id}`}>
-              <div class="group-head" data-reveal>
-                <h3>{group.name}</h3>
-                <p>{group.blurb}</p>
+      {exhibits.map((exhibit) => {
+        const data = exhibit.entry.data;
+        const used = skillsFor(exhibit.id);
+        return (
+          <section
+            class="room"
+            id={exhibit.id}
+            data-room={exhibit.id}
+            data-term-target
+            data-sculpture={exhibit.sculpture}
+            data-paintings={JSON.stringify((exhibit.paintings ?? []).map((painting) => ({ src: painting.src })))}
+            data-wall={exhibit.wall}
+            data-accession={exhibit.accession}
+            aria-labelledby={`${exhibit.id}-title`}
+          >
+            <article class="placard" data-case={exhibit.id}>
+              <header class="placard-head">
+                <p class="accession">{exhibit.accession}</p>
+                <span class="tag" data-status={data.status}>{statusWord[data.status]}</span>
+              </header>
+              <h2 id={`${exhibit.id}-title`} data-case-title>{data.title}</h2>
+              <p class="placard-meta">{data.year}, {data.role}</p>
+              <p class="placard-summary">{data.summary}</p>
+              {data.contribution ? <p class="placard-part"><strong>My part.</strong> {data.contribution}</p> : null}
+
+              {exhibit.control === 'arm' ? (
+                <fieldset class="controls" data-arm-controls>
+                  <legend>Take the controls of the real arm model</legend>
+                  {armJoints.map((joint) => (
+                    <label class="joint-slider">
+                      <span>{joint.label}<b data-joint-value>{Math.round((joint.value * 180) / Math.PI)}°</b></span>
+                      <input type="range" min={joint.min} max={joint.max} step="0.01" value={joint.value} data-arm-joint={joint.name} />
+                    </label>
+                  ))}
+                  <p class="controls-note">Limits come from the team's URDF. The motion test resumes nine seconds after you let go.</p>
+                </fieldset>
+              ) : null}
+              {exhibit.control === 'sun' ? (
+                <fieldset class="controls">
+                  <legend>Move the sun around the south pole</legend>
+                  <label class="joint-slider"><span>Sun azimuth <b data-sun-value>auto</b></span><input type="range" min="0" max="6.283" step="0.01" value="0" data-sun /></label>
+                  <p class="controls-note">The light stays low on the horizon, so crater rims throw long shadows. That trade-off is what SouthPoint maps.</p>
+                </fieldset>
+              ) : null}
+              {exhibit.control === 'wash' ? (
+                <fieldset class="controls">
+                  <legend>Take the wand</legend>
+                  <div class="control-row">
+                    <button type="button" class="hold" data-wash-hold aria-describedby={`${exhibit.id}-wash-note`}>Hold to spray</button>
+                    <button type="button" data-wash-reset>Reset the slab</button>
+                  </div>
+                  <p class="controls-note" id={`${exhibit.id}-wash-note`}>Hold the button (or Space) and watch the grime come off the pavers. No customer photos here: those need the customer's permission.</p>
+                </fieldset>
+              ) : null}
+              {exhibit.control === 'tamper' ? (
+                <fieldset class="controls">
+                  <legend>Test the chain</legend>
+                  <div class="control-row"><button type="button" data-tamper>Tamper with record 4</button></div>
+                  <p class="controls-note">Watch the chain: the edited record turns amber, then every block after it fails verification.</p>
+                </fieldset>
+              ) : null}
+
+              <div class="placard-actions">
+                {exhibit.kiosk ? <button type="button" class="btn btn-primary btn-small" data-kiosk-open={`kiosk-${exhibit.kiosk}`}>Try it: {exhibit.kioskTitle}</button> : null}
+                {exhibit.paintings?.length ? <button type="button" class="btn btn-ghost btn-small" data-curtain={exhibit.id} aria-pressed="false">Draw the curtains</button> : null}
+                {data.link ? <a class="placard-link" href={data.link} target="_blank" rel="noreferrer">{sentence(data.linkLabel ?? 'View project')}</a> : null}
               </div>
-              {projects.filter((entry) => entry.data.group === group.id).map((entry) => {
-                const data = entry.data;
-                return (
-                  <article class="case" id={entry.id} data-case={entry.id} aria-labelledby={`${entry.id}-title`}>
-                    <header class="case-head" data-reveal>
-                      <div class="case-meta">
-                        <span class="tag" data-status={data.status}>{statusWord[data.status]}</span>
-                        {data.year ? <span>{data.year}</span> : null}
-                        {data.role ? <span>{data.role}</span> : null}
-                      </div>
-                      <h4 class="case-title" id={`${entry.id}-title`} data-case-title>{data.title}</h4>
-                      <p class="case-summary">{data.summary}</p>
-                    </header>
 
-                    <div class="case-body" data-reveal>
-                      <dl class="case-facts">
-                        {data.problem ? <div><dt>Problem</dt><dd>{data.problem}</dd></div> : null}
-                        {data.system ? <div><dt>{data.status === 'SHIPPED' || data.status === 'ACTIVE' ? 'System' : 'Current design'}</dt><dd>{data.system}</dd></div> : null}
-                        {data.decision ? <div><dt>Key decision</dt><dd>{data.decision}</dd></div> : null}
-                        {data.contribution ? <div><dt>My part</dt><dd>{data.contribution}</dd></div> : null}
-                        {data.next ? <div><dt>Next</dt><dd>{data.next}</dd></div> : null}
-                      </dl>
-                      <aside class="case-side">
-                        {data.highlights?.length ? (
-                          <ul class="case-highlights">{data.highlights.map((item) => <li>{item}</li>)}</ul>
-                        ) : null}
-                        <ul class="stack" aria-label="Stack">{titleCase(data.stack).map((item) => <li>{item}</li>)}</ul>
-                        {data.link ? <a class="case-link" href={data.link} target="_blank" rel="noreferrer">{(data.linkLabel ?? 'View project').toLowerCase().replace(/^\w/, (c) => c.toUpperCase())}</a> : null}
-                      </aside>
-                    </div>
+              {exhibit.paintings?.length ? (
+                <div class="thumbs">
+                  {exhibit.paintings.map((painting) => (
+                    <button type="button" class="thumb" data-lightbox={painting.src} data-caption={painting.caption}>
+                      <img src={painting.src.replace('.webp', '-640.webp')} alt={painting.alt} width="640" height="400" loading="lazy" decoding="async" />
+                      <span>{painting.caption}</span>
+                    </button>
+                  ))}
+                </div>
+              ) : null}
 
-                    {entry.id === 'waybionic-ground-station' ? (
-                      <div class="case-instruments" data-reveal>
-                        <div class="evidence-pair">
-                          <figure><img src="/assets/waybionic/engineer-monitor-normal.png" alt="WayBionic engineering monitor in RViz showing a mock normal joint state." loading="lazy" decoding="async" /><figcaption>Mock normal state, RViz</figcaption></figure>
-                          <figure><img src="/assets/waybionic/engineer-monitor-fault.png" alt="WayBionic engineering monitor in RViz flagging a mock fault and stale state." loading="lazy" decoding="async" /><figcaption>Mock fault and stale state</figcaption></figure>
-                        </div>
-                        <div class="instrument-wrap"><StaleStateLab /></div>
-                        <figure class="video-frame">
-                          <video controls playsinline preload="none" poster="/assets/waybionic/engineer-monitor-normal.png"><source src="/assets/waybionic/arm-demo.mp4" type="video/mp4" />Your browser can't play this video. <a href="/assets/waybionic/arm-demo.mp4">Download the MP4</a>.</video>
-                          <figcaption>The team's arm moving. Captures are mock RViz states; nothing on this page connects to ROS or sends hardware commands.</figcaption>
-                        </figure>
-                      </div>
-                    ) : null}
-                    {entry.id === 'physical-ai-blackbox' ? <div class="case-instruments" data-reveal><div class="instrument-wrap"><BlackBoxDemo /></div></div> : null}
-                    {entry.id === 'autonomous-rover' ? <div class="case-instruments" data-reveal><RoverSonarSim /></div> : null}
-                    {entry.id === 'teach-to-game' ? <div class="case-instruments" data-reveal><div class="instrument-wrap"><SnakeRewardLab /></div></div> : null}
-                    {entry.id === 'soccer-intelligence' ? <div class="case-instruments" data-reveal><PoissonExplorer /></div> : null}
-                    {entry.id === 'hvac-express' ? <div class="case-instruments" data-reveal><div class="instrument-wrap"><HvacSimulator /></div></div> : null}
-                    {entry.id === 'southpoint' ? (
-                      <div class="case-instruments" data-reveal>
-                        <div class="instrument arch">
-                          <div class="instrument-head"><span class="instrument-title">Architecture</span><span class="instrument-chip">from the team README</span></div>
-                          <div class="arch-cols">
-                            <div><p>Front end</p><ul><li>2D map: sun, shadows, rims</li><li>Sky dome and sun slider</li><li>3D surface, react-three-fiber</li><li>Compare and mission panel</li></ul></div>
-                            <div class="arch-link" aria-hidden="true"><span>REST / JSON</span></div>
-                            <div><p>FastAPI back end</p><ul><li>ephemeris.py: Skyfield + DE421</li><li>terrain.py: LOLA DEM</li><li>scoring.py: heuristic status</li><li>mission.py: illustrative plan</li></ul></div>
-                          </div>
-                        </div>
-                      </div>
-                    ) : null}
-                    {entry.id === 'aircade' ? (
-                      <div class="case-instruments" data-reveal>
-                        <div class="instrument arch">
-                          <div class="instrument-head"><span class="instrument-title">Motion input path</span><span class="instrument-chip">not yet validated end to end</span></div>
-                          <ol class="flow">
-                            <li><strong>AirPods / iPhone</strong><span>CoreMotion samples</span></li>
-                            <li><strong>Swift sender</strong><span>normalise and stream</span></li>
-                            <li><strong>Local relay</strong><span>WebSocket</span></li>
-                            <li><strong>Browser game</strong><span>per-game mapping</span></li>
-                          </ol>
-                          <ul class="games"><li>Pong</li><li>Snake</li><li>Breakout</li><li>Bowling</li><li>Tanks</li></ul>
-                        </div>
-                      </div>
-                    ) : null}
-                    {entry.id === 'proofly' ? (
-                      <div class="case-instruments" data-reveal>
-                        <div class="instrument arch">
-                          <div class="instrument-head"><span class="instrument-title">From community work to a credential</span><span class="instrument-chip">fictional demo data</span></div>
-                          <ol class="flow">
-                            <li><strong>Project</strong><span>student logs the work</span></li>
-                            <li><strong>Vouch</strong><span>community member confirms</span></li>
-                            <li><strong>Review</strong><span>simulated coordinator</span></li>
-                            <li><strong>Sign</strong><span>Ed25519 credential</span></li>
-                            <li><strong>Verify</strong><span>employer lens, issuer allowlist</span></li>
-                          </ol>
-                        </div>
-                      </div>
-                    ) : null}
-                    {entry.id === 'chinook-clean' ? (
-                      <div class="case-instruments" data-reveal>
-                        <div class="instrument arch">
-                          <div class="instrument-head"><span class="instrument-title">How a job runs</span><span class="instrument-chip">owner-operated</span></div>
-                          <ol class="flow">
-                            <li><strong>Conversation</strong><span>what the customer wants cleaned</span></li>
-                            <li><strong>Quote</strong><span>surface, access, time</span></li>
-                            <li><strong>Schedule</strong><span>weather and equipment</span></li>
-                            <li><strong>Wash</strong><span>on site, by hand</span></li>
-                            <li><strong>Walkthrough</strong><span>the customer checks the result</span></li>
-                          </ol>
-                        </div>
-                      </div>
-                    ) : null}
-                  </article>
-                );
-              })}
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
+              {used.length ? (
+                <div class="skills-on-show">
+                  <p>Skills on show</p>
+                  <ul>{used.map((skill) => <li><a href="#toolbox">{skill.name}</a></li>)}</ul>
+                </div>
+              ) : null}
+
+              <details class="notes">
+                <summary>Read the full exhibit notes</summary>
+                <dl>
+                  {data.problem ? <div><dt>Problem</dt><dd>{data.problem}</dd></div> : null}
+                  {data.system ? <div><dt>{data.status === 'SHIPPED' || data.status === 'ACTIVE' ? 'System' : 'Current design'}</dt><dd>{data.system}</dd></div> : null}
+                  {data.decision ? <div><dt>Key decision</dt><dd>{data.decision}</dd></div> : null}
+                  {data.highlights?.length ? <div><dt>Built</dt><dd><ul>{data.highlights.map((item) => <li>{item}</li>)}</ul></dd></div> : null}
+                  {data.lesson ? <div><dt>What broke, what I learned</dt><dd>{data.lesson}</dd></div> : null}
+                  {data.team ? <div><dt>Team</dt><dd>{data.team}</dd></div> : null}
+                  {data.next ? <div><dt>Next</dt><dd>{data.next}</dd></div> : null}
+                  <div><dt>Stack</dt><dd><ul class="stack">{stackList(data.stack).map((item) => <li>{item}</li>)}</ul></dd></div>
+                </dl>
+              </details>
+            </article>
+          </section>
+        );
+      })}
+
+      <section class="room room-finale" id="next-wing" data-room="next-wing" data-sculpture="barrier" data-accession="AK.next" aria-labelledby="next-wing-title">
+        <article class="placard">
+          <header class="placard-head"><p class="accession">Under construction</p><span class="tag" data-status="IN PROGRESS">In progress</span></header>
+          <h2 id="next-wing-title">The next wing</h2>
+          <p class="placard-summary">The goal is a robotics company that ships machines into the real world. The next exhibits are being built in simulation first, so none of them waits on buying hardware.</p>
+          <ol class="mini-route">
+            {roadmap.map((stop) => <li data-state={stop.state}><strong>{stop.tool}</strong><span>{stop.skill}</span></li>)}
+          </ol>
+          <div class="placard-actions"><a class="btn btn-primary btn-small" href="#thinking">Leave the hall for the archive</a></div>
+        </article>
+      </section>
+    </div>
 
     <section class="thinking night" id="thinking" data-term-target aria-labelledby="thinking-title">
       <div class="shell">
-        <div class="thinking-head" data-reveal>
+        <div data-reveal>
           <h2 id="thinking-title" class="section-title">How I make a call</h2>
           <p class="section-intro">One real decision from WayBionic, annotated. The arm is surgical hardware; the ground station is the first place a mistake would show up.</p>
         </div>
@@ -227,21 +250,22 @@ const facts = [
 <span class="ln">2</span><span class="k">drives</span>:
 <span class="ln">3</span>  <span class="k">source</span>: <span class="v">simulated</span>        <span class="c"># MKS CAN drives</span>
 <span class="ln">4</span>  <span class="k">live_hardware</span>: <span class="v">opt_in</span>
-<span class="ln">5</span><span class="k">diagnostics_panel</span>:
+<span class="ln">5</span><span class="k">diagnostics</span>:
 <span class="ln">6</span>  <span class="k">mode</span>: <span class="v">monitor_only</span>     <span class="c"># never commands</span>
 <span class="ln">7</span>  <span class="k">flag</span>: [<span class="v">stale</span>, <span class="v">future_dated</span>, <span class="v">error</span>]
-<span class="ln">8</span><span class="k">joint_state</span>:
-<span class="ln">9</span>  <span class="k">label</span>: <span class="v">commanded | estimated | measured</span>
-<span class="ln">10</span><span class="k">motion</span>:
-<span class="ln">11</span>  <span class="k">checks</span>: [<span class="v">joint_limits</span>, <span class="v">collision</span>]</code></pre>
+<span class="ln">8</span>  <span class="k">merge</span>: <span class="v">per_publisher</span>    <span class="c"># one sensor can't hide another's fault</span>
+<span class="ln">9</span><span class="k">joint_state</span>:
+<span class="ln">10</span>  <span class="k">label</span>: <span class="v">commanded | estimated | measured</span>
+<span class="ln">11</span><span class="k">motion</span>:
+<span class="ln">12</span>  <span class="k">checks</span>: [<span class="v">joint_limits</span>, <span class="v">collision</span>]</code></pre>
           <ol class="decision-notes">
             <li><strong>Simulation is the default.</strong> Motion tests publish to a simulated joint-state driver. Touching the real arm is a deliberate opt-in, not the path you fall into.</li>
-            <li><strong>The monitor watches; it never drives.</strong> Keeping the diagnostics panel read-only means a UI bug can mislead an operator but cannot move a joint.</li>
-            <li><strong>Old data must look old.</strong> A stale value that still looks current is worse than no value. Stale and future-dated samples are flagged in RViz.</li>
-            <li><strong>Say where a number came from.</strong> Commanded, estimated, and measured positions are kept apart until actuator names and units are confirmed on the real model.</li>
+            <li><strong>The monitor watches; it never drives.</strong> A read-only diagnostics panel means a UI bug can mislead an operator but cannot move a joint.</li>
+            <li><strong>Old data must look old.</strong> Code review on my diagnostics CLI caught old samples shown as fresh. A stale value that looks current is worse than no value, so stale and future-dated samples are flagged.</li>
+            <li><strong>One sensor can't hide another's fault.</strong> Review also caught a fault vanishing when a different sensor updated. Status is now merged per publisher, and each fix has a regression test: 11 passing on ROS 2 Jazzy.</li>
           </ol>
         </div>
-        <p class="fine" data-reveal>The config block paraphrases the decision for reading; it is not copied from the team repository.</p>
+        <p class="fine" data-reveal>The config block paraphrases the decisions for reading; it is not copied from the team repository.</p>
       </div>
     </section>
 
@@ -286,9 +310,9 @@ const facts = [
 
     <section class="toolbox paper-deep" id="toolbox" data-term-target aria-labelledby="toolbox-title">
       <div class="shell">
-        <div class="toolbox-head" data-reveal>
+        <div data-reveal>
           <h2 id="toolbox-title" class="section-title">Toolbox</h2>
-          <p class="section-intro">No skill bars. Each tool is listed with the projects on this page where it was actually used, so you can check. Hatched entries are on the roadmap and still being learned.</p>
+          <p class="section-intro">No skill bars. Each tool links to the exhibits where it was actually used, so you can walk back and check. Hatched entries are on the roadmap and still being learned.</p>
         </div>
         <div class="skill-groups">
           {skillGroups.map(({ group, items }) => (
@@ -299,9 +323,7 @@ const facts = [
                   <li class:list={['skill', { learning: skill.learning }]}>
                     <span class="skill-name">{skill.name}</span>
                     <span class="skill-used">
-                      {skill.used.map((id) => projects.some((entry) => entry.id === id)
-                        ? <a href={`#${id}`}>{projectNames[id] ?? id}</a>
-                        : <span>{id === 'robotics-roadmap' ? 'Roadmap' : projectNames[id] ?? id}</span>)}
+                      {skill.used.map((id) => onTour.has(id) ? <a href={`#${id}`}>{projectNames[id] ?? id}</a> : <span>{projectNames[id] ?? id}</span>)}
                     </span>
                   </li>
                 ))}
@@ -314,9 +336,9 @@ const facts = [
 
     <section class="next night" id="next" data-term-target aria-labelledby="next-title">
       <div class="shell">
-        <div class="next-head" data-reveal>
+        <div data-reveal>
           <h2 id="next-title" class="section-title">Where this is heading</h2>
-          <p class="section-intro">The goal is a robotics company that ships machines into the real world. The plan builds the skills in simulation first, so none of it waits on buying hardware.</p>
+          <p class="section-intro">Simulation first: each stage teaches a skill the next one needs, and none of them waits on hardware.</p>
         </div>
         <ol class="route" data-reveal>
           {roadmap.map((stop, index) => (
@@ -329,19 +351,18 @@ const facts = [
             </li>
           ))}
         </ol>
-
         <article class="research" data-reveal>
           <div>
             <p class="research-kind">Personal research, 27-page design study and preprint</p>
-            <h3>Science fiction, with numbers attached</h3>
-            <p>A feasibility assessment of a metre-scale confined-plasma cutting blade, modelled as a sheared-flow-stabilised screw pinch. The study separates what current plasma physics supports from the gaps that still block a handheld system.</p>
+            <h3>What would a real lightsaber take?</h3>
+            <p>"Design Requirements and Technology Gaps for a Hand-Held Confined-Plasma Cutting Blade" models a metre-scale plasma blade as a sheared-flow-stabilised screw pinch. The plasma configuration itself does not break physics and is largely supported by current Z-pinch work. Building one is another matter.</p>
           </div>
           <dl>
-            <div><dt>Physics</dt><dd>Confined plasma, Z-pinch feasibility</dd></div>
-            <div><dt>Gaps found</dt><dd>Compact power density; keeping ambient air out</dd></div>
-            <div><dt>Why it matters</dt><dd>Modelling and honest limits instead of hand-waving</dd></div>
+            <div><dt>Model</dt><dd>Sheared-flow-stabilised screw pinch</dd></div>
+            <div><dt>Gaps found</dt><dd>Four, led by a compact power source with enormous energy density</dd></div>
+            <div><dt>Hardest number</dt><dd>Ambient air kept below 6 parts per million along a one-metre open column</dd></div>
           </dl>
-          <a class="case-link" href={contact.scholar} target="_blank" rel="noreferrer">Google Scholar profile</a>
+          <a class="placard-link" href={contact.scholar} target="_blank" rel="noreferrer">Google Scholar profile</a>
         </article>
       </div>
     </section>
@@ -371,8 +392,8 @@ const facts = [
 
     <section class="contact night" id="contact" data-term-target aria-labelledby="contact-title">
       <div class="shell">
-        <h2 id="contact-title" class="contact-title" data-reveal>Let's build<br />something that moves.</h2>
-        <p class="contact-copy" data-reveal>Looking for software and robotics internships in Canada and the US. The fastest way to reach me is email.</p>
+        <h2 id="contact-title" class="contact-title" data-reveal>The gift shop<br />is an inbox.</h2>
+        <p class="contact-copy" data-reveal>I'm looking for software and robotics internships. The fastest way to reach me is email.</p>
         <a class="contact-email" href={`mailto:${contact.email}`} data-reveal>{contact.email}</a>
         <ul class="contact-links" data-reveal>
           <li><a href={contact.resume} download>Resume (PDF)</a></li>
@@ -383,32 +404,101 @@ const facts = [
       </div>
       <footer class="footer shell">
         <span>Ajmal Khidri, Calgary</span>
-        <span>Built with Astro and Three.js. The arm above is solved in your browser.</span>
+        <span>Built with Astro and Three.js. The WayBionic arm is the team's MIT-licensed URDF, rendered live.</span>
       </footer>
     </section>
   </main>
+
+  <dialog class="kiosk" id="kiosk-stale-lab" aria-label="When fresh data goes stale"><button type="button" class="kiosk-close" data-kiosk-close>Close</button><div class="instrument-wrap"><StaleStateLab /></div></dialog>
+  <dialog class="kiosk" id="kiosk-motor-bus" aria-label="Plan the arm bus"><button type="button" class="kiosk-close" data-kiosk-close>Close</button><MotorBusKiosk /></dialog>
+  <dialog class="kiosk" id="kiosk-hash-chain" aria-label="Change one record"><button type="button" class="kiosk-close" data-kiosk-close>Close</button><div class="instrument-wrap"><BlackBoxDemo /></div></dialog>
+  <dialog class="kiosk kiosk-wide" id="kiosk-snake-lab" aria-label="Train a policy yourself"><button type="button" class="kiosk-close" data-kiosk-close>Close</button><div class="instrument-wrap"><SnakeRewardLab /></div></dialog>
+  <dialog class="kiosk kiosk-wide" id="kiosk-rover-sim" aria-label="Drop an obstacle"><button type="button" class="kiosk-close" data-kiosk-close>Close</button><RoverSonarSim /></dialog>
+  <dialog class="kiosk" id="kiosk-poisson" aria-label="Expected goals in, outcomes out"><button type="button" class="kiosk-close" data-kiosk-close>Close</button><PoissonExplorer /></dialog>
+  <dialog class="kiosk" id="kiosk-signature" aria-label="Sign it, then tamper with it"><button type="button" class="kiosk-close" data-kiosk-close>Close</button><SignatureKiosk /></dialog>
+  <dialog class="kiosk" id="kiosk-hvac" aria-label="Comfort, calculated"><button type="button" class="kiosk-close" data-kiosk-close>Close</button><div class="instrument-wrap"><HvacSimulator /></div></dialog>
+  <dialog class="lightbox" data-lightbox-dialog aria-label="Exhibit image"><button type="button" class="kiosk-close" data-kiosk-close>Close</button><img alt="" data-lightbox-img /><p data-lightbox-caption></p></dialog>
 
   <SiteTerminal />
 </SiteLayout>
 
 <script>
-  // Top bar turns solid once the hero is behind it.
-  const topbar = document.querySelector<HTMLElement>('[data-topbar]');
-  const hero = document.querySelector<HTMLElement>('[data-hero]');
-  if (topbar && hero) {
-    const sync = () => topbar.classList.toggle('is-solid', hero.getBoundingClientRect().bottom < topbar.offsetHeight);
-    window.addEventListener('scroll', sync, { passive: true });
-    sync();
+  import { startMuseum } from '../scripts/museum/museum';
+
+  const museum = document.querySelector<HTMLElement>('[data-museum]');
+  const send = (room: string, key: string, value: number) => dispatchEvent(new CustomEvent('museum:control', { detail: { room, key, value } }));
+
+  // WebGL is optional: without it the rooms collapse into readable placards with images.
+  if (museum) {
+    const probe = document.createElement('canvas');
+    const gl = probe.getContext('webgl2') ?? probe.getContext('webgl');
+    if (!gl) museum.classList.add('is-static');
+    else void startMuseum(museum).catch(() => museum.classList.add('is-static'));
   }
 
-  // Project rail tracks the case in view.
-  const links = new Map([...document.querySelectorAll<HTMLAnchorElement>('[data-rail-link]')].map((link) => [link.dataset.railLink, link]));
-  const spy = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (!entry.isIntersecting) return;
-      links.forEach((link) => link.removeAttribute('aria-current'));
-      links.get((entry.target as HTMLElement).dataset.case)?.setAttribute('aria-current', 'true');
+  const floorplan = document.querySelector<HTMLElement>('.floorplan');
+  if (museum && floorplan) new IntersectionObserver(([entry]) => floorplan.classList.toggle('is-hidden', !entry.isIntersecting), { rootMargin: '-40% 0px -40% 0px' }).observe(museum);
+
+  const topbar = document.querySelector<HTMLElement>('[data-topbar]');
+  const syncBar = () => topbar?.classList.toggle('is-solid', scrollY > innerHeight * 0.6);
+  addEventListener('scroll', syncBar, { passive: true });
+  syncBar();
+
+  // Arm controls drive the real URDF model in the hall.
+  document.querySelectorAll<HTMLInputElement>('[data-arm-joint]').forEach((input) => {
+    input.addEventListener('input', () => {
+      send('waybionic-ground-station', input.dataset.armJoint ?? '', Number(input.value));
+      const label = input.closest('label')?.querySelector('[data-joint-value]');
+      if (label) label.textContent = `${Math.round((Number(input.value) * 180) / Math.PI)}°`;
     });
-  }, { rootMargin: '-45% 0px -50% 0px' });
-  document.querySelectorAll('[data-case]').forEach((node) => spy.observe(node));
+  });
+  const sun = document.querySelector<HTMLInputElement>('[data-sun]');
+  sun?.addEventListener('input', () => {
+    send('southpoint', 'sun', Number(sun.value));
+    const label = document.querySelector('[data-sun-value]');
+    if (label) label.textContent = `${Math.round((Number(sun.value) * 180) / Math.PI)}°`;
+  });
+  document.querySelector('[data-tamper]')?.addEventListener('click', () => send('physical-ai-blackbox', 'tamper', 1));
+  document.querySelector('[data-chain-mutate]')?.addEventListener('click', () => send('physical-ai-blackbox', 'tamper', 1));
+
+  const hold = document.querySelector<HTMLButtonElement>('[data-wash-hold]');
+  if (hold) {
+    const on = () => { send('chinook-clean', 'spray', 1); hold.classList.add('is-held'); };
+    const off = () => { send('chinook-clean', 'spray', 0); hold.classList.remove('is-held'); };
+    hold.addEventListener('pointerdown', (event) => { hold.setPointerCapture(event.pointerId); on(); });
+    hold.addEventListener('pointerup', off);
+    hold.addEventListener('pointercancel', off);
+    hold.addEventListener('keydown', (event) => { if ((event.key === ' ' || event.key === 'Enter') && !event.repeat) { event.preventDefault(); on(); } });
+    hold.addEventListener('keyup', (event) => { if (event.key === ' ' || event.key === 'Enter') off(); });
+    hold.addEventListener('blur', off);
+  }
+  document.querySelector('[data-wash-reset]')?.addEventListener('click', () => send('chinook-clean', 'reset', 1));
+
+  document.querySelectorAll<HTMLButtonElement>('[data-curtain]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const closed = button.getAttribute('aria-pressed') !== 'true';
+      button.setAttribute('aria-pressed', String(closed));
+      button.textContent = closed ? 'Open the curtains' : 'Draw the curtains';
+      send(button.dataset.curtain ?? '', 'curtain', closed ? 0 : 1);
+    });
+  });
+
+  // Kiosks and the lightbox are native modal dialogs: focus is trapped and Escape closes them.
+  document.querySelectorAll<HTMLButtonElement>('[data-kiosk-open]').forEach((button) => {
+    button.addEventListener('click', () => document.querySelector<HTMLDialogElement>(`#${button.dataset.kioskOpen}`)?.showModal());
+  });
+  document.querySelectorAll<HTMLDialogElement>('dialog.kiosk, dialog.lightbox').forEach((dialog) => {
+    dialog.querySelector('[data-kiosk-close]')?.addEventListener('click', () => dialog.close());
+    dialog.addEventListener('click', (event) => { if (event.target === dialog) dialog.close(); });
+  });
+  const lightbox = document.querySelector<HTMLDialogElement>('[data-lightbox-dialog]');
+  document.querySelectorAll<HTMLButtonElement>('[data-lightbox]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const image = lightbox?.querySelector<HTMLImageElement>('[data-lightbox-img]');
+      const caption = lightbox?.querySelector<HTMLElement>('[data-lightbox-caption]');
+      if (image) { image.src = button.dataset.lightbox ?? ''; image.alt = button.querySelector('img')?.alt ?? ''; }
+      if (caption) caption.textContent = button.dataset.caption ?? '';
+      lightbox?.showModal();
+    });
+  });
 </script>

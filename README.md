@@ -24,7 +24,7 @@ The original WayBionic arm video was compressed to `public/assets/waybionic/arm-
 
 The static build has three routes:
 
-- `/`: the main portfolio ("Workcell"), a scrolling page with a live Three.js robot arm in the hero.
+- `/`: the main portfolio, "The Collection": a scroll-driven walk through a red-walled museum hall at night, rendered with Three.js behind HTML placards.
 - `/os/`: the classic AjmalOS desktop, kept as-is and linked from the contact section and the terminal (`os`).
 - `/404.html`: the not-found page.
 
@@ -38,13 +38,18 @@ Project entries live in `src/content/projects/`; the schema is defined in `src/c
 
 Everything that is not a project (roles, education, awards, certifications, skills mapped to projects, roadmap, coursework, GitHub snapshot) lives in `src/data/profile.ts`. Every skill lists the project ids where it was used, and the Toolbox section links to those projects.
 
-## Design system
+## Design system and the museum
 
-`src/styles/site.css` defines the tokens: night navy `#0a1322`, drafting-film paper `#e6eaec`, safety-tape yellow `#ffc72c` (status and primary actions only), and telemetry cyan `#5cc8d6` (live data only). Type is Big Shoulders Display (headlines), Instrument Sans (body), and IBM Plex Mono (data only). Interactive demos sit in dark "instrument" panels.
+The page is a red-walled picture gallery at night: crimson damask, ebonised wainscoting, black marble plinths, gilt frames, black velvet curtains, and Garamond (Cormorant Garamond for display, EB Garamond for text, IBM Plex Mono for data). Tokens live at the top of `src/styles/site.css`.
 
-The hero arm (`src/components/site/WorkcellHero.astro`) is built from primitives with no model files. It solves closed-form inverse kinematics toward the pointer: base yaw from the target bearing, a two-link planar solve for the wrist centre, and a wrist angle that holds the tool pitch. A critically damped spring drives each joint toward the solution. The scene renders only while the hero is on screen, caps the pixel ratio at 2 (1.5 on narrow screens), and skips the power-up and idle sweep when reduced motion is requested.
+- `src/data/exhibits.ts` defines the tour: room order, accession numbers, screenshots ("paintings"), the sculpture on each plinth, the kiosk demo, and the placard control.
+- `src/scripts/museum/museum.ts` builds the hall and maps scroll position to a camera path through the rooms. Each room "wakes" (picture lights, curtains, motion) as the visitor arrives. A torch follows the pointer, and curtains open on arrival or on click.
+- `src/scripts/museum/sculptures.ts` holds the plinth pieces: an IK arm at the entrance, the WayBionic old arm loaded from its real URDF and STL meshes (`public/models/waybionic-old-arm/`, MIT), a CAN motor bus, a hash chain that fails after a tampered block, a learning snake, a sonar rover, the Moon with a movable sun, and a slab you pressure-wash.
+- `src/scripts/museum/interior.ts` draws every texture on a canvas at load, so the hall ships no image files.
+- Placard controls (`museum:control` window events) drive the sculptures. Kiosks are native `<dialog>` elements holding the full interactive demos.
+- Without WebGL, or with it failing, the museum collapses into a readable column of placards with screenshots (`.museum.is-static`). Reduced motion snaps the camera between rooms.
 
-Technical claims are limited to inspected source or approved records. The portfolio's Snake Reward Lab is a separate, browser-only tabular Q-learning demonstration; it is not the Python PPO runner in Teach to Game. Its reward readout is a stochastic training metric, not a held-out result, and neither its policy nor score is saved. Aircade motion controls remain labeled experimental until the full device-to-game path has been tested on hardware.
+Screenshots in `public/exhibits/` were captured from each project running locally (Soccer Lab, SouthPoint, Aircade, Proofly, Teach to Game) or the live HVAC Express site.
 
 ## Architecture, accessibility, and evidence
 

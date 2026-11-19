@@ -1,0 +1,53 @@
+<div class="instrument sig-kiosk" data-sig-kiosk>
+  <div class="instrument-head">
+    <span class="instrument-title">Sign it, then tamper with it</span>
+    <span class="instrument-chip">Ed25519 in your browser</span>
+  </div>
+  <label class="sig-label" for="sig-text">A vouch (fictional)</label>
+  <textarea id="sig-text" data-sig-text rows="3">Priya ran the library's weekly tech-help hour for six weeks and patiently walked seniors through their first video calls.</textarea>
+  <div class="instrument-actions">
+    <button type="button" data-sig-sign>Sign with a new key</button>
+    <button type="button" data-sig-verify disabled>Verify the text as it is now</button>
+  </div>
+  <dl class="instrument-stats">
+    <div><dt>public key</dt><dd data-sig-key>--</dd></div>
+    <div><dt>signature</dt><dd data-sig-value>--</dd></div>
+    <div><dt>result</dt><dd data-sig-result role="status">not signed</dd></div>
+  </dl>
+  <p class="instrument-note">Sign, then change a single character and verify again. This is the property Proofly relies on: a signature proves the words weren't edited after signing. It does not prove they are true. The key exists only in this tab.</p>
+</div>
+
+<script>
+  const kiosk = document.querySelector<HTMLElement>('[data-sig-kiosk]');
+  if (kiosk) {
+    const text = kiosk.querySelector<HTMLTextAreaElement>('[data-sig-text]');
+    const verifyButton = kiosk.querySelector<HTMLButtonElement>('[data-sig-verify]');
+    const out = (selector: string, value: string) => { const node = kiosk.querySelector<HTMLElement>(selector); if (node) node.textContent = value; };
+    const hex = (buffer: ArrayBuffer) => [...new Uint8Array(buffer)].map((byte) => byte.toString(16).padStart(2, '0')).join('');
+    let keys: CryptoKeyPair | undefined;
+    let signature: ArrayBuffer | undefined;
+    const encode = () => new TextEncoder().encode(text?.value ?? '');
+
+    kiosk.querySelector('[data-sig-sign]')?.addEventListener('click', async () => {
+      try {
+        keys = await crypto.subtle.generateKey({ name: 'Ed25519' }, false, ['sign', 'verify']) as CryptoKeyPair;
+        signature = await crypto.subtle.sign({ name: 'Ed25519' }, keys.privateKey, encode());
+        out('[data-sig-key]', `${hex(await crypto.subtle.exportKey('raw', keys.publicKey)).slice(0, 16)}…`);
+        out('[data-sig-value]', `${hex(signature).slice(0, 16)}…`);
+        out('[data-sig-result]', 'signed, now edit and verify');
+        kiosk.dataset.state = 'signed';
+        if (verifyButton) verifyButton.disabled = false;
+      } catch {
+        out('[data-sig-result]', 'this browser does not support Ed25519 in Web Crypto yet');
+        kiosk.dataset.state = 'error';
+      }
+    });
+
+    verifyButton?.addEventListener('click', async () => {
+      if (!keys || !signature) return;
+      const valid = await crypto.subtle.verify({ name: 'Ed25519' }, keys.publicKey, signature, encode());
+      out('[data-sig-result]', valid ? 'valid: unchanged since signing' : 'invalid: the text was edited');
+      kiosk.dataset.state = valid ? 'valid' : 'invalid';
+    });
+  }
+</script>

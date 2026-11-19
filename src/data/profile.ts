@@ -20,22 +20,41 @@ export interface Role {
 
 export const roles: Role[] = [
   {
+    start: 'Oct 2026',
+    end: 'Present',
+    org: 'Schulich Space Rover Team, University of Calgary',
+    title: 'Controls Software Team',
+    kind: 'club',
+    points: [
+      'Control software for a Mars-style rover and robotic arm built for the Canadian International Rover Challenge.',
+      'Wrote the arm motor integration study: how three Damiao CAN motors reach the rover computer through USB-to-CAN and SocketCAN, and which driver path to own.'
+    ]
+  },
+  {
+    start: 'Oct 2026',
+    end: 'Nov 2026',
+    org: 'Elections Alberta',
+    title: 'Counting Officer',
+    kind: 'work',
+    points: ['Counted, verified, and recorded ballots under strict handling and reporting procedures.']
+  },
+  {
     start: 'Sep 2026',
     end: 'Present',
     org: 'Cybersecurity Club, University of Calgary',
     title: 'Junior Executive',
     kind: 'club',
-    points: ['Supports workshops, learning resources, and educational initiatives for members.']
+    points: ['Plans and delivers workshops, learning resources, and educational initiatives for members.']
   },
   {
     start: 'Aug 2026',
     end: 'Present',
     org: 'WayBionic Robotics, University of Calgary',
-    title: 'Member, ground station',
+    title: 'Software Team Member',
     kind: 'club',
     points: [
-      'Built the movement-test panels and the diagnostics behaviour that surfaces stale joint values and errors inside RViz.',
-      'Changed the arm wiring to match the control code.'
+      'Built the ROS 2 diagnostics CLI, now merged: snapshot and live-watch modes, per-signal age tracking, and stale and future-dated sample detection, backed by 11 regression tests on ROS 2 Jazzy.',
+      'Built the movement-test panels and the RViz diagnostics behaviour, and changed the arm wiring to match the control code.'
     ]
   },
   {
@@ -52,7 +71,7 @@ export const roles: Role[] = [
     org: 'Mount Royal University',
     title: 'Learning Peer (Tutor)',
     kind: 'teaching',
-    points: ['One-on-one academic support in technical coursework, with materials written to improve student comprehension.']
+    points: ['Tutored students one-on-one and in groups, including Math 30-1 and 31, and wrote study materials to improve comprehension.']
   },
   {
     start: 'Mar 2024',
@@ -62,7 +81,7 @@ export const roles: Role[] = [
     kind: 'work',
     points: [
       'Owns the technical infrastructure for a family-run heating and cooling company: website, hosting, and lead generation.',
-      'Sells directly to clients in a commission-driven environment, translating service specs into terms customers can act on.'
+      'Sells directly to walk-in and inbound customers in a commission-driven environment, translating service specs into choices people can act on.'
     ]
   },
   {
@@ -72,6 +91,14 @@ export const roles: Role[] = [
     title: 'Owner & operator',
     kind: 'business',
     points: ['Runs a power-washing business end to end: customer conversations, scheduling, equipment, and the work itself.']
+  },
+  {
+    start: 'Sep 2022',
+    end: 'Jun 2023',
+    org: 'TEDxIsmaili (TedEd Club)',
+    title: 'Operations Manager, volunteer',
+    kind: 'club',
+    points: ['Ran the event website and technical responsibilities, and helped plan the in-person event.']
   }
 ];
 
@@ -84,7 +111,7 @@ export const education = [
   },
   {
     school: 'Mount Royal University',
-    credential: 'B.Sc. Computer Information Systems (transferred)',
+    credential: 'B.Sc. & Business, Computer Science & Finance (transferred)',
     when: 'Before UCalgary',
     notes: ["Dean's List"]
   }
@@ -98,6 +125,7 @@ export const awards = [
 ];
 
 export const certifications = [
+  { name: 'Fundamentals of Machine Learning and AI', issuer: 'Amazon Web Services', when: 'Oct 2026' },
   { name: 'Introduction to Cybersecurity', issuer: 'Cisco', when: 'Jul 2026' },
   { name: 'Introduction to Generative AI', issuer: 'Google', when: 'Jul 2026' },
   { name: 'Introduction to Large Language Models', issuer: 'Google', when: 'Jul 2026' }
@@ -121,6 +149,7 @@ export const skills: Skill[] = [
   { name: 'Swift', group: 'Languages', used: ['aircade'] },
   { name: 'ROS 2 Jazzy', group: 'Robotics & control', used: ['waybionic-ground-station'] },
   { name: 'RViz', group: 'Robotics & control', used: ['waybionic-ground-station'] },
+  { name: 'CAN bus / SocketCAN', group: 'Robotics & control', used: ['rover-arm-motors'] },
   { name: 'Phidgets SDK', group: 'Robotics & control', used: ['autonomous-rover'] },
   { name: 'Inverse kinematics', group: 'Robotics & control', used: ['portfolio'] },
   { name: 'MuJoCo / LeRobot', group: 'Robotics & control', used: ['robotics-roadmap'], learning: true },
@@ -130,11 +159,14 @@ export const skills: Skill[] = [
   { name: 'Tabular Q-learning', group: 'Machine learning', used: ['teach-to-game', 'portfolio'] },
   { name: 'Poisson outcome models', group: 'Machine learning', used: ['soccer-intelligence'] },
   { name: 'React', group: 'Web & product', used: ['soccer-intelligence', 'southpoint'] },
+  { name: 'Node.js / Express', group: 'Web & product', used: ['proofly'] },
+  { name: 'FastAPI', group: 'Web & product', used: ['southpoint'] },
   { name: 'Next.js', group: 'Web & product', used: ['soccer-intelligence'] },
   { name: 'Three.js', group: 'Web & product', used: ['southpoint', 'aircade', 'portfolio'] },
   { name: 'Astro', group: 'Web & product', used: ['portfolio'] },
   { name: 'WordPress / PHP', group: 'Web & product', used: ['hvac-express'] },
   { name: 'Hash chains & signatures', group: 'Infrastructure & security', used: ['physical-ai-blackbox', 'proofly'] },
+  { name: 'Regression testing', group: 'Infrastructure & security', used: ['waybionic-ground-station', 'proofly', 'teach-to-game'] },
   { name: 'Hostinger & DNS', group: 'Infrastructure & security', used: ['hvac-express', 'portfolio'] },
   { name: 'SEO & Search Console', group: 'Infrastructure & security', used: ['hvac-express'] },
   { name: 'Playwright', group: 'Infrastructure & security', used: ['teach-to-game', 'portfolio'] },
@@ -157,6 +189,7 @@ export const coursework = [
 ];
 
 export const offline = [
+  { title: 'Plasma physics', detail: 'Wrote a 27-page feasibility study on what a real lightsaber would take.' },
   { title: 'Banff trails', detail: 'Johnston Canyon, Big Beehive, Sarrail Ridge.' },
   { title: 'Star Wars', detail: 'Legends and canon, deep in the rabbit hole.' },
   { title: 'Fast cars', detail: 'The faster and stranger the engineering, the better.' },
@@ -178,3 +211,18 @@ export const githubSnapshot = {
     { name: 'soccer-hackathon-project', language: 'TypeScript', pushed: '2026-10-15' }
   ]
 };
+
+// The Societies Room: clubs and teams (current first), then hackathons, from LinkedIn and repos.
+export const societies = [
+  { title: 'WayBionic Robotics', role: 'Software Team Member', when: 'Aug 2026 – now', detail: 'A remotely operated surgical robot for space and remote care. I write ground-station diagnostics and motion-test tooling in ROS 2.', link: '#waybionic-ground-station' },
+  { title: 'Schulich Space Rover Team', role: 'Controls Software', when: 'Oct 2026 – now', detail: 'A Mars-style rover and robotic arm for the Canadian International Rover Challenge. I am working on the arm’s motor integration.', link: '#rover-arm-motors' },
+  { title: 'UCalgary Cybersecurity Club', role: 'Junior Executive', when: 'Sep 2026 – now', detail: 'Planning workshops, learning resources, and educational initiatives for members.' },
+  { title: 'NASA Space Apps Calgary', role: 'SouthPoint', when: 'Nov 2026', detail: 'Lunar landing-site navigator, built in a weekend with a five-person team at the Aerospace Innovation Hub.', link: '#southpoint' },
+  { title: 'Hack the Change 2026', role: 'Proofly', when: 'Nov 2026', detail: 'Code the Change YYC’s hackathon: signed, verifiable evidence of skills from community work.', link: '#proofly' },
+  { title: 'MRUHacks', role: 'Aircade', when: 'Oct 2026', detail: 'A five-game arcade with experimental AirPods motion controls.', link: '#aircade' }
+];
+
+export const pastSocieties = [
+  { title: 'TEDxIsmaili', role: 'Operations Manager', when: 'Sep 2022 – Jun 2023' },
+  { title: 'Mount Royal University', role: 'Learning Peer', when: '2025 – 2026' }
+];

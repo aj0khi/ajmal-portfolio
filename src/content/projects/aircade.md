@@ -18,4 +18,6 @@ highlights:
   - "Five browser games: Pong, Snake, Breakout, Bowling, Tanks."
   - "Swift CoreMotion sender and sample normaliser."
   - "Local WebSocket relay between phone, AirPods, and browser."
+team: Built at MRUHacks with Mudassar Alvi, Tung Le, Mia Ahamed, and Pranav Kumar.
+lesson: "The idea was to use the motion sensors already inside AirPods like a Wii Remote. The hard part was not the games but the path from a head-worn sensor to a browser: pairing, permissions, calibration, and a relay. That is why keyboard play stays the reliable fallback."
 ---

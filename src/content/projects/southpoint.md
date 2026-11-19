@@ -19,4 +19,6 @@ highlights:
   - "Terrain service: LOLA DEM elevation, cross-sections, and illumination maps."
   - "Heuristic screening score combining sunlight, Earth visibility, and slope."
   - "Compare two or three site and date combinations side by side."
+team: Built at NASA Space Apps Calgary, hosted by the Aerospace Innovation Hub, with Farhad Alizada, Orlando Ormon, Diego Gonzalez, and Qanita Farrukh.
+lesson: "A seemingly simple question, where should we land, turns into a mix of orbital geometry, terrain data, and interface design. Where terrain data was missing, we labelled the illustrative synthetic terrain rather than hiding it."
 ---
