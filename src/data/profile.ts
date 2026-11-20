@@ -177,7 +177,7 @@ export const roadmap = [
   { tool: 'LeRobot in MuJoCo', skill: 'Imitation learning', why: 'Learn manipulation on the simulated SO-101 arm instead of buying the physical kit.', state: 'current' },
   { tool: 'NVIDIA Isaac Lab', skill: 'Reinforcement-learning locomotion', why: 'Move from copying demonstrations to learning from reward.', state: 'queued' },
   { tool: 'ROS 2 Nav2 + SLAM', skill: 'Navigation and mapping', why: 'Close the loop between perception, maps, and motion.', state: 'queued' },
-  { tool: 'SmolVLA fine-tuning', skill: 'Vision-language-action models', why: 'Stretch goal: language-conditioned control.', state: 'stretch' }
+  { tool: 'SmolVLA fine-tuning', skill: 'Vision-language-action models', why: 'Fine-tune a small vision-language-action model so a simulated arm follows a typed instruction.', state: 'stretch' }
 ] as const;
 
 export const coursework = [

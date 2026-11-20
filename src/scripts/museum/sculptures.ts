@@ -12,8 +12,8 @@ export interface Sculpture {
 
 export const palette = {
   brass: 0xd4a94f,
-  teal: 0x2bb3a8,
-  data: 0x5cc8d6,
+  teal: 0x4f8f7d,
+  data: 0x80bba7,
   fault: 0xff6a5c,
   steel: 0x2a3a40,
   bone: 0xe9ece6

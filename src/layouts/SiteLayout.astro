@@ -41,21 +41,6 @@ const {
     <script>
       if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => undefined);
       document.documentElement.classList.add('js');
-
-      // Reveal once on enter. Content is visible by default; the class only exists when JS runs.
-      const items = document.querySelectorAll<HTMLElement>('[data-reveal]');
-      if (matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) {
-        items.forEach((item) => item.classList.add('is-in'));
-      } else {
-        const observer = new IntersectionObserver((entries) => {
-          entries.forEach((entry) => {
-            if (!entry.isIntersecting) return;
-            entry.target.classList.add('is-in');
-            observer.unobserve(entry.target);
-          });
-        }, { rootMargin: '0px 0px -12% 0px' });
-        items.forEach((item) => observer.observe(item));
-      }
     </script>
   </body>
 </html>

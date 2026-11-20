@@ -37,6 +37,23 @@ const armJoints = [
   { name: 'old_arm_elbow_pitch_joint', label: 'elbow_pitch', min: -1.073, max: 2.068, value: 0.6 },
   { name: 'old_arm_wrist_roll_joint', label: 'wrist_roll', min: -0.48, max: 4.232, value: 1.5 }
 ];
+// The annotated decision: each line names the note that explains it, and the pin marks where
+// that note's lines start, so reading a note lights the config it describes.
+const decisionLines: { html: string; note?: string; pin?: boolean }[] = [
+  { html: '<span class="c"># ground station launch: how the decision reads as config</span>' },
+  { html: '<span class="k">drives</span>:', note: '1' },
+  { html: '  <span class="k">source</span>: <span class="v">simulated</span>        <span class="c"># MKS CAN drives</span>', note: '1', pin: true },
+  { html: '  <span class="k">live_hardware</span>: <span class="v">opt_in</span>', note: '1' },
+  { html: '<span class="k">diagnostics</span>:' },
+  { html: '  <span class="k">mode</span>: <span class="v">monitor_only</span>     <span class="c"># never commands</span>', note: '2', pin: true },
+  { html: '  <span class="k">flag</span>: [<span class="v">stale</span>, <span class="v">future_dated</span>, <span class="v">error</span>]', note: '3', pin: true },
+  { html: '  <span class="k">merge</span>: <span class="v">per_publisher</span>    <span class="c"># one sensor can\'t hide another\'s fault</span>', note: '4', pin: true },
+  { html: '<span class="k">joint_state</span>:' },
+  { html: '  <span class="k">label</span>: <span class="v">commanded | estimated | measured</span>' },
+  { html: '<span class="k">motion</span>:' },
+  { html: '  <span class="k">checks</span>: [<span class="v">joint_limits</span>, <span class="v">collision</span>]' }
+];
+
 const rooms = [{ id: 'entrance', name: 'Entrance' }, { id: 'thread', name: 'The thread' }, { id: 'societies', name: 'The Societies Room' }, ...exhibits.map((exhibit) => ({ id: exhibit.id, name: shortTitle(exhibit.entry.data.title) })), { id: 'next-wing', name: 'The next wing' }];
 ---
 
@@ -50,7 +67,8 @@ const rooms = [{ id: 'entrance', name: 'Entrance' }, { id: 'thread', name: 'The 
       <a href="#toolbox">Toolbox</a>
       <a href="#contact">Contact</a>
     </nav>
-    <a class="btn btn-small" href={contact.resume} download>Resume</a>
+    <button type="button" class="term-launch" data-term-open aria-keyshortcuts="Control+K"><span>Terminal</span><kbd>Ctrl K</kbd></button>
+    <a class="btn btn-ghost btn-small" href={contact.resume} download>Resume</a>
   </header>
 
   <nav class="floorplan" aria-label="Museum floor plan">
@@ -241,42 +259,33 @@ const rooms = [{ id: 'entrance', name: 'Entrance' }, { id: 'thread', name: 'The 
 
     <section class="thinking night" id="thinking" data-term-target aria-labelledby="thinking-title">
       <div class="shell">
-        <div data-reveal>
+        <div>
           <h2 id="thinking-title" class="section-title">How I make a call</h2>
           <p class="section-intro">One real decision from WayBionic, annotated. The arm is surgical hardware; the ground station is the first place a mistake would show up.</p>
         </div>
-        <div class="decision" data-reveal>
-          <pre class="decision-code" aria-label="Illustrative ground-station launch parameters"><code><span class="ln">1</span><span class="c"># ground station launch: how the decision reads as config</span>
-<span class="ln">2</span><span class="k">drives</span>:
-<span class="ln">3</span>  <span class="k">source</span>: <span class="v">simulated</span>        <span class="c"># MKS CAN drives</span>
-<span class="ln">4</span>  <span class="k">live_hardware</span>: <span class="v">opt_in</span>
-<span class="ln">5</span><span class="k">diagnostics</span>:
-<span class="ln">6</span>  <span class="k">mode</span>: <span class="v">monitor_only</span>     <span class="c"># never commands</span>
-<span class="ln">7</span>  <span class="k">flag</span>: [<span class="v">stale</span>, <span class="v">future_dated</span>, <span class="v">error</span>]
-<span class="ln">8</span>  <span class="k">merge</span>: <span class="v">per_publisher</span>    <span class="c"># one sensor can't hide another's fault</span>
-<span class="ln">9</span><span class="k">joint_state</span>:
-<span class="ln">10</span>  <span class="k">label</span>: <span class="v">commanded | estimated | measured</span>
-<span class="ln">11</span><span class="k">motion</span>:
-<span class="ln">12</span>  <span class="k">checks</span>: [<span class="v">joint_limits</span>, <span class="v">collision</span>]</code></pre>
+        <div class="decision">
+          <pre class="decision-code" aria-label="Illustrative ground-station launch parameters"><code>{decisionLines.map((line, index) => (
+            <span class="line" data-note={line.note}><span class="ln">{index + 1}</span><Fragment set:html={line.html} />{line.pin ? <i class="pin" aria-hidden="true">{line.note}</i> : null}</span>
+          ))}</code></pre>
           <ol class="decision-notes">
-            <li><strong>Simulation is the default.</strong> Motion tests publish to a simulated joint-state driver. Touching the real arm is a deliberate opt-in, not the path you fall into.</li>
-            <li><strong>The monitor watches; it never drives.</strong> A read-only diagnostics panel means a UI bug can mislead an operator but cannot move a joint.</li>
-            <li><strong>Old data must look old.</strong> Code review on my diagnostics CLI caught old samples shown as fresh. A stale value that looks current is worse than no value, so stale and future-dated samples are flagged.</li>
-            <li><strong>One sensor can't hide another's fault.</strong> Review also caught a fault vanishing when a different sensor updated. Status is now merged per publisher, and each fix has a regression test: 11 passing on ROS 2 Jazzy.</li>
+            <li tabindex="0" data-note="1"><strong>Simulation is the default.</strong> Motion tests publish to a simulated joint-state driver. Touching the real arm is a deliberate opt-in, not the path you fall into.</li>
+            <li tabindex="0" data-note="2"><strong>The monitor watches; it never drives.</strong> A read-only diagnostics panel means a UI bug can mislead an operator but cannot move a joint.</li>
+            <li tabindex="0" data-note="3"><strong>Old data must look old.</strong> Code review on my diagnostics CLI caught old samples shown as fresh. A stale value that looks current is worse than no value, so stale and future-dated samples are flagged.</li>
+            <li tabindex="0" data-note="4"><strong>One sensor can't hide another's fault.</strong> Review also caught a fault vanishing when a different sensor updated. Status is now merged per publisher, and each fix has a regression test: 11 passing on ROS 2 Jazzy.</li>
           </ol>
         </div>
-        <p class="fine" data-reveal>The config block paraphrases the decisions for reading; it is not copied from the team repository.</p>
+        <p class="fine">The config block paraphrases the decisions for reading; it is not copied from the team repository.</p>
       </div>
     </section>
 
     <section class="experience paper" id="experience" data-term-target aria-labelledby="experience-title">
       <div class="shell">
-        <h2 id="experience-title" class="section-title" data-reveal>Experience</h2>
+        <h2 id="experience-title" class="section-title">Experience</h2>
         <div class="exp-grid">
           <ol class="timeline">
             {roles.map((role) => (
-              <li data-kind={role.kind} data-reveal>
-                <p class="when">{role.start} to {role.end}</p>
+              <li data-kind={role.kind}>
+                <p class="when">{role.start === 'Ongoing' ? 'Ongoing' : `${role.start} to ${role.end}`}</p>
                 <h3>{role.title}</h3>
                 <p class="org">{role.org}</p>
                 <ul>{role.points.map((point) => <li>{point}</li>)}</ul>
@@ -284,7 +293,7 @@ const rooms = [{ id: 'entrance', name: 'Entrance' }, { id: 'thread', name: 'The 
             ))}
           </ol>
           <aside class="exp-side">
-            <div class="exp-block" data-reveal>
+            <div class="exp-block">
               <h3>Education</h3>
               {education.map((item) => (
                 <div class="edu">
@@ -295,11 +304,11 @@ const rooms = [{ id: 'entrance', name: 'Entrance' }, { id: 'thread', name: 'The 
                 </div>
               ))}
             </div>
-            <div class="exp-block" data-reveal>
+            <div class="exp-block">
               <h3>Awards</h3>
               <ul class="plain">{awards.map((award) => <li><strong>{award.name}</strong><span>{award.detail}</span></li>)}</ul>
             </div>
-            <div class="exp-block" data-reveal>
+            <div class="exp-block">
               <h3>Certifications</h3>
               <ul class="plain">{certifications.map((cert) => <li><strong>{cert.name}</strong><span>{cert.issuer}, {cert.when}</span></li>)}</ul>
             </div>
@@ -310,13 +319,13 @@ const rooms = [{ id: 'entrance', name: 'Entrance' }, { id: 'thread', name: 'The 
 
     <section class="toolbox paper-deep" id="toolbox" data-term-target aria-labelledby="toolbox-title">
       <div class="shell">
-        <div data-reveal>
+        <div>
           <h2 id="toolbox-title" class="section-title">Toolbox</h2>
           <p class="section-intro">No skill bars. Each tool links to the exhibits where it was actually used, so you can walk back and check. Hatched entries are on the roadmap and still being learned.</p>
         </div>
         <div class="skill-groups">
           {skillGroups.map(({ group, items }) => (
-            <div class="skill-group" data-reveal>
+            <div class="skill-group">
               <h3>{group}</h3>
               <ul>
                 {items.map((skill) => (
@@ -336,11 +345,11 @@ const rooms = [{ id: 'entrance', name: 'Entrance' }, { id: 'thread', name: 'The 
 
     <section class="next night" id="next" data-term-target aria-labelledby="next-title">
       <div class="shell">
-        <div data-reveal>
+        <div>
           <h2 id="next-title" class="section-title">Where this is heading</h2>
           <p class="section-intro">Simulation first: each stage teaches a skill the next one needs, and none of them waits on hardware.</p>
         </div>
-        <ol class="route" data-reveal>
+        <ol class="route">
           {roadmap.map((stop, index) => (
             <li data-state={stop.state}>
               <span class="route-step">{index + 1}</span>
@@ -351,7 +360,7 @@ const rooms = [{ id: 'entrance', name: 'Entrance' }, { id: 'thread', name: 'The 
             </li>
           ))}
         </ol>
-        <article class="research" data-reveal>
+        <article class="research">
           <div>
             <p class="research-kind">Personal research, 27-page design study and preprint</p>
             <h3>What would a real lightsaber take?</h3>
@@ -369,12 +378,11 @@ const rooms = [{ id: 'entrance', name: 'Entrance' }, { id: 'thread', name: 'The 
 
     <section class="activity paper" id="activity" data-term-target aria-labelledby="activity-title">
       <div class="shell activity-grid">
-        <div data-reveal>
+        <div>
           <h2 id="activity-title" class="section-title">Recent activity</h2>
-          <p class="section-intro">Pulled from GitHub when the page loads, with a dated snapshot as the fallback.</p>
           <GithubPulse />
         </div>
-        <div data-reveal>
+        <div>
           <h3 class="minor-title">Smaller builds and coursework</h3>
           <ul class="coursework">
             {coursework.map((item) => (
@@ -392,10 +400,10 @@ const rooms = [{ id: 'entrance', name: 'Entrance' }, { id: 'thread', name: 'The 
 
     <section class="contact night" id="contact" data-term-target aria-labelledby="contact-title">
       <div class="shell">
-        <h2 id="contact-title" class="contact-title" data-reveal>The gift shop<br />is an inbox.</h2>
-        <p class="contact-copy" data-reveal>I'm looking for software and robotics internships. The fastest way to reach me is email.</p>
-        <a class="contact-email" href={`mailto:${contact.email}`} data-reveal>{contact.email}</a>
-        <ul class="contact-links" data-reveal>
+        <h2 id="contact-title" class="contact-title">The gift shop<br />is an inbox.</h2>
+        <p class="contact-copy">I'm looking for software and robotics internships. The fastest way to reach me is email.</p>
+        <a class="contact-email" href={`mailto:${contact.email}`}>{contact.email}</a>
+        <ul class="contact-links">
           <li><a href={contact.resume} download>Resume (PDF)</a></li>
           <li><a href={contact.github} target="_blank" rel="noreferrer">GitHub</a></li>
           <li><a href={contact.linkedin} target="_blank" rel="noreferrer">LinkedIn</a></li>
@@ -443,6 +451,36 @@ const rooms = [{ id: 'entrance', name: 'Entrance' }, { id: 'thread', name: 'The 
   const syncBar = () => topbar?.classList.toggle('is-solid', scrollY > innerHeight * 0.6);
   addEventListener('scroll', syncBar, { passive: true });
   syncBar();
+
+  // Reading a note lights the config lines it explains; pointing at a line finds its note.
+  // Mouse follows hover, touch toggles on tap, and the keyboard follows focus.
+  const decision = document.querySelector<HTMLElement>('.decision');
+  if (decision) {
+    const notes = [...decision.querySelectorAll<HTMLElement>('.decision-notes [data-note]')];
+    const noteAt = (target: EventTarget | null) => (target as HTMLElement | null)?.closest<HTMLElement>('[data-note]')?.dataset.note;
+    const show = (note?: string) => {
+      if (note) decision.dataset.active = note;
+      else delete decision.dataset.active;
+      notes.forEach((item) => item.classList.toggle('is-active', item.dataset.note === note));
+    };
+    let pointer = 'mouse';
+    decision.addEventListener('pointerdown', (event) => { pointer = event.pointerType; });
+    decision.addEventListener('pointerover', (event) => {
+      if (event.pointerType !== 'mouse') return;
+      const note = noteAt(event.target);
+      if (note) show(note);
+      else if ((event.target as HTMLElement).closest('.line')) show();
+    });
+    decision.addEventListener('pointerleave', (event) => { if (event.pointerType === 'mouse') show(); });
+    decision.addEventListener('click', (event) => {
+      if (pointer === 'mouse') return;
+      const note = noteAt(event.target);
+      show(note && note !== decision.dataset.active ? note : undefined);
+    });
+    // Only keyboard focus counts here: a tap also focuses the note, and its click does the toggling.
+    decision.addEventListener('focusin', (event) => { if ((event.target as HTMLElement).matches(':focus-visible')) show(noteAt(event.target)); });
+    decision.addEventListener('focusout', (event) => { if (!decision.contains(event.relatedTarget as Node | null)) show(); });
+  }
 
   // Placards scroll with the page rather than inside themselves (an inner scroller swallows the
   // wheel and stalls the walk). A placard taller than the view pins once its bottom is visible.
