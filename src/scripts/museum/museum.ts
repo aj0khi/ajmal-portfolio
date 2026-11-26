@@ -1,14 +1,16 @@
-// "Night at the museum": one long gallery hall rendered behind the page. Scroll position
-// walks the camera from exhibit to exhibit; each exhibit wakes up (lights, motion) as the
-// visitor arrives. All content lives in the HTML placards; the canvas is decorative.
+// "Night at the museum": one long gallery hall rendered behind the page. Each scroll snaps to
+// one room; the hall cuts to that room's pose off-screen and slides in over a frozen frame of
+// the last one, so nothing between two rooms is ever drawn. Each exhibit wakes up (lights,
+// curtains, motion) as it arrives. All content lives in the HTML placards; the canvas is decorative.
 import * as THREE from 'three';
 import { damask, giltFrame, materials, parquet, pictureLight, plaque, stanchions, walnut } from './interior';
 import { barrier, hashChain, ikArm, moonGlobe, motorBus, roverLoop, snakeBoard, waybionicArm, washSlab, type IkArm, type Sculpture } from './sculptures';
+import { SWEEP } from './sweep';
+import { sweepFor, type Tour } from './tour';
 
 const SPACING = 10;
 const HALF_WIDTH = 5;
 const HEIGHT = 5.2;
-const CORRIDOR_LOOKAHEAD = 9;
 
 type Stop = { camera: THREE.Vector3; look: THREE.Vector3; focus: THREE.Vector3; wall?: { centre: THREE.Vector3; side: number; width: number } };
 type Room = {
@@ -123,19 +125,17 @@ function makeCurtain(width: number, height: number): Curtain {
   return { group, meshes: halves.map((half) => half.mesh), set };
 }
 
-export async function startMuseum(root: HTMLElement) {
+export async function startMuseum(root: HTMLElement, tour: Tour) {
   const canvas = root.querySelector<HTMLCanvasElement>('[data-museum-canvas]');
-  const roomElements = [...root.querySelectorAll<HTMLElement>('[data-room]')];
-  if (!canvas || !roomElements.length) return;
+  const live = root.querySelector<HTMLElement>('[data-stage-live]');
+  const ghost = root.querySelector<HTMLCanvasElement>('[data-stage-ghost]');
+  const ghostContext = ghost?.getContext('2d');
+  const roomElements = tour.rooms;
+  if (!canvas || !live || !ghost || !ghostContext || !roomElements.length) throw new Error('museum markup missing');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
 
-  let renderer: THREE.WebGLRenderer;
-  try {
-    renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
-  } catch {
-    root.classList.add('is-static');
-    return;
-  }
+  // Throws without WebGL; the caller falls back to the pocket guide.
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.05;
   renderer.shadowMap.enabled = true;
@@ -397,86 +397,55 @@ export async function startMuseum(root: HTMLElement) {
   });
 
   // Framing. Wall rooms are viewed nearly head-on from far enough back that the whole hang
-  // fits in the part of the screen the placard leaves free (right side, or top on phones).
-  let curveCamera: THREE.CatmullRomCurve3;
-  let curveLook: THREE.CatmullRomCurve3;
+  // fits in the part of the screen the placard leaves free (right side, or top on tall screens).
+  type Pose = { camera: THREE.Vector3; look: THREE.Vector3; right: THREE.Vector3; back: THREE.Vector3 };
+  let poses: Pose[] = [];
+  const up = new THREE.Vector3(0, 1, 0);
   const framed = (aspect: number, narrow: boolean) => rooms.map(({ stop }, index) => {
+    let pose: { camera: THREE.Vector3; look: THREE.Vector3 };
     if (!stop.wall) {
       const direction = new THREE.Vector3().subVectors(stop.look, stop.camera).normalize();
-      const right = new THREE.Vector3().crossVectors(direction, new THREE.Vector3(0, 1, 0)).normalize();
+      const right = new THREE.Vector3().crossVectors(direction, up).normalize();
       const shift = narrow ? new THREE.Vector3(0, -0.6, 0).addScaledVector(direction, -1.2) : right.multiplyScalar(index === 0 ? -0.2 : -1.2);
-      return { camera: stop.camera.clone().add(shift), look: stop.look.clone().add(narrow ? new THREE.Vector3(0, -0.6, 0) : shift) };
+      pose = { camera: stop.camera.clone().add(shift), look: stop.look.clone().add(narrow ? new THREE.Vector3(0, -0.6, 0) : shift) };
+    } else {
+      const { centre, side, width } = stop.wall;
+      const tanHalf = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+      const freeFraction = narrow ? 0.92 : 0.56;
+      const distance = Math.min(HALF_WIDTH * 2 - 0.5, Math.max(6.2, width / (freeFraction * 2 * tanHalf * aspect)));
+      const normal = new THREE.Vector3(-side, 0, 0);
+      const along = new THREE.Vector3(0, 0, side);
+      const look = centre.clone().setY(narrow ? 1.6 : 1.85);
+      const cameraPosition = look.clone().addScaledVector(normal, distance).addScaledVector(along, -0.6).setY(narrow ? 1.6 : 1.75);
+      const visibleWidth = 2 * distance * tanHalf * aspect;
+      const visibleHeight = 2 * distance * tanHalf;
+      // Slide both points so the hang's centre lands at ~68% across (desktop) or ~30% down (tall).
+      const shift = narrow ? new THREE.Vector3(0, -0.2 * visibleHeight, 0) : along.clone().multiplyScalar(-0.18 * visibleWidth);
+      pose = { camera: cameraPosition.add(shift), look: look.add(shift) };
     }
-    const { centre, side, width } = stop.wall;
-    const tanHalf = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
-    const freeFraction = narrow ? 0.92 : 0.56;
-    const distance = Math.min(HALF_WIDTH * 2 - 0.5, Math.max(6.2, width / (freeFraction * 2 * tanHalf * aspect)));
-    const normal = new THREE.Vector3(-side, 0, 0);
-    const along = new THREE.Vector3(0, 0, side);
-    const look = centre.clone().setY(narrow ? 1.6 : 1.85);
-    const cameraPosition = look.clone().addScaledVector(normal, distance).addScaledVector(along, -0.6).setY(narrow ? 1.6 : 1.75);
-    const visibleWidth = 2 * distance * tanHalf * aspect;
-    const visibleHeight = 2 * distance * tanHalf;
-    // Slide both points so the hang's centre lands at ~68% across (desktop) or ~30% down (phone).
-    const shift = narrow ? new THREE.Vector3(0, -0.2 * visibleHeight, 0) : along.clone().multiplyScalar(-0.18 * visibleWidth);
-    return { camera: cameraPosition.add(shift), look: look.add(shift) };
+    const forward = new THREE.Vector3().subVectors(pose.look, pose.camera).setY(0).normalize();
+    return { ...pose, right: new THREE.Vector3().crossVectors(forward, up).normalize(), back: forward.negate() };
   });
 
-  // Sizes come from the canvas's own CSS box (100lvh), not innerHeight: on phones innerHeight
-  // changes every time the URL bar slides, which would rebuild the renderer and jolt the camera.
-  const metrics = { tops: [] as number[], heights: [] as number[], vh: canvas.clientHeight || innerHeight };
-  const measure = () => {
-    metrics.vh = canvas.clientHeight || innerHeight;
-    metrics.tops = roomElements.map((room) => room.getBoundingClientRect().top + scrollY);
-    metrics.heights = roomElements.map((room) => room.offsetHeight);
-  };
-
+  // Sizes come from the canvas's own CSS box (100lvh), not innerHeight, so a sliding URL bar
+  // never rebuilds the renderer.
   let sized = '';
   const resize = () => {
     const width = canvas.clientWidth || innerWidth;
     const height = canvas.clientHeight || innerHeight;
     const key = `${width}x${height}@${devicePixelRatio}`;
-    if (key === sized) { measure(); return; }
+    if (key === sized) return;
     sized = key;
     const narrow = width / height < 0.9;
-    renderer.setPixelRatio(Math.min(devicePixelRatio, narrow ? 1.5 : 2));
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
     renderer.setSize(width, height, false);
     camera.aspect = width / height;
     camera.fov = narrow ? 64 : 50;
     camera.updateProjectionMatrix();
-    const poses = framed(width / height, narrow);
-    // Consecutive rooms face opposite walls, so a straight blend would drag the eye through
-    // its own look target and spin the view. A corridor pose between each pair keeps the
-    // visitor facing down the hall mid-walk: turn from one wall, walk, turn to the next.
-    const path = poses.flatMap((pose, index) => {
-      const next = poses[index + 1];
-      if (!next) return [pose];
-      const camera = pose.camera.clone().lerp(next.camera, 0.5).setX(0);
-      const look = camera.clone().add(new THREE.Vector3(0, 0, -CORRIDOR_LOOKAHEAD));
-      return [pose, { camera, look }];
-    });
-    curveCamera = new THREE.CatmullRomCurve3(path.map((pose) => pose.camera), false, 'centripetal');
-    curveLook = new THREE.CatmullRomCurve3(path.map((pose) => pose.look), false, 'centripetal');
-    measure();
+    poses = framed(width / height, narrow);
   };
   resize();
   addEventListener('resize', resize);
-  new ResizeObserver(measure).observe(root);
-
-  const ease = (t: number) => t * t * (3 - 2 * t);
-  const progress = () => {
-    const centre = scrollY + metrics.vh * 0.5;
-    const { tops, heights } = metrics;
-    if (centre < tops[0]) return 0;
-    for (let index = 0; index < tops.length; index += 1) {
-      if (centre < tops[index] + heights[index]) {
-        if (index === 0) return 0;
-        const frac = (centre - tops[index]) / heights[index];
-        return index - 1 + ease(Math.min(1, frac / 0.45));
-      }
-    }
-    return tops.length - 1;
-  };
 
   // Entrance interaction: the arm reaches for the pointer while the visitor is in the foyer.
   const raycaster = new THREE.Raycaster();
@@ -521,17 +490,43 @@ export async function startMuseum(root: HTMLElement) {
   const readout = root.querySelector<HTMLElement>('[data-readout]');
   const jointNodes = [...root.querySelectorAll<HTMLElement>('[data-joint]')];
   const stateNode = root.querySelector<HTMLElement>('[data-ik-state]');
-  const mapLinks = [...document.querySelectorAll<HTMLElement>('[data-floor-link]')];
-  const counter = document.querySelector<HTMLElement>('[data-floor-count]');
 
-  let shown = 0;
+  let active = Math.max(0, tour.current());
   let last = performance.now();
   let lastUi = 0;
-  let activeIndex = -1;
-  const cameraTarget = new THREE.Vector3();
-  const lookTarget = new THREE.Vector3();
+  // The arrival: when the last cut happened and which way the room came in (+1 from the right).
+  let arrivedAt = -Infinity;
+  let arrivedFrom = 0;
+  let pendingCut: { to: number; direction: number } | null = null;
+  let slide: Animation[] = [];
   const lookNow = new THREE.Vector3();
-  let first = true;
+
+  tour.on((to, from) => { pendingCut = { to, direction: reduced.matches ? 0 : sweepFor(to, from) }; });
+
+  // Freeze what is on screen into the ghost layer, cut the camera to the next room, and slide
+  // the live hall in over the frozen frame. A new scroll during the first half of a slide just
+  // retargets the cut, so a fast flick or a long jump still reads as one sweep.
+  const cut = (now: number, to: number, direction: number) => {
+    const inFlight = slide.some((animation) => (Number(animation.currentTime) || 0) < SWEEP.slide.duration * 0.5);
+    if (direction && !inFlight) {
+      renderer.render(scene, camera);
+      if (ghost.width !== canvas.width || ghost.height !== canvas.height) { ghost.width = canvas.width; ghost.height = canvas.height; }
+      ghostContext.drawImage(canvas, 0, 0);
+      slide.forEach((animation) => animation.cancel());
+      root.dataset.sweep = direction > 0 ? 'from-right' : 'from-left';
+      slide = [
+        live.animate([{ transform: `translate3d(${direction * 100}%, 0, 0)` }, { transform: 'none' }], SWEEP.slide),
+        ghost.animate([{ transform: 'none', opacity: 1 }, { transform: `translate3d(${-direction * 28}%, 0, 0) scale(0.94)`, opacity: 0.18 }], SWEEP.slide)
+      ];
+    }
+    rooms[active].wake = 0;
+    active = to;
+    const room = rooms[to];
+    room.wake = 0;
+    if (direction) { room.curtainOpen = 0; room.curtainManual = null; }
+    arrivedAt = now;
+    arrivedFrom = direction;
+  };
 
   const frame = (now: number) => {
     // Smoothing follows real elapsed time so slow devices still arrive; physics stays capped.
@@ -539,18 +534,19 @@ export async function startMuseum(root: HTMLElement) {
     const dt = Math.min(0.05, elapsed);
     last = now;
     const time = now / 1000;
-    const goal = progress();
-    shown = reduced.matches ? Math.round(goal) : shown + (goal - shown) * (1 - Math.exp(-elapsed * 4.5));
-    if (first) { shown = goal; first = false; }
-    const t = Math.min(1, Math.max(0, shown / (rooms.length - 1)));
-    curveCamera.getPoint(t, cameraTarget);
-    curveLook.getPoint(t, lookTarget);
-    camera.position.copy(cameraTarget);
-    lookNow.copy(lookTarget);
+    if (pendingCut) { cut(now, pendingCut.to, pendingCut.direction); pendingCut = null; }
+
+    // After the cut the camera keeps drifting the way the room came in, and eases forward a
+    // step, so the hall settles with parallax instead of stopping dead with the slide.
+    const pose = poses[active];
+    const age = (now - arrivedAt) / SWEEP.settle.duration;
+    const carry = arrivedFrom && age < 1 ? (1 - age) ** 4 : 0;
+    camera.position.copy(pose.camera).addScaledVector(pose.right, -arrivedFrom * SWEEP.drift * carry).addScaledVector(pose.back, 0.7 * carry);
+    lookNow.copy(pose.look).addScaledVector(pose.right, -arrivedFrom * SWEEP.drift * 0.6 * carry);
     camera.lookAt(lookNow);
 
     if (ik) {
-      if (shown < 0.6 && pointerActive && now - pointerSeen < 2600) {
+      if (active === 0 && pointerActive && now - pointerSeen < 2600) {
         raycaster.setFromCamera(pointer, camera);
         const focus = rooms[0].stop.focus;
         plane.setFromNormalAndCoplanarPoint(new THREE.Vector3().subVectors(camera.position, focus).setY(0).normalize(), focus);
@@ -559,11 +555,9 @@ export async function startMuseum(root: HTMLElement) {
       } else ik.aim(null);
     }
 
-    let nearest = 0;
     rooms.forEach((room, index) => {
-      const target = Math.max(0, 1 - Math.abs(shown - index) * 1.5);
+      const target = index === active ? 1 : 0;
       room.wake += (target - room.wake) * (1 - Math.exp(-elapsed * 3));
-      if (Math.abs(shown - index) < Math.abs(shown - nearest)) nearest = index;
       const level = 0.1 + room.wake * 0.9;
       // Paintings sit in near-darkness until their picture light comes on.
       room.images.forEach((material) => material.color.setScalar(material.map ? level : 0.08));
@@ -571,19 +565,19 @@ export async function startMuseum(root: HTMLElement) {
       room.letters.forEach((material) => { material.opacity = 0.18 + room.wake * 0.82; });
       room.lamps.forEach((material) => material.color.setRGB(0.25 + room.wake * 0.75, 0.2 + room.wake * 0.69, 0.12 + room.wake * 0.54));
       room.glows.forEach((material) => { material.opacity = room.wake * 0.5; });
-      if (room.wake > 0.02 || index === 0) room.sculpture?.update(time, dt, room.wake);
+      if (room.wake > 0.02 || index === active) room.sculpture?.update(time, dt, room.wake);
     });
 
     rooms.forEach((room, index) => {
       if (!room.curtains.length) return;
-      if (Math.abs(shown - index) > 1.2) room.curtainManual = null; // reset once the visitor walks on
+      if (index !== active) room.curtainManual = null; // reset once the visitor walks on
       const auto = Math.min(1, Math.max(0, (room.wake - 0.35) / 0.5));
       const goalOpen = room.curtainManual ?? auto;
       room.curtainOpen += (goalOpen - room.curtainOpen) * (1 - Math.exp(-elapsed * (reduced.matches ? 30 : 2.6)));
       if (room.wake > 0.02 || room.curtainOpen > 0.01) room.curtains.forEach((curtain) => curtain.set(room.curtainOpen, time));
     });
 
-    const torchOn = pointerActive && now - pointerSeen < 4000 && shown > 0.4;
+    const torchOn = pointerActive && now - pointerSeen < 4000 && active > 0;
     torch.intensity += ((torchOn ? 45 : 0) - torch.intensity) * (1 - Math.exp(-elapsed * 5));
     if (torch.intensity > 0.5) {
       raycaster.setFromCamera(pointer, camera);
@@ -591,23 +585,17 @@ export async function startMuseum(root: HTMLElement) {
       torch.target.position.copy(raycaster.ray.origin).addScaledVector(raycaster.ray.direction, 8);
     }
 
-    const active = rooms[nearest];
-    followSpot.position.set(active.stop.focus.x * 0.6, HEIGHT - 0.3, active.stop.focus.z + 2.2);
-    followSpot.target.position.copy(active.stop.focus);
-    followSpot.intensity = nearest === 0 ? 0 : 140 * active.wake;
+    const here = rooms[active];
+    followSpot.position.set(here.stop.focus.x * 0.6, HEIGHT - 0.3, here.stop.focus.z + 2.2);
+    followSpot.target.position.copy(here.stop.focus);
+    followSpot.intensity = active === 0 ? 0 : 140 * here.wake;
     entranceKey.intensity = 70 * rooms[0].wake;
 
     renderer.render(scene, camera);
 
     if (now - lastUi > 80) {
       lastUi = now;
-      if (nearest !== activeIndex) {
-        activeIndex = nearest;
-        roomElements.forEach((room, index) => room.classList.toggle('is-active', index === nearest));
-        mapLinks.forEach((link, index) => link.toggleAttribute('aria-current', index === nearest));
-        if (counter) counter.textContent = `${String(nearest).padStart(2, '0')} / ${String(rooms.length - 1).padStart(2, '0')}`;
-      }
-      if (ik && readout && nearest === 0) {
+      if (ik && readout && active === 0) {
         const { angles, limited } = ik.readout();
         angles.forEach((value, index) => {
           const degrees = (value * 180) / Math.PI;

@@ -26,7 +26,11 @@
   --sans: 'EB Garamond', Georgia, serif;
   --mono: 'IBM Plex Mono', ui-monospace, monospace;
 
+  --hall: #070505;
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-out: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-in: cubic-bezier(0.55, 0, 1, 0.45);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
   --shell: min(100% - 2rem, 84rem);
   --gap: clamp(1rem, 2.4vw, 2rem);
   --section: clamp(5rem, 12vw, 10rem);
@@ -44,14 +48,13 @@
 
 html {
   scroll-behavior: smooth;
-  scroll-padding-top: 5rem;
   -webkit-text-size-adjust: 100%;
   scrollbar-color: var(--night-3) var(--night);
 }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-delay: 0s !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; transition-delay: 0s !important; }
 }
 
 body {
@@ -82,6 +85,7 @@ ol, ul { padding: 0; list-style: none; }
 }
 
 .shell { width: var(--shell); margin-inline: auto; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 
 .skip-link {
   position: fixed;
@@ -232,60 +236,156 @@ ol, ul { padding: 0; list-style: none; }
 
 /* ---------- The hall ---------- */
 
-.museum { position: relative; background: #0e0a07; color: var(--frost); }
-.museum-canvas { position: fixed; inset: 0; z-index: 0; width: 100%; height: 100vh; height: 100lvh; opacity: 0; transition: opacity 1.2s var(--ease); }
-.museum.is-live .museum-canvas { opacity: 1; }
-.museum-vignette {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  background:
-    linear-gradient(90deg, rgba(12, 9, 6, 0.72) 0%, rgba(12, 9, 6, 0.25) 36%, transparent 52%),
-    radial-gradient(120% 90% at 60% 50%, transparent 55%, rgba(6, 4, 2, 0.7) 100%);
+/* One room per screen. Every room is a mandatory snap stop, so one scroll (or one swipe) is
+   one room and a fast flick can't skip any. The archive is a single snap area taller than the
+   screen, which browsers let you scroll through freely. */
+html { scroll-snap-type: y mandatory; }
+
+.museum { position: relative; color: var(--frost); background: var(--hall); }
+
+/* The stage holds every visual layer and never scrolls. 100lvh keeps it the same size while
+   a phone's URL bar slides, so nothing behind the text ever jumps. */
+.stage { position: fixed; inset: 0; z-index: 0; height: 100vh; height: 100lvh; overflow: hidden; background: var(--hall); pointer-events: none; }
+.plates, .plate, .stage-ghost, .stage-live, .stage-vignette { position: absolute; inset: 0; }
+.plate { margin: 0; overflow: hidden; background: var(--hall); }
+.plate.is-front { z-index: 1; }
+.plate img { width: 100%; height: 100%; object-fit: cover; }
+.museum-canvas { width: 100%; height: 100%; }
+.stage-ghost { width: 100%; height: 100%; opacity: 0; }
+.stage-live { opacity: 0; transition: opacity 1.2s var(--ease); }
+.museum.is-3d .stage-ghost { opacity: 1; }
+.museum.is-3d .stage-live { opacity: 1; }
+.museum.is-3d .plates { opacity: 0; transition: opacity 1.2s var(--ease); }
+
+/* The sweep's leading edge: a long soft shadow and a gilt hairline, like the edge of a frame
+   passing in front of you. Both sit outside the layer, so they only show while it moves. */
+.stage-live, .plate.is-front { box-shadow: 0 0 140px 60px rgba(4, 3, 3, 0.85); }
+.stage-live::before, .plate.is-front::before {
+  content: '';
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  bottom: 0;
+  left: -1px;
+  width: 1px;
+  background: linear-gradient(180deg, transparent, var(--gilt) 30%, var(--gilt) 70%, transparent);
+  opacity: 0.75;
 }
+.museum[data-sweep='from-left'] .stage-live::before,
+.museum[data-sweep='from-left'] .plate.is-front::before { left: auto; right: -1px; }
+
+.stage-vignette {
+  background:
+    linear-gradient(90deg, rgba(7, 5, 5, 0.82) 0%, rgba(7, 5, 5, 0.35) 34%, transparent 52%),
+    radial-gradient(120% 90% at 62% 50%, transparent 55%, rgba(4, 3, 2, 0.7) 100%);
+}
+.stage-grain {
+  position: absolute;
+  inset: 0;
+  opacity: 0.09;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+/* How far through the hall you are: a gilt thread across the top of the screen. */
+.stage-progress { position: absolute; inset: 0 0 auto; z-index: 3; height: 2px; background: linear-gradient(90deg, rgba(209, 169, 86, 0.2), var(--gilt)); transform: scaleX(var(--tour-progress, 0)); transform-origin: left; transition: transform 900ms var(--ease-in-out); }
+
+/* Wide screens: the photograph takes the right two-thirds, where the live hall frames its hang. */
+.plate { left: 34%; -webkit-mask-image: linear-gradient(90deg, transparent, #000 22%); mask-image: linear-gradient(90deg, transparent, #000 22%); }
+
 html.over-curtain, html.over-curtain body { cursor: pointer; }
 
-.room { position: relative; z-index: 1; min-height: 190vh; padding-bottom: 20vh; }
-.room-entrance { min-height: 140vh; padding-bottom: 0; }
+.room {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  align-items: center;
+  min-height: 100vh;
+  min-height: 100svh;
+  padding: 6rem 0 3rem;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+.archive { position: relative; z-index: 2; scroll-snap-align: start; }
+.room h2:focus, .room h1:focus { outline: none; }
 
-/* Placards: gallery-white cards, like the labels beside real museum pieces. */
+/* Placards: dark exhibition labels with a double gilt rule, sized to fit one screen. The long
+   notes live in each exhibit's dossier drawer. */
 .placard {
-  position: sticky;
-  /* --placard-h comes from a ResizeObserver; a tall placard pins by its bottom edge instead. */
-  top: min(5.5rem, calc(100vh - var(--placard-h, 0px) - 1.5rem));
-  width: min(29rem, 40vw);
-  margin: 62vh 0 0 clamp(1rem, 4vw, 3.5rem);
-  padding: 1.6rem 1.6rem 1.4rem;
+  position: relative;
+  width: min(30rem, 40vw);
+  margin-left: clamp(1.5rem, 5vw, 4.5rem);
+  padding: 2rem 2rem 1.75rem;
   --ink: #f1e6d2;
   --ink-dim: #c9b59b;
   color: var(--ink);
-  background: linear-gradient(180deg, #161010, #0e0a0a);
-  border-radius: 0;
-  /* A double gilt rule, like the mount on an old exhibition label. */
-  box-shadow: inset 0 0 0 1px #b8913e, inset 0 0 0 6px #120c0c, inset 0 0 0 7px rgba(184, 145, 62, 0.6), 0 2px 4px rgba(0, 0, 0, 0.3), 0 24px 48px -16px rgba(0, 0, 0, 0.6);
+  background: linear-gradient(180deg, rgba(23, 16, 16, 0.94), rgba(13, 9, 9, 0.96));
+  box-shadow: inset 0 0 0 1px #b8913e, inset 0 0 0 6px #120c0c, inset 0 0 0 7px rgba(184, 145, 62, 0.55), 0 2px 4px rgba(0, 0, 0, 0.3), 0 30px 60px -20px rgba(0, 0, 0, 0.7);
 }
-.placard > * { transition: opacity 400ms var(--ease); }
-.js .museum.is-live .room:not(.is-active) .placard > * { opacity: 0.45; }
-.js .museum.is-live .room .placard:focus-within > * { opacity: 1; }
+/* The room number, oversized and only outlined, breaking out over the frame's top edge. */
+.placard-numeral {
+  position: absolute;
+  top: -0.5em;
+  right: 1.1rem;
+  font: italic 500 clamp(5rem, 7vw, 7.5rem)/1 var(--display);
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(209, 169, 86, 0.6);
+  font-variant-numeric: lining-nums;
+  pointer-events: none;
+  user-select: none;
+}
 .placard-head { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
 .accession { font: 500 0.78rem/1 var(--mono); color: var(--gilt); }
-.placard h2 { margin-top: 0.9rem; font: 600 clamp(2.1rem, 3.3vw, 2.8rem)/1.05 var(--display); letter-spacing: -0.01em; text-wrap: balance; }
-.placard-meta { margin-top: 0.5rem; font-size: 0.88rem; color: var(--ink-dim); }
-.placard-summary { margin-top: 0.9rem; font-size: 1.02rem; line-height: 1.55; }
-.placard-part { margin-top: 0.8rem; font-size: 0.95rem; color: var(--ink-dim); }
+.placard h2 { margin-top: 1rem; font: 600 clamp(2.3rem, 3.4vw, 3rem)/1 var(--display); letter-spacing: -0.015em; text-wrap: balance; }
+.placard-sub { display: block; margin-top: 0.45rem; font: italic 500 clamp(1.15rem, 1.5vw, 1.35rem)/1.2 var(--display); letter-spacing: 0; color: var(--gilt); }
+.word { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: 0.1em; margin-bottom: -0.1em; }
+.word > span { display: inline-block; }
+.placard-meta { margin-top: 0.8rem; font-size: 0.88rem; color: var(--ink-dim); }
+.placard-summary { margin-top: 0.9rem; font-size: 1.04rem; line-height: 1.58; }
+.placard-part { margin-top: 0.8rem; font-size: 0.95rem; line-height: 1.55; color: var(--ink-dim); }
 .placard-part strong { color: var(--ink); }
-.placard-fine { margin-top: 1rem; font-size: 0.88rem; color: var(--ink-dim); }
+.placard-fine { margin-top: 1.1rem; font-size: 0.88rem; color: var(--ink-dim); }
 .placard .tag::before { background: #140e0e; }
-.placard-wall h2 { font-size: clamp(2.2rem, 3.6vw, 3rem); }
-.thread-list { display: grid; gap: 0.9rem; margin-top: 1.2rem; }
-.thread-list li { padding-left: 0.9rem; border-left: 2px solid var(--tag); font-size: 0.95rem; color: var(--ink-dim); }
+.placard-wall h2 { font-size: clamp(2.4rem, 3.6vw, 3.2rem); }
+.thread-list { display: grid; gap: 0.9rem; margin-top: 1.3rem; }
+.thread-list li { padding-left: 0.9rem; border-left: 1px solid var(--tag); font-size: 0.95rem; color: var(--ink-dim); }
 .thread-list strong { display: block; color: var(--ink); }
 
-.placard-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem 1rem; margin-top: 1.2rem; }
+/* Arrival choreography. The room sweeps in first; a beat later the placard's parts rise into
+   place in reading order, and each word of the title climbs out of its own mask. Leaving is
+   quick and quiet. Without JavaScript (or before the hall starts) everything simply shows. */
+.js .museum.is-live .room [data-reveal],
+.js .museum.is-live .room .placard-numeral {
+  opacity: 0;
+  transform: translate3d(0, 26px, 0);
+  transition: opacity 200ms ease, transform 200ms var(--ease-in);
+}
+.js .museum.is-live .room .word > span { transform: translate3d(0, 112%, 0); transition: transform 200ms var(--ease-in); }
+.js .museum.is-live .room.is-active [data-reveal],
+.js .museum.is-live .room.is-active .placard-numeral {
+  opacity: 1;
+  transform: none;
+  transition: opacity 700ms ease calc(var(--i, 0) * 80ms + 320ms), transform 1000ms var(--ease) calc(var(--i, 0) * 80ms + 320ms);
+}
+.js .museum.is-live .room.is-active .placard-numeral { transition-delay: 200ms; }
+.js .museum.is-live .room.is-active .word > span { transform: none; transition: transform 1100ms var(--ease) calc(var(--w, 0) * 60ms + 260ms); }
+
+.placard-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem 1.1rem; margin-top: 1.4rem; }
 .placard .btn-ghost { color: var(--ink); border-color: rgba(239, 230, 210, 0.3); }
-.placard .btn-ghost:hover { background: rgba(239, 230, 210, 0.06); }
-.placard .btn-ghost[aria-pressed='true'] { background: var(--ink); color: #120c0c; }
+@media (hover: hover) and (pointer: fine) { .placard .btn-ghost:hover { background: rgba(239, 230, 210, 0.06); border-color: rgba(239, 230, 210, 0.6); } }
+.text-button {
+  padding: 0.3rem 0;
+  font-size: 0.92rem;
+  color: var(--ink-dim);
+  background: none;
+  border: 0;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: rgba(209, 169, 86, 0.5);
+  text-underline-offset: 4px;
+  transition: color 150ms ease, text-decoration-color 150ms ease;
+}
+.text-button:hover { color: var(--ink); text-decoration-color: var(--gilt); }
+.text-button[aria-pressed='true'] { color: var(--gilt); }
 .placard-link {
   font-weight: 600;
   text-decoration: none;
@@ -297,9 +397,10 @@ html.over-curtain, html.over-curtain body { cursor: pointer; }
 .placard-link:hover { background-size: 0 1px; background-position: 100% 100%; }
 
 /* Exhibit controls */
-.controls { margin: 1.2rem 0 0; padding: 1rem; border: 1px solid rgba(239, 230, 210, 0.14); border-radius: 2px; background: rgba(239, 230, 210, 0.04); }
+.controls { margin: 1.3rem 0 0; padding: 0.9rem 1rem 1rem; border: 1px solid rgba(239, 230, 210, 0.14); border-radius: 2px; background: rgba(239, 230, 210, 0.035); }
 .controls legend { padding: 0 0.4rem; font-weight: 600; font-size: 0.92rem; }
-.joint-slider { display: grid; gap: 0.2rem; margin-top: 0.55rem; font: 400 0.8rem/1.3 var(--mono); }
+.joint-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 1.1rem; }
+.joint-slider { display: grid; gap: 0.2rem; margin-top: 0.55rem; font: 400 0.78rem/1.3 var(--mono); }
 .joint-slider span { display: flex; justify-content: space-between; }
 .joint-slider b { font-weight: 500; color: var(--gilt); font-variant-numeric: tabular-nums; }
 .joint-slider input { accent-color: var(--gilt); }
@@ -307,42 +408,24 @@ html.over-curtain, html.over-curtain body { cursor: pointer; }
 .control-row { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.4rem; }
 .control-row button { min-height: 2.6rem; padding: 0.5rem 1rem; border: 1px solid rgba(239, 230, 210, 0.3); border-radius: 999px; background: transparent; font-weight: 500; cursor: pointer; transition: background-color 180ms var(--ease), color 180ms var(--ease), transform 120ms var(--ease); }
 .control-row button:hover { background: rgba(239, 230, 210, 0.06); }
+.control-row button:active { transform: scale(0.96); }
 .control-row .hold { color: var(--on-accent); background: var(--tag); border-color: var(--tag); touch-action: none; user-select: none; }
 .control-row .hold.is-held { transform: scale(0.96); background: #8f1422; }
+/* The photographs can't be steered, so their controls only exist in the live hall. */
+.museum.is-plates .controls, .museum.is-plates [data-curtain], .museum.is-plates .readout, .museum.is-plates .entrance-hint { display: none; }
 
-.thumbs { display: grid; grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr)); gap: 0.6rem; margin-top: 1.2rem; }
-.thumb { display: grid; gap: 0.35rem; padding: 0; text-align: left; background: none; border: 0; cursor: zoom-in; color: inherit; }
-.thumb img { width: 100%; height: auto; aspect-ratio: 16 / 10; object-fit: cover; border-radius: 2px; box-shadow: 0 0 0 1px rgba(239, 230, 210, 0.12); transition: transform 250ms var(--ease); }
-.thumb:hover img { transform: scale(1.02); }
-.thumb span { font-size: 0.78rem; color: var(--ink-dim); }
-
-.skills-on-show { margin-top: 1.2rem; }
-.skills-on-show p { font-size: 0.8rem; font-weight: 600; color: var(--ink-dim); }
-.skills-on-show ul { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.4rem; }
-.skills-on-show a { display: inline-block; padding: 0.15rem 0.55rem; font: 400 0.74rem/1.5 var(--mono); color: var(--ink); text-decoration: none; border-radius: 2px; box-shadow: inset 0 0 0 1px rgba(239, 230, 210, 0.2); transition: background-color 180ms var(--ease); }
-.skills-on-show a:hover { background: var(--tag); color: var(--on-accent); }
-
-.notes { margin-top: 1.2rem; border-top: 1px solid rgba(239, 230, 210, 0.14); }
-.notes summary { padding: 0.8rem 0 0.2rem; font-weight: 600; cursor: pointer; }
-.notes summary::marker { color: var(--gilt); }
-.notes dl { display: grid; gap: 0.9rem; margin-top: 0.6rem; }
-.notes dt { font-size: 0.8rem; font-weight: 600; }
-.notes dd { margin-top: 0.15rem; font-size: 0.92rem; line-height: 1.5; color: var(--ink-dim); }
-.notes dd ul:not(.stack) { display: grid; gap: 0.3rem; padding-left: 1rem; list-style: disc; }
-.stack { display: flex; flex-wrap: wrap; gap: 0.35rem; }
-.stack li { padding: 0.2rem 0.5rem; font: 400 0.72rem/1.3 var(--mono); border: 1px solid rgba(239, 230, 210, 0.18); border-radius: var(--radius-s); background: rgba(239, 230, 210, 0.05); }
-
-.mini-route { display: grid; gap: 0.5rem; margin-top: 1.2rem; counter-reset: route; }
+.mini-route { display: grid; gap: 0.55rem; margin-top: 1.3rem; counter-reset: route; }
 .mini-route li { display: grid; grid-template-columns: 1.8rem 1fr; column-gap: 0.4rem; counter-increment: route; font-size: 0.9rem; color: var(--ink-dim); }
 .mini-route li::before { content: counter(route); grid-row: span 2; display: grid; place-items: center; width: 1.5rem; height: 1.5rem; border-radius: 50%; font: 500 0.75rem var(--mono); box-shadow: inset 0 0 0 1px rgba(239, 230, 210, 0.3); }
 .mini-route li[data-state='current']::before { background: var(--tag); box-shadow: none; }
 .mini-route strong { color: var(--ink); }
 
 /* Entrance */
-.entrance-copy { position: sticky; top: 0; display: grid; align-content: center; min-height: 100svh; padding-block: 6rem 3rem; pointer-events: none; }
+.room-entrance { align-items: stretch; padding: 0; }
+.entrance-copy { display: grid; align-content: center; min-height: 100svh; padding-block: 6rem 6rem; pointer-events: none; }
 .entrance-copy a, .entrance-copy button { pointer-events: auto; }
 .entrance-kicker { font: 500 0.85rem/1.4 var(--mono); color: var(--gilt); }
-.entrance-title { margin-top: 1rem; font: 500 clamp(4.6rem, 13vw, 12rem)/0.84 var(--display); font-style: italic; letter-spacing: -0.02em; }
+.entrance-title { margin-top: 1rem; font: 500 clamp(4.6rem, 13vw, 12rem)/0.84 var(--display); font-style: italic; letter-spacing: -0.025em; }
 .entrance-lede { max-width: 32rem; margin-top: 1.8rem; font-size: clamp(1.05rem, 1.5vw, 1.2rem); color: #ddd2b8; }
 .entrance-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem 1rem; margin-top: 2rem; }
 .entrance-actions .btn-primary { min-height: 3.6rem; padding: 0.5em 1.1em; font-size: 1.35rem; }
@@ -352,7 +435,28 @@ html.over-curtain, html.over-curtain body { cursor: pointer; }
 .js [data-rise]:nth-child(3) { animation-delay: 350ms; }
 .js [data-rise]:nth-child(4) { animation-delay: 480ms; }
 .js [data-rise]:nth-child(5) { animation-delay: 650ms; }
+.js .entrance-cue[data-rise] { animation-delay: 1100ms; }
 @keyframes rise { to { opacity: 1; transform: none; } }
+
+/* The cue: a thread of light running down a gilt line, pointing at the first room. */
+.entrance-cue {
+  position: absolute;
+  z-index: 2;
+  bottom: 2rem;
+  left: 50%;
+  display: grid;
+  justify-items: center;
+  gap: 0.75rem;
+  translate: -50% 0;
+  font: 500 0.75rem/1 var(--mono);
+  color: var(--frost-dim);
+  text-decoration: none;
+  transition: color 150ms ease;
+}
+.entrance-cue:hover { color: var(--frost); }
+.entrance-cue i { position: relative; width: 1px; height: 3.25rem; overflow: hidden; background: rgba(209, 169, 86, 0.25); }
+.entrance-cue i::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, transparent, var(--gilt)); animation: cue 2.4s var(--ease-in-out) infinite; }
+@keyframes cue { from { transform: translateY(-100%); } to { transform: translateY(100%); } }
 
 .readout {
   position: absolute;
@@ -378,21 +482,89 @@ html.over-curtain, html.over-curtain body { cursor: pointer; }
 .readout-joints dt { color: var(--frost-dim); }
 .readout-joints dd { font-variant-numeric: tabular-nums; }
 .readout-note { margin-top: 0.7rem; font: 400 0.78rem/1.45 var(--sans); color: var(--frost-dim); }
-.museum.is-static .readout { display: none; }
 @media (min-width: 1100px) { .readout { right: 6.5rem; } }
 
 /* Floor plan: a quiet wayfinding rail on the right edge. */
 .floorplan { position: fixed; right: 1.1rem; top: 50%; z-index: 30; display: none; transform: translateY(-50%); transition: opacity 300ms var(--ease); }
 .floorplan.is-hidden { opacity: 0; pointer-events: none; }
 @media (min-width: 1100px) { .floorplan { display: block; } }
-.floorplan-count { margin-bottom: 0.6rem; font: 500 0.72rem var(--mono); color: var(--frost-dim); text-align: right; }
+.floorplan-count { margin-bottom: 0.6rem; font: 500 0.72rem var(--mono); color: var(--frost-dim); text-align: right; font-variant-numeric: tabular-nums; }
 .floorplan ol { display: grid; gap: 0.2rem; justify-items: end; }
 .floorplan a { display: flex; align-items: center; gap: 0.6rem; padding: 0.15rem 0; color: var(--frost-dim); text-decoration: none; font-size: 0.78rem; }
-.floorplan a::after { content: ''; width: 14px; height: 2px; background: rgba(233, 236, 230, 0.3); transition: width 250ms var(--ease), background-color 250ms; }
+.floorplan a::after { content: ''; width: 14px; height: 1px; background: rgba(233, 236, 230, 0.3); transition: width 250ms var(--ease), background-color 250ms; }
 .floorplan a span { opacity: 0; transform: translateX(6px); transition: opacity 200ms, transform 200ms var(--ease); }
 .floorplan:hover a span, .floorplan a:focus-visible span, .floorplan a[aria-current] span { opacity: 1; transform: none; }
 .floorplan a[aria-current] { color: var(--frost); }
-.floorplan a[aria-current]::after { width: 28px; background: var(--tag); }
+.floorplan a[aria-current]::after { width: 28px; background: var(--gilt); }
+
+/* Dossiers: each exhibit's full notes, in a drawer that slides in from the right. */
+html:has(dialog[open]) { overflow: hidden; }
+.dossier {
+  position: fixed;
+  inset: 0 0 0 auto;
+  width: min(40rem, 100%);
+  height: 100vh;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: 4.5rem clamp(1.5rem, 4vw, 3.25rem) 3.5rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  --ink: #f1e6d2;
+  --ink-dim: #c9b59b;
+  color: var(--ink);
+  background: linear-gradient(180deg, #181111, #0c0808 40%);
+  border: 0;
+  box-shadow: inset 1px 0 0 rgba(184, 145, 62, 0.55), -40px 0 120px rgba(0, 0, 0, 0.6);
+}
+.dossier::backdrop { background: rgba(6, 4, 4, 0.62); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
+.dossier[open] { animation: dossier-in 420ms var(--ease-out); }
+.dossier[open]::backdrop { animation: fade-in 420ms var(--ease-out); }
+.dossier.is-closing { animation: dossier-out 280ms var(--ease-in) forwards; }
+.dossier.is-closing::backdrop { animation: fade-out 280ms var(--ease-in) forwards; }
+@keyframes dossier-in { from { transform: translate3d(100%, 0, 0); } }
+@keyframes dossier-out { to { transform: translate3d(100%, 0, 0); } }
+@keyframes fade-in { from { opacity: 0; } }
+@keyframes fade-out { to { opacity: 0; } }
+.dossier h3 { margin-top: 0.9rem; font: 600 clamp(2.3rem, 5vw, 3.2rem)/1 var(--display); letter-spacing: -0.015em; }
+.dossier h4 { margin-top: 2.5rem; padding-bottom: 0.6rem; border-bottom: 1px solid rgba(239, 230, 210, 0.14); font: 500 1.4rem/1 var(--display); }
+.dossier-part { margin-top: 1.3rem; padding-left: 1rem; border-left: 1px solid var(--tag); font-size: 1rem; line-height: 1.6; color: var(--ink-dim); }
+.dossier-part strong { color: var(--ink); }
+.dossier-notes { display: grid; gap: 1.4rem; margin-top: 2rem; }
+.dossier-notes dt { font: 500 0.76rem/1.3 var(--mono); color: var(--gilt); }
+.dossier-notes dd { margin-top: 0.35rem; font-size: 1rem; line-height: 1.6; color: var(--ink-dim); }
+.dossier-notes dd ul:not(.stack) { display: grid; gap: 0.35rem; padding-left: 1rem; list-style: disc; }
+.dossier-notes dd li::marker { color: var(--gilt); }
+.dossier-societies { display: grid; gap: 1.6rem; margin-top: 1.6rem; }
+.dossier-close {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.25rem;
+  min-height: 2.5rem;
+  padding: 0.45rem 1.1rem;
+  color: var(--frost);
+  background: transparent;
+  border: 1px solid rgba(239, 230, 210, 0.28);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: border-color 150ms ease, background-color 150ms ease;
+}
+.dossier-close:hover { border-color: var(--gilt); background: rgba(239, 230, 210, 0.05); }
+
+.thumbs { display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: 0.9rem; margin-top: 2rem; }
+.thumb { display: grid; gap: 0.45rem; padding: 0; text-align: left; background: none; border: 0; cursor: zoom-in; color: inherit; }
+.thumb img { width: 100%; height: auto; aspect-ratio: 16 / 10; object-fit: cover; border-radius: 1px; box-shadow: 0 0 0 1px rgba(184, 145, 62, 0.45), 0 0 0 5px #120c0c, 0 0 0 6px rgba(184, 145, 62, 0.3); transition: transform 250ms var(--ease); }
+@media (hover: hover) and (pointer: fine) { .thumb:hover img { transform: scale(1.015); } }
+.thumb span { font-size: 0.8rem; color: var(--ink-dim); }
+
+.skills-on-show { margin-top: 2rem; }
+.skills-on-show p { font: 500 0.76rem/1.3 var(--mono); color: var(--gilt); }
+.skills-on-show ul { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.5rem; }
+.skills-on-show a { display: inline-block; padding: 0.2rem 0.6rem; font: 400 0.76rem/1.5 var(--mono); color: var(--ink); text-decoration: none; border-radius: 2px; box-shadow: inset 0 0 0 1px rgba(239, 230, 210, 0.2); transition: background-color 150ms ease, color 150ms ease; }
+.skills-on-show a:hover { background: var(--tag); color: var(--on-accent); }
+.stack { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+.stack li { padding: 0.2rem 0.5rem; font: 400 0.72rem/1.3 var(--mono); border: 1px solid rgba(239, 230, 210, 0.18); border-radius: var(--radius-s); background: rgba(239, 230, 210, 0.05); }
 
 /* Kiosks and lightbox */
 .kiosk, .lightbox {
@@ -434,21 +606,54 @@ html.over-curtain, html.over-curtain body { cursor: pointer; }
 .sig-kiosk[data-state='valid'] [data-sig-result] { color: var(--data); }
 .sig-kiosk[data-state='invalid'] [data-sig-result], .sig-kiosk[data-state='error'] [data-sig-result] { color: var(--fault); }
 
-/* Narrow screens: the exhibit sits in the top of the view, the placard below it. */
-@media (max-width: 899px) {
-  .museum-vignette { background: linear-gradient(180deg, transparent 0%, transparent 35%, rgba(12, 9, 6, 0.55) 70%, rgba(12, 9, 6, 0.85) 100%); }
-  .room { min-height: 200vh; }
-  .placard { width: auto; margin: 75vh 1rem 0; top: min(40svh, calc(100svh - var(--placard-h, 0px) - 1rem)); padding: 1.2rem; }
-  .entrance-copy { align-content: end; padding-bottom: 2.5rem; }
-  .entrance-title { font-size: clamp(3.6rem, 17vw, 6rem); }
-  .readout { display: none; }
-}
 
-/* No WebGL (or it failed): rooms become an ordinary, readable sequence of placards. */
-.museum.is-static .museum-canvas, .museum.is-static .museum-vignette { display: none; }
-.museum.is-static .room { min-height: 0; padding: 3rem 0; }
-.museum.is-static .room-entrance { min-height: 100svh; }
-.museum.is-static .placard { position: static; width: min(44rem, calc(100% - 2rem)); max-height: none; margin: 0 auto; opacity: 1; transform: none; }
+.kiosk.is-closing, .lightbox.is-closing { animation: kiosk-out 200ms var(--ease-in) forwards; }
+@keyframes kiosk-out { to { opacity: 0; transform: translateY(8px) scale(0.985); } }
+
+/* Phones and portrait tablets: the pocket guide. The photograph fills the top of the screen,
+   and each room's label reads like a catalogue page below it, set straight on the dark. */
+@media (max-width: 899px), (orientation: portrait) {
+  .plate { left: 0; bottom: auto; height: min(62svh, 100vw); -webkit-mask-image: linear-gradient(180deg, #000 62%, transparent); mask-image: linear-gradient(180deg, #000 62%, transparent); }
+  .stage-vignette { background: linear-gradient(180deg, rgba(7, 5, 5, 0.6) 0%, transparent 16%, transparent 38%, rgba(7, 5, 5, 0.86) 58%, var(--hall) 70%); }
+  .stage-live, .plate.is-front { box-shadow: 0 0 80px 30px rgba(4, 3, 3, 0.85); }
+
+  .room { align-items: end; padding: 46svh 0 max(1.75rem, env(safe-area-inset-bottom)); }
+  .placard {
+    width: auto;
+    margin: 0;
+    padding: 2.25rem 1.25rem 0;
+    background: linear-gradient(180deg, transparent, var(--hall) 2.25rem);
+    box-shadow: none;
+  }
+  .placard::before { content: ''; display: block; width: 2.5rem; height: 1px; margin-bottom: 1.1rem; background: var(--gilt); }
+  .placard-numeral { top: -2.6rem; right: 1rem; font-size: 5rem; -webkit-text-stroke-color: rgba(209, 169, 86, 0.55); }
+  .placard h2 { margin-top: 0.75rem; font-size: clamp(2.2rem, 9.5vw, 3rem); }
+  .placard-wall h2 { font-size: clamp(2.2rem, 9.5vw, 3rem); }
+  .placard-summary { font-size: 1.02rem; line-height: 1.5; }
+  .museum.is-plates .placard-part { display: none; }
+  .thread-list { gap: 0.7rem; }
+  .thread-list li { font-size: 0.92rem; line-height: 1.45; }
+  .placard-actions { margin-top: 1.2rem; }
+
+  .room-entrance { align-items: end; padding: 0; }
+  .entrance-copy { align-content: end; min-height: 100svh; padding-block: 34svh max(1.5rem, env(safe-area-inset-bottom)); }
+  /* The top bar already carries Resume, so the entrance keeps one clear way in. */
+  .entrance-actions .btn-ghost { display: none; }
+  .entrance-kicker { font-size: 0.75rem; }
+  .entrance-title { margin-top: 0.6rem; font-size: clamp(3.6rem, 16.5vw, 6.5rem); }
+  .entrance-lede { margin-top: 1rem; font-size: 0.98rem; line-height: 1.5; }
+  .entrance-actions { margin-top: 1.4rem; }
+  .entrance-actions .btn-primary { min-height: 3.1rem; font-size: 1.15rem; }
+  .entrance-cue { position: static; grid-template-columns: auto 1fr; justify-items: start; align-items: center; margin-top: 1.4rem; translate: none; pointer-events: auto; }
+  .entrance-cue i { width: 3.25rem; height: 1px; }
+  .entrance-cue i::after { background: linear-gradient(90deg, transparent, var(--gilt)); animation-name: cue-across; }
+  .readout { display: none; }
+  .society-list { gap: 0.7rem 1.2rem; }
+  .society-list .society-name { font-size: 1.02rem; line-height: 1.2; }
+  .society-list .society-role { display: none; }
+}
+@keyframes cue-across { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+
 
 
 /* ---------- Instruments: dark panels mounted on the paper ---------- */
@@ -825,7 +1030,10 @@ dialog.kiosk .instrument-wrap .snake-method summary:focus-visible { outline: 2px
 .not-found a { justify-self: start; }
 
 /* Societies placard */
-.society-list { display: grid; gap: 1.6rem; margin-top: 1.4rem; }
+.society-list { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem 1.4rem; margin-top: 1.4rem; }
+.society-list .society-name { font-size: 1.12rem; }
+.society-role { font: italic 400 0.95rem/1.3 var(--sans); color: var(--ink-dim); }
+.society-role span { display: block; font: 500 0.72rem/1.6 var(--mono); font-style: normal; color: var(--gilt); }
 .society-when { font: 500 0.74rem/1.3 var(--mono); color: var(--gilt); }
 .society-name { margin-top: 0.2rem; font: 600 1.25rem/1.15 var(--display); }
 .society-name a { text-decoration-color: rgba(184, 145, 62, 0.6); text-underline-offset: 3px; }

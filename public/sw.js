@@ -1,5 +1,5 @@
 // Network-first for pages so new deploys show up immediately; cache is only an offline fallback.
-const CACHE = 'ajmal-workcell-v4';
+const CACHE = 'ajmal-workcell-v5';
 const SHELL = ['/', '/manifest.webmanifest', '/favicon.svg'];
 
 self.addEventListener('install', (event) => {

@@ -54,6 +54,10 @@ const decisionLines: { html: string; note?: string; pin?: boolean }[] = [
   { html: '  <span class="k">checks</span>: [<span class="v">joint_limits</span>, <span class="v">collision</span>]' }
 ];
 
+// Headings split into words so each can rise out of its own mask when the room arrives.
+const words = (text: string) => text.split(' ');
+const numeral = (index: number) => String(index).padStart(2, '0');
+
 const rooms = [{ id: 'entrance', name: 'Entrance' }, { id: 'thread', name: 'The thread' }, { id: 'societies', name: 'The Societies Room' }, ...exhibits.map((exhibit) => ({ id: exhibit.id, name: shortTitle(exhibit.entry.data.title) })), { id: 'next-wing', name: 'The next wing' }];
 ---
 
@@ -80,19 +84,32 @@ const rooms = [{ id: 'entrance', name: 'Entrance' }, { id: 'thread', name: 'The 
 
   <main>
     <div class="museum" data-museum>
-      <canvas class="museum-canvas" data-museum-canvas aria-hidden="true"></canvas>
-      <div class="museum-vignette" aria-hidden="true"></div>
+      <div class="stage" aria-hidden="true">
+        <div class="plates">
+          {rooms.map((room, index) => (
+            <figure class="plate" data-plate hidden={index !== 0}>
+              <img data-src={`/plates/${room.id}.webp`} alt="" width="1080" height="1080" decoding="async" />
+            </figure>
+          ))}
+        </div>
+        <canvas class="stage-ghost" data-stage-ghost></canvas>
+        <div class="stage-live" data-stage-live><canvas class="museum-canvas" data-museum-canvas></canvas></div>
+        <div class="stage-vignette"></div>
+        <div class="stage-grain"></div>
+        <div class="stage-progress"></div>
+      </div>
 
       <section class="room room-entrance" id="entrance" data-room="entrance" data-term-target aria-labelledby="entrance-title">
         <div class="entrance-copy shell">
           <p class="entrance-kicker" data-rise>The Ajmal Khidri Collection. Open after hours.</p>
-          <h1 id="entrance-title" class="entrance-title" data-rise>Systems<br />that move.</h1>
+          <h1 id="entrance-title" class="entrance-title" tabindex="-1" data-rise>Systems<br />that move.</h1>
           <p class="entrance-lede" data-rise>Computer Science at the University of Calgary. Robotics software at WayBionic and the Schulich Space Rover Team, Junior Executive at the UCalgary Cybersecurity Club, the tech behind a Calgary HVAC company, and a power-washing business I run myself. Every exhibit here is real, and most of them still run.</p>
           <div class="entrance-actions" data-rise>
             <a class="btn btn-primary" href="#thread">Enter the collection</a>
             <a class="btn btn-ghost" href={contact.resume} download>Download resume</a>
           </div>
-          <p class="entrance-hint" data-rise>Scroll to walk the hall. Move your cursor to carry a torch, and the arm on the plinth will reach for it.</p>
+          <p class="entrance-hint" data-rise>Move your cursor to carry a torch through the hall. The arm on the plinth will reach for it.</p>
+          <a class="entrance-cue" href="#thread" data-rise><span>Scroll to enter</span><i aria-hidden="true"></i></a>
         </div>
         <aside class="readout" aria-label="Live joint readout from the entrance arm" data-readout>
           <div class="readout-head"><span>/joint_states</span><span class="readout-state" data-ik-state>idle sweep</span></div>
@@ -108,41 +125,60 @@ const rooms = [{ id: 'entrance', name: 'Entrance' }, { id: 'thread', name: 'The 
 
       <section class="room room-wall" id="thread" data-room="thread" data-wall="Compressors.|Nozzles.|Joints." data-accession="Wall text" aria-labelledby="thread-title">
         <article class="placard placard-wall">
-          <h2 id="thread-title">Compressors. Nozzles. Joints.</h2>
-          <p class="placard-summary">Most student portfolios are a list of apps. This one keeps returning to machines that have to keep running while someone depends on them.</p>
-          <ul class="thread-list">
+          <p class="placard-numeral" aria-hidden="true">01</p>
+          <header class="placard-head" data-reveal style="--i:0"><p class="accession">Wall text</p></header>
+          <h2 id="thread-title" tabindex="-1">{words('Compressors. Nozzles. Joints.').map((word, w) => <><span class="word" style={`--w:${w}`}><span>{word}</span></span>{' '}</>)}</h2>
+          <p class="placard-summary" data-reveal style="--i:2">Most student portfolios are a list of apps. This one keeps returning to machines that have to keep running while someone depends on them.</p>
+          <ul class="thread-list" data-reveal style="--i:3">
             <li><strong>HVAC Express</strong> Since March 2024: the website, hosting, and lead generation for a family heating and cooling company, plus selling its service face to face.</li>
             <li><strong>Chinook Clean</strong> A power-washing business I own: pumps, nozzles, quotes, schedules, and a result the customer judges on the spot.</li>
             <li><strong>WayBionic and the Schulich Space Rover Team</strong> Since August 2026: diagnostics and ground-station software for a surgical arm, and controls for a Mars-style rover's arm.</li>
           </ul>
-          <p class="placard-fine">Fourteen rooms ahead. Most have controls on the placard and a kiosk you can open.</p>
+          <p class="placard-fine" data-reveal style="--i:4">Thirteen rooms ahead, one scroll each. Most have a kiosk you can open.</p>
         </article>
       </section>
 
       <section class="room" id="societies" data-room="societies" data-term-target data-wall="The Societies|Room" data-accession="Gallery II" data-plaques={JSON.stringify(societies.map(({ title, role, when }) => ({ title, role, when })))} aria-labelledby="societies-title">
         <article class="placard">
-          <header class="placard-head"><p class="accession">Gallery II</p><span class="tag" data-status="ACTIVE">Current</span></header>
-          <h2 id="societies-title">The Societies Room</h2>
-          <p class="placard-summary">The teams I build with and the weekends I spent building. Each brass plaque on the wall is one of them.</p>
-          <ul class="society-list">
+          <p class="placard-numeral" aria-hidden="true">02</p>
+          <header class="placard-head" data-reveal style="--i:0"><p class="accession">Gallery II</p><span class="tag" data-status="ACTIVE">Current</span></header>
+          <h2 id="societies-title" tabindex="-1">{words('The Societies Room').map((word, w) => <><span class="word" style={`--w:${w}`}><span>{word}</span></span>{' '}</>)}</h2>
+          <p class="placard-summary" data-reveal style="--i:2">The teams I build with and the weekends I spent building. Each brass plaque on the wall is one of them.</p>
+          <ul class="society-list" data-reveal style="--i:3">
+            {societies.map((item) => (
+              <li>
+                <p class="society-name">{item.link ? <a href={item.link}>{item.title}</a> : item.title}</p>
+                <p class="society-role">{item.role}<span>{item.when}</span></p>
+              </li>
+            ))}
+          </ul>
+          <div class="placard-actions" data-reveal style="--i:4">
+            <button type="button" class="btn btn-ghost btn-small" data-dossier-open="dossier-societies">Read about each team</button>
+          </div>
+        </article>
+        <dialog class="dossier" id="dossier-societies" aria-labelledby="dossier-societies-title">
+          <button type="button" class="dossier-close" data-kiosk-close>Close</button>
+          <p class="accession">Gallery II</p>
+          <h3 id="dossier-societies-title">The Societies Room</h3>
+          <ul class="dossier-societies">
             {societies.map((item) => (
               <li>
                 <p class="society-when">{item.when}</p>
-                <p class="society-name">{item.link ? <a href={item.link}>{item.title}</a> : item.title}<span>{item.role}</span></p>
+                <p class="society-name">{item.title}<span>{item.role}</span></p>
                 <p class="society-detail">{item.detail}</p>
               </li>
             ))}
           </ul>
-          <details class="notes">
-            <summary>Earlier volunteering</summary>
-            <ul class="society-list">{pastSocieties.map((item) => <li><p class="society-when">{item.when}</p><p class="society-name">{item.title}<span>{item.role}</span></p></li>)}</ul>
-          </details>
-        </article>
+          <h4>Earlier volunteering</h4>
+          <ul class="dossier-societies">{pastSocieties.map((item) => <li><p class="society-when">{item.when}</p><p class="society-name">{item.title}<span>{item.role}</span></p></li>)}</ul>
+        </dialog>
       </section>
 
-      {exhibits.map((exhibit) => {
+      {exhibits.map((exhibit, order) => {
         const data = exhibit.entry.data;
         const used = skillsFor(exhibit.id);
+        const title = data.title;
+        const [main, subtitle] = title.split(' — ');
         return (
           <section
             class="room"
@@ -156,36 +192,39 @@ const rooms = [{ id: 'entrance', name: 'Entrance' }, { id: 'thread', name: 'The 
             aria-labelledby={`${exhibit.id}-title`}
           >
             <article class="placard" data-case={exhibit.id}>
-              <header class="placard-head">
+              <p class="placard-numeral" aria-hidden="true">{numeral(order + 3)}</p>
+              <header class="placard-head" data-reveal style="--i:0">
                 <p class="accession">{exhibit.accession}</p>
                 <span class="tag" data-status={data.status}>{statusWord[data.status]}</span>
               </header>
-              <h2 id={`${exhibit.id}-title`} data-case-title>{data.title}</h2>
-              <p class="placard-meta">{data.year}, {data.role}</p>
-              <p class="placard-summary">{data.summary}</p>
-              {data.contribution ? <p class="placard-part"><strong>My part.</strong> {data.contribution}</p> : null}
+              <h2 id={`${exhibit.id}-title`} tabindex="-1" data-case-title>{words(main).map((word, w) => <><span class="word" style={`--w:${w}`}><span>{word}</span></span>{' '}</>)}{subtitle ? <><span class="sr-only"> — </span><span class="placard-sub" data-reveal style="--i:1">{subtitle}</span></> : null}</h2>
+              <p class="placard-meta" data-reveal style="--i:2">{data.year}, {data.role}</p>
+              <p class="placard-summary" data-reveal style="--i:3">{data.summary}</p>
+              {data.contribution ? <p class="placard-part" data-reveal style="--i:4"><strong>My part.</strong> {data.contribution}</p> : null}
 
               {exhibit.control === 'arm' ? (
-                <fieldset class="controls" data-arm-controls>
+                <fieldset class="controls" data-reveal style="--i:5" data-arm-controls>
                   <legend>Take the controls of the real arm model</legend>
-                  {armJoints.map((joint) => (
-                    <label class="joint-slider">
-                      <span>{joint.label}<b data-joint-value>{Math.round((joint.value * 180) / Math.PI)}°</b></span>
-                      <input type="range" min={joint.min} max={joint.max} step="0.01" value={joint.value} data-arm-joint={joint.name} />
-                    </label>
-                  ))}
+                  <div class="joint-grid">
+                    {armJoints.map((joint) => (
+                      <label class="joint-slider">
+                        <span>{joint.label}<b data-joint-value>{Math.round((joint.value * 180) / Math.PI)}°</b></span>
+                        <input type="range" min={joint.min} max={joint.max} step="0.01" value={joint.value} data-arm-joint={joint.name} />
+                      </label>
+                    ))}
+                  </div>
                   <p class="controls-note">Limits come from the team's URDF. The motion test resumes nine seconds after you let go.</p>
                 </fieldset>
               ) : null}
               {exhibit.control === 'sun' ? (
-                <fieldset class="controls">
+                <fieldset class="controls" data-reveal style="--i:5">
                   <legend>Move the sun around the south pole</legend>
                   <label class="joint-slider"><span>Sun azimuth <b data-sun-value>auto</b></span><input type="range" min="0" max="6.283" step="0.01" value="0" data-sun /></label>
                   <p class="controls-note">The light stays low on the horizon, so crater rims throw long shadows. That trade-off is what SouthPoint maps.</p>
                 </fieldset>
               ) : null}
               {exhibit.control === 'wash' ? (
-                <fieldset class="controls">
+                <fieldset class="controls" data-reveal style="--i:5">
                   <legend>Take the wand</legend>
                   <div class="control-row">
                     <button type="button" class="hold" data-wash-hold aria-describedby={`${exhibit.id}-wash-note`}>Hold to spray</button>
@@ -195,18 +234,27 @@ const rooms = [{ id: 'entrance', name: 'Entrance' }, { id: 'thread', name: 'The 
                 </fieldset>
               ) : null}
               {exhibit.control === 'tamper' ? (
-                <fieldset class="controls">
+                <fieldset class="controls" data-reveal style="--i:5">
                   <legend>Test the chain</legend>
                   <div class="control-row"><button type="button" data-tamper>Tamper with record 4</button></div>
                   <p class="controls-note">Watch the chain: the edited record turns amber, then every block after it fails verification.</p>
                 </fieldset>
               ) : null}
 
-              <div class="placard-actions">
+              <div class="placard-actions" data-reveal style="--i:6">
                 {exhibit.kiosk ? <button type="button" class="btn btn-primary btn-small" data-kiosk-open={`kiosk-${exhibit.kiosk}`}>Try it: {exhibit.kioskTitle}</button> : null}
-                {exhibit.paintings?.length ? <button type="button" class="btn btn-ghost btn-small" data-curtain={exhibit.id} aria-pressed="false">Draw the curtains</button> : null}
+                <button type="button" class="btn btn-ghost btn-small" data-dossier-open={`dossier-${exhibit.id}`}>Exhibit notes</button>
+                {exhibit.paintings?.length ? <button type="button" class="text-button" data-curtain={exhibit.id} aria-pressed="false">Draw the curtains</button> : null}
                 {data.link ? <a class="placard-link" href={data.link} target="_blank" rel="noreferrer">{sentence(data.linkLabel ?? 'View project')}</a> : null}
               </div>
+            </article>
+
+            <dialog class="dossier" id={`dossier-${exhibit.id}`} aria-labelledby={`dossier-${exhibit.id}-title`}>
+              <button type="button" class="dossier-close" data-kiosk-close>Close</button>
+              <p class="accession">{exhibit.accession}</p>
+              <h3 id={`dossier-${exhibit.id}-title`}>{shortTitle(title)}</h3>
+              <p class="placard-meta">{data.year}, {data.role}</p>
+              {data.contribution ? <p class="dossier-part"><strong>My part.</strong> {data.contribution}</p> : null}
 
               {exhibit.paintings?.length ? (
                 <div class="thumbs">
@@ -219,44 +267,43 @@ const rooms = [{ id: 'entrance', name: 'Entrance' }, { id: 'thread', name: 'The 
                 </div>
               ) : null}
 
+              <dl class="dossier-notes">
+                {data.problem ? <div><dt>Problem</dt><dd>{data.problem}</dd></div> : null}
+                {data.system ? <div><dt>{data.status === 'SHIPPED' || data.status === 'ACTIVE' ? 'System' : 'Current design'}</dt><dd>{data.system}</dd></div> : null}
+                {data.decision ? <div><dt>Key decision</dt><dd>{data.decision}</dd></div> : null}
+                {data.highlights?.length ? <div><dt>Built</dt><dd><ul>{data.highlights.map((item) => <li>{item}</li>)}</ul></dd></div> : null}
+                {data.lesson ? <div><dt>What broke, what I learned</dt><dd>{data.lesson}</dd></div> : null}
+                {data.team ? <div><dt>Team</dt><dd>{data.team}</dd></div> : null}
+                {data.next ? <div><dt>Next</dt><dd>{data.next}</dd></div> : null}
+                <div><dt>Stack</dt><dd><ul class="stack">{stackList(data.stack).map((item) => <li>{item}</li>)}</ul></dd></div>
+              </dl>
+
               {used.length ? (
                 <div class="skills-on-show">
                   <p>Skills on show</p>
-                  <ul>{used.map((skill) => <li><a href="#toolbox">{skill.name}</a></li>)}</ul>
+                  <ul>{used.map((skill) => <li><a href="#toolbox" data-dossier-leave>{skill.name}</a></li>)}</ul>
                 </div>
               ) : null}
-
-              <details class="notes">
-                <summary>Read the full exhibit notes</summary>
-                <dl>
-                  {data.problem ? <div><dt>Problem</dt><dd>{data.problem}</dd></div> : null}
-                  {data.system ? <div><dt>{data.status === 'SHIPPED' || data.status === 'ACTIVE' ? 'System' : 'Current design'}</dt><dd>{data.system}</dd></div> : null}
-                  {data.decision ? <div><dt>Key decision</dt><dd>{data.decision}</dd></div> : null}
-                  {data.highlights?.length ? <div><dt>Built</dt><dd><ul>{data.highlights.map((item) => <li>{item}</li>)}</ul></dd></div> : null}
-                  {data.lesson ? <div><dt>What broke, what I learned</dt><dd>{data.lesson}</dd></div> : null}
-                  {data.team ? <div><dt>Team</dt><dd>{data.team}</dd></div> : null}
-                  {data.next ? <div><dt>Next</dt><dd>{data.next}</dd></div> : null}
-                  <div><dt>Stack</dt><dd><ul class="stack">{stackList(data.stack).map((item) => <li>{item}</li>)}</ul></dd></div>
-                </dl>
-              </details>
-            </article>
+            </dialog>
           </section>
         );
       })}
 
       <section class="room room-finale" id="next-wing" data-room="next-wing" data-sculpture="barrier" data-accession="AK.next" aria-labelledby="next-wing-title">
         <article class="placard">
-          <header class="placard-head"><p class="accession">Under construction</p><span class="tag" data-status="IN PROGRESS">In progress</span></header>
-          <h2 id="next-wing-title">The next wing</h2>
-          <p class="placard-summary">The goal is a robotics company that ships machines into the real world. The next exhibits are being built in simulation first, so none of them waits on buying hardware.</p>
-          <ol class="mini-route">
+          <p class="placard-numeral" aria-hidden="true">{numeral(rooms.length - 1)}</p>
+          <header class="placard-head" data-reveal style="--i:0"><p class="accession">Under construction</p><span class="tag" data-status="IN PROGRESS">In progress</span></header>
+          <h2 id="next-wing-title" tabindex="-1">{words('The next wing').map((word, w) => <><span class="word" style={`--w:${w}`}><span>{word}</span></span>{' '}</>)}</h2>
+          <p class="placard-summary" data-reveal style="--i:2">The goal is a robotics company that ships machines into the real world. The next exhibits are being built in simulation first, so none of them waits on buying hardware.</p>
+          <ol class="mini-route" data-reveal style="--i:3">
             {roadmap.map((stop) => <li data-state={stop.state}><strong>{stop.tool}</strong><span>{stop.skill}</span></li>)}
           </ol>
-          <div class="placard-actions"><a class="btn btn-primary btn-small" href="#thinking">Leave the hall for the archive</a></div>
+          <div class="placard-actions" data-reveal style="--i:4"><a class="btn btn-primary btn-small" href="#thinking">Leave the hall for the archive</a></div>
         </article>
       </section>
     </div>
 
+    <div class="archive">
     <section class="thinking night" id="thinking" data-term-target aria-labelledby="thinking-title">
       <div class="shell">
         <div>
@@ -415,6 +462,7 @@ const rooms = [{ id: 'entrance', name: 'Entrance' }, { id: 'thread', name: 'The 
         <span>Built with Astro and Three.js. The WayBionic arm is the team's MIT-licensed URDF, rendered live.</span>
       </footer>
     </section>
+    </div>
   </main>
 
   <dialog class="kiosk" id="kiosk-stale-lab" aria-label="When fresh data goes stale"><button type="button" class="kiosk-close" data-kiosk-close>Close</button><div class="instrument-wrap"><StaleStateLab /></div></dialog>
@@ -431,24 +479,36 @@ const rooms = [{ id: 'entrance', name: 'Entrance' }, { id: 'thread', name: 'The 
 </SiteLayout>
 
 <script>
-  import { startMuseum } from '../scripts/museum/museum';
+  import { startTour } from '../scripts/museum/tour';
+  import { startPlates } from '../scripts/museum/plates';
 
   const museum = document.querySelector<HTMLElement>('[data-museum]');
   const send = (room: string, key: string, value: number) => dispatchEvent(new CustomEvent('museum:control', { detail: { room, key, value } }));
 
-  // WebGL is optional: without it the rooms collapse into readable placards with images.
+  // Everyone starts on the pocket guide's photographs, so the first paint is never an empty
+  // black stage. Wide landscape screens with WebGL then load the live hall (and Three.js) on
+  // top; phones, portrait tablets, and anything that fails stay on the photographs.
   if (museum) {
+    const tour = startTour(museum);
+    const stopPlates = startPlates(museum, tour);
     const probe = document.createElement('canvas');
-    const gl = probe.getContext('webgl2') ?? probe.getContext('webgl');
-    if (!gl) museum.classList.add('is-static');
-    else void startMuseum(museum).catch(() => museum.classList.add('is-static'));
+    const webgl = Boolean(probe.getContext('webgl2') ?? probe.getContext('webgl'));
+    const roomy = matchMedia('(min-width: 900px) and (orientation: landscape)').matches;
+    if (webgl && roomy) {
+      import('../scripts/museum/museum')
+        .then(({ startMuseum }) => startMuseum(museum, tour))
+        .then(() => { stopPlates(); museum.classList.add('is-3d'); })
+        .catch(() => museum.classList.add('is-plates'));
+    } else museum.classList.add('is-plates');
   }
 
   const floorplan = document.querySelector<HTMLElement>('.floorplan');
   if (museum && floorplan) new IntersectionObserver(([entry]) => floorplan.classList.toggle('is-hidden', !entry.isIntersecting), { rootMargin: '-40% 0px -40% 0px' }).observe(museum);
 
+  // The bar stays clear over the hall and turns solid once the archive scrolls under it.
   const topbar = document.querySelector<HTMLElement>('[data-topbar]');
-  const syncBar = () => topbar?.classList.toggle('is-solid', scrollY > innerHeight * 0.6);
+  const archive = document.querySelector<HTMLElement>('.archive');
+  const syncBar = () => topbar?.classList.toggle('is-solid', Boolean(archive && archive.getBoundingClientRect().top < 80));
   addEventListener('scroll', syncBar, { passive: true });
   syncBar();
 
@@ -481,13 +541,6 @@ const rooms = [{ id: 'entrance', name: 'Entrance' }, { id: 'thread', name: 'The 
     decision.addEventListener('focusin', (event) => { if ((event.target as HTMLElement).matches(':focus-visible')) show(noteAt(event.target)); });
     decision.addEventListener('focusout', (event) => { if (!decision.contains(event.relatedTarget as Node | null)) show(); });
   }
-
-  // Placards scroll with the page rather than inside themselves (an inner scroller swallows the
-  // wheel and stalls the walk). A placard taller than the view pins once its bottom is visible.
-  const placardSize = new ResizeObserver((entries) => entries.forEach(({ target, borderBoxSize }) => {
-    (target as HTMLElement).style.setProperty('--placard-h', `${Math.round(borderBoxSize[0].blockSize)}px`);
-  }));
-  document.querySelectorAll('.placard').forEach((placard) => placardSize.observe(placard));
 
   // Arm controls drive the real URDF model in the hall.
   document.querySelectorAll<HTMLInputElement>('[data-arm-joint]').forEach((input) => {
@@ -528,13 +581,38 @@ const rooms = [{ id: 'entrance', name: 'Entrance' }, { id: 'thread', name: 'The 
     });
   });
 
-  // Kiosks and the lightbox are native modal dialogs: focus is trapped and Escape closes them.
-  document.querySelectorAll<HTMLButtonElement>('[data-kiosk-open]').forEach((button) => {
-    button.addEventListener('click', () => document.querySelector<HTMLDialogElement>(`#${button.dataset.kioskOpen}`)?.showModal());
+  // Kiosks, dossiers and the lightbox are native modal dialogs: focus is trapped and Escape
+  // closes them. Closing plays a short exit first, so a dossier slides back where it came from.
+  const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+  const pendingExit = new WeakMap<HTMLDialogElement, () => void>();
+  const settle = (dialog: HTMLDialogElement) => {
+    pendingExit.get(dialog)?.();
+    dialog.classList.remove('is-closing');
+  };
+  const finish = (dialog: HTMLDialogElement) => { settle(dialog); if (dialog.open) dialog.close(); };
+  const dismiss = (dialog: HTMLDialogElement) => {
+    // A second close request mid-exit (double click, repeated Escape) just finishes it.
+    if (reducedMotion.matches || dialog.classList.contains('is-closing')) { finish(dialog); return; }
+    dialog.classList.add('is-closing');
+    // Only the dialog's own exit counts; animations ending inside it bubble up too.
+    const onEnd = (event: AnimationEvent) => { if (event.target === dialog) finish(dialog); };
+    const timer = window.setTimeout(() => finish(dialog), 400);
+    dialog.addEventListener('animationend', onEnd);
+    pendingExit.set(dialog, () => { clearTimeout(timer); dialog.removeEventListener('animationend', onEnd); pendingExit.delete(dialog); });
+  };
+  document.querySelectorAll<HTMLButtonElement>('[data-kiosk-open], [data-dossier-open]').forEach((button) => {
+    const id = button.dataset.kioskOpen ?? button.dataset.dossierOpen;
+    button.addEventListener('click', () => document.querySelector<HTMLDialogElement>(`#${id}`)?.showModal());
   });
-  document.querySelectorAll<HTMLDialogElement>('dialog.kiosk, dialog.lightbox').forEach((dialog) => {
-    dialog.querySelector('[data-kiosk-close]')?.addEventListener('click', () => dialog.close());
-    dialog.addEventListener('click', (event) => { if (event.target === dialog) dialog.close(); });
+  document.querySelectorAll<HTMLDialogElement>('dialog.kiosk, dialog.lightbox, dialog.dossier').forEach((dialog) => {
+    dialog.querySelector('[data-kiosk-close]')?.addEventListener('click', () => dismiss(dialog));
+    dialog.addEventListener('click', (event) => { if (event.target === dialog) dismiss(dialog); });
+    dialog.addEventListener('cancel', (event) => { event.preventDefault(); dismiss(dialog); });
+    dialog.addEventListener('close', () => settle(dialog));
+  });
+  // A skill link inside a dossier leaves the hall for the toolbox, so close the drawer first.
+  document.querySelectorAll<HTMLAnchorElement>('[data-dossier-leave]').forEach((link) => {
+    link.addEventListener('click', () => link.closest('dialog')?.close());
   });
   const lightbox = document.querySelector<HTMLDialogElement>('[data-lightbox-dialog]');
   document.querySelectorAll<HTMLButtonElement>('[data-lightbox]').forEach((button) => {
