@@ -1,0 +1,190 @@
+/* Driveway to the Moon. Road-sign type (Big Shoulders, drawn for Chicago's street signs),
+   plain-spoken body text (Public Sans, from US government signage), and an instrument
+   cluster lit in sodium amber. Signal red is kept for the one thing to press at each stop. */
+
+:root {
+  --asphalt: #0b0e15;
+  --asphalt-2: #141924;
+  --chalk: #f3eee4;
+  --chalk-dim: #bdb7aa;
+  --line: rgba(243, 238, 228, 0.16);
+  --sodium: #f2a541;
+  --signal: #d8342c;
+  --signal-deep: #b02820;
+
+  /* The shared kiosks (kiosks.css) read the museum's colour names; here they map onto the
+     journey's palette. */
+  --night: var(--asphalt);
+  --night-2: var(--asphalt-2);
+  --night-line: var(--line);
+  --frost: var(--chalk);
+  --frost-dim: var(--chalk-dim);
+  --ink: var(--asphalt); /* kiosks set dark text on their teal badges */
+  --tag: var(--signal);
+  --gilt: var(--sodium);
+  --data: #7fc4ad;
+  --fault: #ff6a5c;
+  --on-accent: #ffffff;
+  --radius-s: 3px;
+  --radius-m: 4px;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --display: 'Big Shoulders', 'Arial Narrow', sans-serif;
+  --sans: 'Public Sans', system-ui, sans-serif;
+  --mono: 'IBM Plex Mono', ui-monospace, monospace;
+
+  --ease-out: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-in: cubic-bezier(0.55, 0, 1, 0.45);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --gutter: clamp(1.25rem, 5vw, 5.5rem);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scrollbar-color: var(--asphalt-2) var(--asphalt); }
+body { margin: 0; color: var(--chalk); background: var(--asphalt); font: 400 1.05rem/1.6 var(--sans); -webkit-font-smoothing: antialiased; }
+h1, h2, p, ul, ol { margin: 0; }
+ul, ol { padding: 0; list-style: none; }
+a { color: inherit; }
+button { font: inherit; color: inherit; }
+::selection { color: var(--asphalt); background: var(--sodium); }
+:focus-visible { outline: 2px solid var(--sodium); outline-offset: 3px; border-radius: 2px; }
+
+.j-skip { position: fixed; top: 0.75rem; left: 0.75rem; z-index: 40; padding: 0.6rem 1rem; color: var(--asphalt); background: var(--sodium); font-weight: 600; transform: translateY(-200%); }
+.j-skip:focus { transform: none; }
+
+/* ---------- Top bar ---------- */
+.j-bar { position: fixed; inset: 0 0 auto; z-index: 30; display: flex; align-items: center; justify-content: space-between; padding: 1rem var(--gutter); pointer-events: none; }
+.j-bar a { pointer-events: auto; }
+.j-mark { display: grid; place-items: center; width: 2.5rem; height: 2.5rem; color: var(--chalk); background: var(--signal); border-radius: 50%; font: 800 1.05rem/1 var(--display); letter-spacing: 0.02em; text-decoration: none; transition: transform 150ms var(--ease-out); }
+.j-mark:active { transform: scale(0.96); }
+.j-bar-links { display: flex; gap: 1.75rem; }
+.j-bar-links a { font-size: 0.92rem; font-weight: 500; text-decoration: none; text-shadow: 0 1px 12px rgba(0, 0, 0, 0.6); background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat; transition: background-size 220ms var(--ease-out); }
+@media (hover: hover) and (pointer: fine) { .j-bar-links a:hover { background-size: 100% 1px; } }
+
+/* ---------- The stage ---------- */
+.j-stage { position: fixed; inset: 0; z-index: 0; height: 100vh; height: 100lvh; overflow: hidden; background: var(--asphalt); }
+.j-canvas { display: block; width: 100%; height: 100%; opacity: 0; transition: opacity 1.4s var(--ease-out); }
+.journey.is-live .j-canvas { opacity: 1; }
+/* The scrim darkens the side of the scene the card sits on, only while a card is showing. */
+.j-scrim { position: absolute; inset: 0; opacity: var(--show, 0); background: linear-gradient(90deg, rgba(7, 9, 14, 0.86) 0%, rgba(7, 9, 14, 0.58) 30%, rgba(7, 9, 14, 0) 58%); }
+.j-flash { position: absolute; inset: 0; opacity: 0; background: radial-gradient(120% 100% at 50% 45%, #ffffff 40%, #f4f1ff 100%); pointer-events: none; }
+.j-grain { position: absolute; inset: 0; opacity: 0.08; mix-blend-mode: overlay; pointer-events: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+
+.j-track { position: relative; z-index: 1; pointer-events: none; }
+
+/* ---------- Stop cards ----------
+   Without JavaScript (or if the journey fails) the cards are an ordinary stacked page. The
+   fixed, scroll-driven layout only switches on in `.js .journey:not(.is-static)`, below. */
+.j-cards { display: grid; gap: 5rem; padding: 7rem var(--gutter) 4rem; }
+.j-card { max-width: 40rem; }
+.j-stage, .j-track, .trip, .j-cue { display: none; }
+
+.js .journey:not(.is-static) .j-stage, .js .journey:not(.is-static) .j-track { display: block; }
+.js .journey:not(.is-static) .trip { display: grid; }
+.js .journey:not(.is-static) .j-cue { display: grid; }
+.js .journey:not(.is-static) .j-cards { position: fixed; inset: 0; z-index: 10; display: block; padding: 0; pointer-events: none; }
+.js .journey:not(.is-static) .j-card { position: absolute; top: 50%; left: var(--gutter); width: min(34rem, 40vw); max-width: none; max-height: calc(100svh - 9rem); overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; translate: 0 -50%; }
+.js .journey:not(.is-static) .j-card.is-live { pointer-events: auto; }
+/* One number per card, --show (0..1), staggers every child by its own --i. Scrolling back
+   plays it in reverse because it is a function of position, not a one-shot animation. */
+.js .journey:not(.is-static) .j-card > * {
+  opacity: clamp(0, calc(var(--show, 0) * 2.4 - var(--i, 0) * 0.32), 1);
+  transform: translate3d(0, calc((1 - clamp(0, calc(var(--show, 0) * 1.7 - var(--i, 0) * 0.14), 1)) * 22px), 0);
+}
+.j-place { font: 500 0.85rem/1.4 var(--sans); color: var(--sodium); }
+.j-title { margin-top: 0.7rem; font: 800 clamp(3.4rem, 6.4vw, 6.75rem)/0.88 var(--display); letter-spacing: -0.005em; text-wrap: balance; }
+.j-card-title .j-title { font-size: clamp(4.5rem, 10vw, 10.5rem); line-height: 0.84; }
+.j-lede { max-width: 31rem; margin-top: 1.4rem; font-size: clamp(1.02rem, 1.25vw, 1.15rem); line-height: 1.6; color: #e4ded1; }
+.j-facts { display: grid; gap: 0.9rem; max-width: 31rem; margin-top: 1.6rem; }
+.j-facts li { display: grid; gap: 0.15rem; padding-left: 1rem; border-left: 1px solid var(--line); font-size: 0.95rem; line-height: 1.5; color: var(--chalk-dim); }
+.j-facts strong { font-weight: 600; color: var(--chalk); }
+.j-part { max-width: 31rem; margin-top: 1rem; font-size: 0.95rem; line-height: 1.55; color: var(--chalk-dim); }
+.j-part strong { color: var(--chalk); font-weight: 600; }
+/* Stop controls: sliders with amber thumbs, one red thing to press, quiet chips for the kiosks. */
+.j-controls { display: grid; gap: 0.75rem; max-width: 31rem; margin-top: 1.4rem; }
+.j-control-row { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+.j-slider-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem 1.2rem; }
+.j-slider { display: grid; gap: 0.3rem; font-size: 0.82rem; color: var(--chalk-dim); }
+.j-slider span { display: flex; justify-content: space-between; gap: 0.5rem; }
+.j-slider b { font: 500 0.82rem var(--mono); font-variant-numeric: tabular-nums; color: var(--sodium); }
+.j-slider input[type='range'] { width: 100%; height: 1.5rem; margin: 0; background: transparent; accent-color: var(--sodium); cursor: pointer; }
+.j-hold, .j-chip { min-height: 2.6rem; padding: 0.55rem 1.1rem; border-radius: 2px; font: 600 0.9rem/1 var(--sans); cursor: pointer; transition: background-color 150ms ease, border-color 150ms ease, transform 150ms var(--ease-out); }
+.j-hold { color: #fff; background: var(--signal); border: 1px solid var(--signal); touch-action: none; user-select: none; -webkit-user-select: none; }
+.j-hold.is-held, .j-hold:active { transform: scale(0.96); background: var(--signal-deep); }
+.j-chip { color: var(--chalk); background: rgba(243, 238, 228, 0.04); border: 1px solid var(--line); justify-self: start; }
+.j-chip:active { transform: scale(0.96); }
+@media (hover: hover) and (pointer: fine) {
+  .j-hold:hover { background: var(--signal-deep); }
+  .j-chip:hover { border-color: rgba(242, 165, 65, 0.6); background: rgba(242, 165, 65, 0.08); }
+}
+.j-note { font-size: 0.82rem; line-height: 1.45; color: var(--chalk-dim); }
+/* Controls that steer the 3D scene mean nothing without it: hidden without JavaScript or in
+   the WebGL fallback. Kiosk chips stay, since kiosks are plain HTML (they need JavaScript). */
+html:not(.js) .j-controls, .journey.is-static .j-slider, .journey.is-static button[data-control], .journey.is-static .j-note { display: none; }
+html:has(dialog[open]) { overflow: hidden; }
+
+.j-elsewhere { display: flex; gap: 1.5rem; margin-top: 1.2rem; font-size: 0.92rem; }
+.j-elsewhere a { color: var(--chalk-dim); text-underline-offset: 4px; text-decoration-color: rgba(242, 165, 65, 0.5); }
+.j-elsewhere a:hover { color: var(--chalk); }
+.j-hint { margin-top: 1.6rem; font-size: 0.9rem; color: var(--chalk-dim); }
+.j-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem 1.5rem; margin-top: 2rem; }
+.j-btn { display: inline-flex; align-items: center; min-height: 3.1rem; padding: 0.7rem 1.5rem; color: #fff; background: var(--signal); border: 0; border-radius: 2px; font: 600 1rem/1 var(--sans); text-decoration: none; cursor: pointer; transition: background-color 150ms ease, transform 150ms var(--ease-out); }
+.j-btn:active { transform: scale(0.96); }
+@media (hover: hover) and (pointer: fine) { .j-btn:hover { background: var(--signal-deep); } }
+.j-link { font-weight: 500; text-decoration: none; padding-bottom: 0.15rem; background: linear-gradient(currentColor, currentColor) 0 100% / 100% 1px no-repeat; transition: background-size 220ms var(--ease-out), color 150ms ease; }
+@media (hover: hover) and (pointer: fine) { .j-link:hover { color: var(--sodium); background-size: 0 1px; background-position: 100% 100%; } }
+
+.j-cue { position: absolute; opacity: var(--show, 0); left: 50%; bottom: 2rem; justify-items: center; gap: 0.7rem; translate: -50% 0; font: 500 0.78rem/1 var(--sans); color: var(--chalk-dim); }
+.j-cue i { position: relative; width: 1px; height: 3rem; overflow: hidden; background: rgba(242, 165, 65, 0.25); }
+.j-cue i::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, transparent, var(--sodium)); animation: cue 2.4s var(--ease-in-out) infinite; }
+@keyframes cue { from { transform: translateY(-100%); } to { transform: translateY(100%); } }
+
+/* ---------- Trip meter ---------- */
+.trip { position: fixed; right: var(--gutter); bottom: 1.75rem; z-index: 20; justify-items: end; gap: 0.9rem; }
+.trip-odo { display: flex; align-items: baseline; gap: 0.45rem; padding: 0.4rem 0.75rem; background: rgba(8, 10, 15, 0.62); border: 1px solid var(--line); border-radius: 3px; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+.trip-km { min-width: 7.5ch; font: 500 1.35rem/1 var(--mono); font-variant-numeric: tabular-nums; text-align: right; color: var(--sodium); text-shadow: 0 0 14px rgba(242, 165, 65, 0.45); }
+.trip-unit { font: 500 0.75rem/1 var(--mono); color: var(--chalk-dim); }
+.trip-name { font: 600 0.82rem/1.2 var(--sans); color: var(--chalk); text-shadow: 0 1px 10px rgba(0, 0, 0, 0.6); }
+/* Fourteen stops as a row of dots on a thin route line; each dot's hit area is wider than the
+   dot itself, and the current stop's name sits above the row. */
+.trip-stops { position: relative; display: flex; }
+.trip-stops::before { content: ''; position: absolute; left: 0.6rem; right: 0.6rem; top: 50%; height: 1px; background: var(--line); }
+.trip-stops button { position: relative; display: grid; place-items: center; width: 1.5rem; height: 1.5rem; padding: 0; background: none; border: 0; cursor: pointer; }
+.trip-stops button::before { content: ''; width: 0.42rem; height: 0.42rem; border-radius: 50%; background: var(--asphalt-2); box-shadow: inset 0 0 0 1px var(--chalk-dim); transition: background-color 200ms ease, box-shadow 200ms ease, transform 200ms var(--ease-out); }
+.trip-stops button[aria-current]::before { background: var(--sodium); box-shadow: 0 0 0 4px rgba(242, 165, 65, 0.22); transform: scale(1.3); }
+@media (hover: hover) and (pointer: fine) { .trip-stops button:hover::before { box-shadow: inset 0 0 0 1px var(--chalk); transform: scale(1.3); } }
+
+/* ---------- After the journey ---------- */
+.arrival { position: relative; z-index: 50; display: grid; align-content: center; gap: 1.5rem; min-height: 100svh; padding: 6rem var(--gutter); background: var(--asphalt); }
+.arrival h2 { max-width: 14ch; font: 800 clamp(3rem, 8vw, 7rem)/0.9 var(--display); }
+.arrival p { max-width: 36rem; color: var(--chalk-dim); }
+.arrival ul { display: flex; flex-wrap: wrap; gap: 0.75rem 2rem; }
+.arrival a { text-underline-offset: 4px; text-decoration-color: rgba(242, 165, 65, 0.5); }
+
+/* ---------- Phones: the card sits at the bottom, the scene above it ---------- */
+@media (max-width: 899px), (orientation: portrait) {
+  .j-bar-links a:first-child { display: none; }
+  .j-scrim { background: linear-gradient(0deg, rgba(7, 9, 14, 0.94) 0%, rgba(7, 9, 14, 0.78) 34%, rgba(7, 9, 14, 0) 60%); }
+  .js .journey:not(.is-static) .j-card { top: auto; bottom: max(1.5rem, env(safe-area-inset-bottom)); left: 1.25rem; right: 1.25rem; width: auto; translate: none; }
+  .j-title { font-size: clamp(2.6rem, 12vw, 4.2rem); }
+  .j-card-title .j-title { font-size: clamp(3.6rem, 17vw, 6rem); }
+  .j-lede { margin-top: 0.9rem; font-size: 0.98rem; line-height: 1.5; }
+  /* Phones keep each card short enough to leave the scene visible: the lede and names stay,
+     the longer detail lines wait for a wider screen. */
+  .j-facts { gap: 0.35rem; margin-top: 0.9rem; }
+  .j-facts li { font-size: 0.88rem; line-height: 1.4; }
+  .js .journey:not(.is-static) .j-facts span, .js .journey:not(.is-static) .j-part { display: none; }
+  .js .journey:not(.is-static) .j-card { max-height: calc(100svh - 10rem); }
+  .j-actions { margin-top: 1.3rem; }
+  .js .journey:not(.is-static) .j-cue { display: none; }
+  .trip { top: 4.4rem; bottom: auto; right: 1.25rem; gap: 0.6rem; }
+  .trip-km { font-size: 1.05rem; }
+  .trip-name { font-size: 0.75rem; }
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js .journey:not(.is-static) .j-card > * { transform: none; }
+  .j-cue i::after { animation: none; }
+  .j-canvas, .j-mark, .j-btn { transition: none; }
+}

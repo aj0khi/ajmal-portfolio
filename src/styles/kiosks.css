@@ -1,0 +1,200 @@
+/* Kiosks: the interactive demos (stale data, hash chain, Snake lab, HVAC, rover sim, Poisson,
+   arm bus, signatures) and the lightbox, shared by the museum (/) and the journey (/journey/).
+   Colours come from custom properties each page defines: --night, --frost, --tag, --data... */
+/* Kiosks and lightbox */
+.kiosk, .lightbox {
+  width: min(46rem, calc(100% - 2rem));
+  max-height: calc(100svh - 2rem);
+  padding: 2.8rem 0 0;
+  overflow: auto;
+  color: var(--frost);
+  background: transparent;
+  border: 0;
+}
+.kiosk-wide { width: min(64rem, calc(100% - 2rem)); }
+.kiosk::backdrop, .lightbox::backdrop { background: rgba(8, 6, 3, 0.75); backdrop-filter: blur(3px); }
+.kiosk[open], .lightbox[open] { animation: kiosk-in 260ms var(--ease); }
+@keyframes kiosk-in { from { opacity: 0; transform: translateY(12px) scale(0.985); } }
+.kiosk-close { position: absolute; top: 0; right: 0; padding: 0.45rem 1rem; color: var(--frost); background: rgba(23, 17, 17, 0.95); border: 1px solid var(--night-line); border-radius: 999px; cursor: pointer; }
+.kiosk-close:hover { border-color: var(--tag); }
+.lightbox { width: min(90rem, calc(100% - 2rem)); }
+.lightbox img { width: 100%; height: auto; border-radius: 4px; }
+.lightbox p { margin-top: 0.6rem; font-size: 0.9rem; color: var(--frost-dim); }
+
+/* Bus planner kiosk */
+.bus-options { display: grid; gap: 0.8rem; }
+@media (min-width: 640px) { .bus-options { grid-template-columns: 1fr 1fr; } }
+.bus-options fieldset { margin: 0; padding: 0.8rem 1rem; border: 1px solid var(--night-line); border-radius: var(--radius-s); }
+.bus-options legend { padding: 0 0.3rem; font-size: 0.85rem; color: var(--frost-dim); }
+.bus-options label { display: flex; gap: 0.5rem; align-items: center; margin-top: 0.35rem; font-size: 0.92rem; cursor: pointer; }
+.bus-options input { accent-color: var(--tag); }
+.bus-checks { display: grid; gap: 0.5rem; margin-top: 1rem; }
+.bus-checks li { position: relative; padding: 0.6rem 0.8rem 0.6rem 2.2rem; border-radius: var(--radius-s); font-size: 0.92rem; background: rgba(128, 187, 167, 0.08); }
+.bus-checks li::before { content: '\2713'; position: absolute; left: 0.8rem; color: var(--data); }
+.bus-checks li[data-ok='false'] { background: rgba(255, 106, 92, 0.1); }
+.bus-checks li[data-ok='false']::before { content: '!'; color: var(--fault); font-weight: 700; }
+
+/* Signature kiosk */
+.sig-label { display: block; margin-bottom: 0.4rem; font-size: 0.85rem; color: var(--frost-dim); }
+.sig-kiosk textarea { width: 100%; padding: 0.7rem 0.8rem; color: var(--frost); background: var(--night); border: 1px solid rgba(233, 236, 230, 0.25); border-radius: var(--radius-s); font: 400 0.95rem/1.5 var(--sans); resize: vertical; }
+.sig-kiosk button:disabled { opacity: 0.45; cursor: not-allowed; }
+.sig-kiosk[data-state='valid'] [data-sig-result] { color: var(--data); }
+.sig-kiosk[data-state='invalid'] [data-sig-result], .sig-kiosk[data-state='error'] [data-sig-result] { color: var(--fault); }
+
+
+.kiosk.is-closing, .lightbox.is-closing { animation: kiosk-out 200ms var(--ease-in) forwards; }
+@keyframes kiosk-out { to { opacity: 0; transform: translateY(8px) scale(0.985); } }
+
+/* ---------- Instruments: dark panels mounted on the paper ---------- */
+
+.instrument,
+.instrument-wrap > section {
+  --inst-ink: var(--frost);
+  --inst-data: var(--data);
+  --inst-tag: var(--tag);
+  padding: clamp(1.1rem, 2.5vw, 1.75rem);
+  color: var(--frost);
+  background: linear-gradient(180deg, var(--night-2), var(--night));
+  border: 1px solid var(--night-line);
+  border-radius: var(--radius-m);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06) inset, 0 40px 80px -40px rgba(0, 0, 0, 0.55);
+}
+.instrument-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; }
+.instrument-title { font: 400 1.4rem/1 var(--display); letter-spacing: 0.01em; }
+.instrument-chip { padding: 0.2rem 0.6rem; font: 400 0.74rem/1.4 var(--mono); color: var(--frost-dim); border: 1px solid var(--night-line); border-radius: 999px; }
+.instrument-note { margin-top: 1rem; font-size: 0.85rem; line-height: 1.5; color: var(--frost-dim); max-width: 46rem; }
+.instrument-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr)); gap: 0.5rem; margin-top: 1rem; }
+.instrument-stats div { padding: 0.6rem 0.75rem; border: 1px solid var(--night-line); border-radius: var(--radius-s); }
+.instrument-stats dt { font: 400 0.72rem/1.3 var(--mono); color: var(--frost-dim); }
+.instrument-stats dd { font: 500 1.05rem/1.4 var(--mono); font-variant-numeric: tabular-nums; }
+.instrument-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem; }
+
+.instrument button,
+.instrument-wrap button {
+  min-height: 2.5rem;
+  padding: 0.45rem 0.95rem;
+  color: var(--frost);
+  background: transparent;
+  border: 1px solid rgba(239, 230, 210, 0.28);
+  border-radius: 999px;
+  font: 500 0.85rem/1.2 var(--sans);
+  letter-spacing: 0;
+  text-transform: none;
+  box-shadow: none;
+  cursor: pointer;
+  transition: background-color 180ms var(--ease), border-color 180ms var(--ease), color 180ms var(--ease);
+}
+.instrument button:hover,
+.instrument-wrap button:hover { background: rgba(239, 230, 210, 0.08); border-color: rgba(239, 230, 210, 0.55); }
+.instrument-wrap button[aria-pressed='true'] { color: var(--on-accent); background: var(--tag); border-color: var(--tag); }
+
+.rover-sim canvas { width: 100%; height: auto; aspect-ratio: 16 / 9; border-radius: var(--radius-s); background: #120d0d; cursor: crosshair; touch-action: manipulation; }
+.rover-sim[data-mode='avoid'] .instrument-chip { color: var(--on-accent); background: var(--tag); border-color: var(--tag); }
+
+/* Poisson explorer */
+.poisson-controls { display: grid; gap: 1rem; }
+@media (min-width: 700px) { .poisson-controls { grid-template-columns: 1fr 1fr; gap: 2rem; } }
+.poisson-controls label { display: grid; gap: 0.45rem; font-size: 0.92rem; }
+.poisson-controls span { display: flex; justify-content: space-between; }
+.poisson-controls b { font: 500 1rem var(--mono); color: var(--data); }
+input[type='range'] { width: 100%; accent-color: var(--tag); }
+.poisson-outcomes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin-top: 1.5rem; }
+.poisson-outcomes div { position: relative; display: grid; gap: 0.2rem; padding: 0.75rem 0.85rem 1rem; border: 1px solid var(--night-line); border-radius: var(--radius-s); overflow: hidden; }
+.poisson-outcomes span { font-size: 0.82rem; color: var(--frost-dim); }
+.poisson-outcomes strong { font: 400 clamp(1.6rem, 3.4vw, 2.4rem)/1 var(--display); font-variant-numeric: tabular-nums; }
+.poisson-outcomes i { position: absolute; inset: auto 0 0 0; height: 3px; background: var(--data); transform: scaleX(var(--share, 0)); transform-origin: left; transition: transform 300ms var(--ease); }
+.poisson-outcomes [data-outcome='draw'] i { background: var(--frost-dim); }
+.poisson-outcomes [data-outcome='away'] i { background: var(--tag); }
+.poisson-grid-wrap { margin-top: 1.5rem; }
+.poisson-axis { font: 400 0.74rem/1.4 var(--mono); color: var(--frost-dim); }
+.poisson-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 3px; max-width: 26rem; margin-top: 0.5rem; }
+.poisson-grid span {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  font: 400 0.72rem var(--mono);
+  color: var(--frost-dim);
+  background: color-mix(in srgb, var(--data) calc(var(--p, 0) * 100%), #2a1d1b);
+  border-radius: 2px;
+  transition: background-color 250ms var(--ease);
+}
+.poisson-grid span[data-hot='true'] { color: var(--ink); }
+.poisson-likely { margin-top: 0.75rem; font-size: 0.92rem; color: var(--frost-dim); }
+.poisson-likely b { color: var(--frost); font: 500 1rem var(--mono); }
+
+/* Existing demo components, re-skinned in place (their markup is shared with /os). */
+.instrument-wrap .window-kicker,
+.instrument-wrap .mono { font-family: var(--mono); }
+.instrument-wrap .window-kicker { font-size: 0.74rem; color: var(--frost-dim); letter-spacing: 0; }
+.instrument-wrap h2,
+.instrument-wrap h3 { margin: 0.6rem 0 1.1rem; font: 400 clamp(1.5rem, 2.6vw, 2rem)/1 var(--display); }
+.instrument-wrap h2 em,
+.instrument-wrap h3 em { font-style: normal; }
+.instrument-wrap .window-note { margin-top: 1rem; font: 400 0.78rem/1.55 var(--mono); color: var(--frost-dim); }
+
+.stale-lab-head { display: flex; justify-content: space-between; gap: 1rem; }
+.stale-lab-head span { font: 500 0.82rem var(--mono); color: var(--data); }
+.stale-controls { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.stale-row { display: grid; grid-template-columns: 1fr auto auto; gap: 1rem; align-items: center; margin-top: 1rem; padding: 0.85rem 1rem; border: 1px solid var(--night-line); border-radius: var(--radius-s); font-family: var(--mono); font-size: 0.85rem; }
+.stale-row strong { padding: 0.15rem 0.55rem; border-radius: 2px; color: var(--ink); background: var(--data); font-weight: 500; }
+.stale-lab[data-lab-state='stale'] .stale-row strong { background: var(--tag); }
+.stale-lab[data-lab-state='future'] .stale-row strong { background: var(--fault); }
+.stale-lab-note { margin-top: 0.85rem; color: var(--frost-dim); font-size: 0.95rem; }
+
+.chain-records { display: grid; gap: 0.6rem; }
+@media (min-width: 760px) { .chain-records { grid-template-columns: repeat(3, 1fr); } }
+.chain-records > div { display: grid; gap: 0.3rem; padding: 0.9rem 1rem; border: 1px solid var(--night-line); border-radius: var(--radius-s); transition: border-color 250ms var(--ease); }
+.chain-records span { font-size: 0.74rem; color: var(--frost-dim); }
+.chain-records strong { font: 500 0.92rem/1.4 var(--mono); }
+.chain-records small { font-size: 0.78rem; color: var(--frost-dim); }
+.chain-records code { font-family: var(--mono); color: var(--data); overflow-wrap: anywhere; }
+.chain-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin-top: 1rem; }
+.chain-actions strong { margin-left: auto; font: 500 0.82rem var(--mono); color: var(--data); }
+.blackbox-demo[data-state='mutated'] .chain-actions strong,
+.blackbox-demo[data-state='changed'] .chain-actions strong { color: var(--tag); }
+.blackbox-demo[data-state='mutated'] [data-chain-record='1'] { border-color: var(--tag); }
+.blackbox-demo[data-state='error'] .chain-actions strong { color: var(--fault); }
+
+.hvac-fields { display: grid; gap: 1rem; }
+@media (min-width: 640px) { .hvac-fields { grid-template-columns: 1fr 1fr; } }
+.hvac-fields label { display: grid; gap: 0.4rem; font-size: 0.9rem; color: var(--frost-dim); }
+.hvac-fields input,
+.hvac-fields select { min-height: 2.75rem; padding: 0.5rem 0.75rem; color: var(--frost); background: var(--night); border: 1px solid rgba(239, 230, 210, 0.25); border-radius: var(--radius-s); }
+.hvac-output { display: grid; gap: 0.25rem; margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--night-line); }
+.hvac-output span { font-size: 0.78rem; color: var(--frost-dim); }
+.hvac-output strong { font: 400 clamp(2.4rem, 5vw, 3.4rem)/1 var(--display); color: var(--tag); }
+.hvac-output small { color: var(--frost-dim); font-size: 0.85rem; }
+
+/* Snake lab reads its palette from custom properties; the classic /os page keeps the defaults. */
+.instrument-wrap {
+  --snake-ink: var(--frost);
+  --snake-bg: linear-gradient(180deg, var(--night-2), var(--night));
+  --snake-border: 1px solid var(--night-line);
+  --snake-shadow: 0 40px 80px -40px rgba(0, 0, 0, 0.55);
+  --snake-data: var(--data);
+  --snake-accent: var(--tag);
+  --snake-panel: rgba(128, 187, 167, 0.06);
+  --snake-dim: #b4c0cd;
+  --snake-strong: var(--frost);
+  --snake-rule: var(--night-line);
+}
+dialog.kiosk .instrument-wrap .snake-lab { margin: 0; border-radius: var(--radius-m); }
+dialog.kiosk .instrument-wrap .snake-lab-state { color: var(--ink); background: var(--data); border-radius: 2px; }
+dialog.kiosk .instrument-wrap .snake-board { background: #120d0d; border: 1px solid var(--night-line); box-shadow: none; border-radius: var(--radius-s); }
+dialog.kiosk .instrument-wrap .snake-cell { background: #2a1d1b; border-radius: 2px; }
+dialog.kiosk .instrument-wrap .snake-cell.snake-body { background: var(--data); box-shadow: none; }
+dialog.kiosk .instrument-wrap .snake-cell.snake-head { background: var(--tag); box-shadow: none; }
+dialog.kiosk .instrument-wrap .snake-cell.snake-food { background: var(--fault); box-shadow: none; }
+dialog.kiosk .instrument-wrap .snake-readout,
+dialog.kiosk .instrument-wrap .snake-reward-control,
+dialog.kiosk .instrument-wrap .snake-learning,
+dialog.kiosk .instrument-wrap .snake-method summary { font-family: var(--mono); }
+dialog.kiosk .instrument-wrap .snake-lab-controls > p { color: #b4c0cd; }
+dialog.kiosk .instrument-wrap .snake-actions button,
+dialog.kiosk .instrument-wrap .snake-pad button { min-height: 2.4rem; color: var(--frost); background: transparent; border: 1px solid rgba(239, 230, 210, 0.28); border-radius: 999px; box-shadow: none; font: 500 0.82rem var(--sans); }
+dialog.kiosk .instrument-wrap .snake-pad button { border-radius: var(--radius-s); }
+dialog.kiosk .instrument-wrap .snake-actions button:hover,
+dialog.kiosk .instrument-wrap .snake-pad button:hover { background: rgba(239, 230, 210, 0.08); }
+dialog.kiosk .instrument-wrap .snake-actions button:focus-visible,
+dialog.kiosk .instrument-wrap .snake-pad button:focus-visible,
+dialog.kiosk .instrument-wrap .snake-method summary:focus-visible { outline: 2px solid var(--tag); }

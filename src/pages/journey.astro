@@ -1,0 +1,256 @@
+---
+// The scroll journey (docs/09-JOURNEY-PLAN.md), built at /journey/ while in progress.
+// Every card's words come from the project records and profile data, not from this file.
+import { getCollection } from 'astro:content';
+import JourneyLayout from '../layouts/JourneyLayout.astro';
+import StaleStateLab from '../components/StaleStateLab.astro';
+import BlackBoxDemo from '../components/BlackBoxDemo.astro';
+import SnakeRewardLab from '../components/SnakeRewardLab.astro';
+import HvacSimulator from '../components/HvacSimulator.astro';
+import RoverSonarSim from '../components/site/RoverSonarSim.astro';
+import PoissonExplorer from '../components/site/PoissonExplorer.astro';
+import MotorBusKiosk from '../components/site/MotorBusKiosk.astro';
+import SignatureKiosk from '../components/site/SignatureKiosk.astro';
+import { stops, type StopId } from '../data/journey';
+import { contact, roadmap, societies } from '../data/profile';
+
+const projects = new Map((await getCollection('projects')).map((entry) => [entry.id, entry.data]));
+const project = (id: string) => projects.get(id)!;
+const shortTitle = (id: string) => project(id).title.split(' — ')[0];
+const linkLabel = (label?: string) => (label ?? 'View project').toLowerCase().replace(/^\w/, (c) => c.toUpperCase());
+
+interface Card {
+  place: string;
+  title: string;
+  lede: string;
+  part?: string;
+  facts?: { name: string; detail: string }[];
+  link?: { href: string; label: string };
+  hint?: string;
+}
+const fromProject = (id: string, place: string, title = shortTitle(id)): Card => {
+  const data = project(id);
+  return { place, title, lede: data.summary, part: data.contribution, link: data.link ? { href: data.link, label: linkLabel(data.linkLabel) } : undefined };
+};
+
+const cards: Record<Exclude<StopId, 'home' | 'next'>, Card> = {
+  chinook: fromProject('chinook-clean', 'Next door, before sunrise'),
+  hvac: fromProject('hvac-express', 'Down the street, first light'),
+  thread: {
+    place: 'The foothills, dawn',
+    title: 'Compressors. Nozzles. Joints.',
+    lede: 'Most student portfolios are a list of apps. This one keeps returning to machines that have to keep running while someone depends on them.'
+  },
+  societies: {
+    place: 'University of Calgary, morning',
+    title: 'The teams I build with',
+    lede: 'Most of my week is robotics software for two student teams, and the club that keeps us honest about security.',
+    facts: societies.slice(0, 3).map(({ title, role }) => ({ name: title, detail: role }))
+  },
+  waybionic: fromProject('waybionic-ground-station', 'The lab, morning', 'WayBionic ground station'),
+  blackbox: fromProject('physical-ai-blackbox', 'The loading dock'),
+  lounge: {
+    place: 'The student lounge',
+    title: 'Three weekend builds',
+    lede: 'Reinforcement learning, motion controls and signed evidence, each started at a hackathon or on a weekend.',
+    facts: ['teach-to-game', 'aircade', 'proofly'].map((id) => ({ name: shortTitle(id), detail: project(id).summary }))
+  },
+  soccer: fromProject('soccer-intelligence', 'The pitch, late morning'),
+  garage: fromProject('rover-arm-motors', "The rover team's garage, noon", 'Rover arm, one bus'),
+  mars: fromProject('autonomous-rover', 'The badlands, noon', 'The rover that noticed'),
+  launch: {
+    place: 'The launch pad, dusk',
+    title: 'Where this is heading',
+    lede: project('robotics-roadmap').summary,
+    facts: roadmap.map(({ tool, skill }) => ({ name: tool, detail: skill })),
+    hint: 'Keep scrolling to launch.'
+  },
+  southpoint: fromProject('southpoint', 'Lunar south pole', 'Landed at the south pole')
+};
+
+// The WayBionic arm's joints, with limits from the team's URDF.
+const armJoints = [
+  { name: 'old_arm_base_yaw_joint', label: 'Base yaw', min: -0.585, max: 4.128, value: 1.2 },
+  { name: 'old_arm_shoulder_pitch_joint', label: 'Shoulder', min: 0, max: 1.963, value: 0.6 },
+  { name: 'old_arm_elbow_pitch_joint', label: 'Elbow', min: -1.073, max: 2.068, value: 0.6 },
+  { name: 'old_arm_wrist_roll_joint', label: 'Wrist roll', min: -0.48, max: 4.232, value: 1.5 }
+];
+const DEG = (180 / Math.PI).toFixed(4);
+---
+
+<JourneyLayout title="Ajmal Khidri — Driveway to the Moon" description="Ride along with a rover from a Calgary driveway, through campus, onto a rocket and down at the Moon's south pole. Each stop is a piece of Ajmal Khidri's work.">
+  <a class="j-skip" href="#arrival">Skip the drive</a>
+  <header class="j-bar">
+    <a class="j-mark" href="/" aria-label="Ajmal Khidri, back to the main site">AK</a>
+    <nav class="j-bar-links" aria-label="Site">
+      <a href="#arrival">Skip the drive</a>
+      <a href={contact.resume} download>Resume</a>
+    </nav>
+  </header>
+
+  <main class="journey" data-journey>
+    <div class="j-stage" aria-hidden="true">
+      <canvas class="j-canvas" data-journey-canvas></canvas>
+      <div class="j-scrim" data-scrim></div>
+      <div class="j-flash" data-flash></div>
+      <div class="j-grain"></div>
+    </div>
+
+    <div class="j-track" data-journey-track></div>
+
+    <div class="j-cards">
+      <p class="j-cue" data-cue aria-hidden="true"><span>Scroll to drive</span><i></i></p>
+
+      <section class="j-card j-card-title" data-card="home" aria-labelledby="j-home">
+        <p class="j-place" style="--i:0">Calgary, before sunrise</p>
+        <h1 id="j-home" class="j-title" style="--i:1">Systems that&nbsp;move.</h1>
+        <p class="j-lede" style="--i:2">I'm Ajmal Khidri, a Computer Science student at the University of Calgary. I write robotics software, run the tech for a Calgary HVAC company, and own a power-washing business. Ride along from my driveway to the Moon.</p>
+        <div class="j-actions" style="--i:3">
+          <button type="button" class="j-btn" data-next="1">Start the drive</button>
+          <a class="j-link" href="#arrival">Skip to the end</a>
+        </div>
+      </section>
+
+      {Object.entries(cards).map(([id, card]) => (
+        <section class="j-card" data-card={id} aria-labelledby={`j-${id}`}>
+          <p class="j-place" style="--i:0">{card.place}</p>
+          <h2 id={`j-${id}`} class="j-title" style="--i:1">{card.title}</h2>
+          <p class="j-lede" style="--i:2">{card.lede}</p>
+          {card.part ? <p class="j-part" style="--i:3"><strong>My part.</strong> {card.part}</p> : null}
+          {card.facts ? (
+            <ul class="j-facts" style="--i:3">{card.facts.map((fact) => <li><strong>{fact.name}</strong><span>{fact.detail}</span></li>)}</ul>
+          ) : null}
+          {id === 'chinook' ? (
+            <div class="j-controls" style="--i:4">
+              <div class="j-control-row">
+                <button type="button" class="j-hold" data-control="spray" data-hold>Hold to spray</button>
+                <button type="button" class="j-chip" data-control="reset">Dirty it again</button>
+              </div>
+              <p class="j-note">The surface cleaner runs a demo pass until you take over.</p>
+            </div>
+          ) : null}
+          {id === 'hvac' ? (
+            <div class="j-controls" style="--i:4">
+              <label class="j-slider"><span>Thermostat <b data-readout data-unit="°C"></b></span><input type="range" min="16" max="26" step="0.5" value="21" data-control="setpoint" /></label>
+              <p class="j-note">An illustration, not a model: set it lower and the condenser on the roof spins up.</p>
+              <button type="button" class="j-chip" data-kiosk="kiosk-hvac">Comfort, calculated</button>
+            </div>
+          ) : null}
+          {id === 'waybionic' ? (
+            <div class="j-controls" style="--i:4">
+              <div class="j-slider-grid">
+                {armJoints.map((joint) => (
+                  <label class="j-slider"><span>{joint.label} <b data-readout data-unit="°" data-scale={DEG}></b></span><input type="range" min={joint.min} max={joint.max} step="0.01" value={joint.value} data-control={joint.name} /></label>
+                ))}
+              </div>
+              <p class="j-note">Limits come from the team's URDF. The motion test resumes nine seconds after you let go.</p>
+              <button type="button" class="j-chip" data-kiosk="kiosk-stale-lab">When fresh data goes stale</button>
+            </div>
+          ) : null}
+          {id === 'blackbox' ? (
+            <div class="j-controls" style="--i:4">
+              <div class="j-control-row">
+                <button type="button" class="j-hold" data-control="tamper">Tamper with record 4</button>
+                <button type="button" class="j-chip" data-kiosk="kiosk-hash-chain">Change one record</button>
+              </div>
+              <p class="j-note">The edited record turns amber, then every block after it fails verification.</p>
+            </div>
+          ) : null}
+          {id === 'lounge' ? (
+            <div class="j-controls" style="--i:4">
+              <div class="j-control-row">
+                <button type="button" class="j-chip" data-kiosk="kiosk-snake-lab">Train a policy yourself</button>
+                <button type="button" class="j-chip" data-kiosk="kiosk-signature">Sign it, then tamper with it</button>
+              </div>
+            </div>
+          ) : null}
+          {id === 'soccer' ? (
+            <div class="j-controls" style="--i:4">
+              <div class="j-slider-grid">
+                <label class="j-slider"><span>Home expected goals <b data-readout></b></span><input type="range" min="0.2" max="3.5" step="0.1" value="1.6" data-control="home" /></label>
+                <label class="j-slider"><span>Away expected goals <b data-readout></b></span><input type="range" min="0.2" max="3.5" step="0.1" value="1.1" data-control="away" /></label>
+              </div>
+              <p class="j-note">The scoreboard shows win, draw and loss chances from a Poisson model, uncalibrated.</p>
+              <button type="button" class="j-chip" data-kiosk="kiosk-poisson">Expected goals in, outcomes out</button>
+            </div>
+          ) : null}
+          {id === 'garage' ? (
+            <div class="j-controls" style="--i:4"><button type="button" class="j-chip" data-kiosk="kiosk-motor-bus">Plan the arm bus</button></div>
+          ) : null}
+          {id === 'mars' ? (
+            <div class="j-controls" style="--i:4"><button type="button" class="j-chip" data-kiosk="kiosk-rover-sim">Drop an obstacle</button></div>
+          ) : null}
+          {id === 'southpoint' ? (
+            <div class="j-controls" style="--i:4">
+              <label class="j-slider"><span>Move the sun <b data-readout data-unit="°" data-scale={DEG}></b></span><input type="range" min="0" max="6.283" step="0.01" value="0.36" data-control="sun" /></label>
+              <p class="j-note">At the south pole the sun stays on the horizon, so crater rims throw long shadows. That trade-off is what SouthPoint maps.</p>
+            </div>
+          ) : null}
+          {card.link ? <div class="j-actions" style="--i:5"><a class="j-link" href={card.link.href} target="_blank" rel="noreferrer">{card.link.label}</a></div> : null}
+          {card.hint ? <p class="j-hint" style="--i:5">{card.hint}</p> : null}
+        </section>
+      ))}
+
+      <section class="j-card" data-card="next" aria-labelledby="j-next">
+        <p class="j-place" style="--i:0">The end of the paving</p>
+        <h2 id="j-next" class="j-title" style="--i:1">Send a transmission.</h2>
+        <p class="j-lede" style="--i:2">The road past here isn't built yet. I'm looking for software and robotics internships; the fastest way to reach me is email.</p>
+        <div class="j-actions" style="--i:3">
+          <a class="j-btn" href={`mailto:${contact.email}`} data-control="transmit">Email me</a>
+          <a class="j-link" href={contact.resume} download>Download my resume</a>
+        </div>
+        <ul class="j-elsewhere" style="--i:4">
+          <li><a href={contact.github} target="_blank" rel="noreferrer">GitHub</a></li>
+          <li><a href={contact.linkedin} target="_blank" rel="noreferrer">LinkedIn</a></li>
+        </ul>
+      </section>
+    </div>
+
+    <nav class="trip" aria-label="Journey stops">
+      <p class="trip-odo" aria-hidden="true"><span class="trip-km" data-km>0.0</span><span class="trip-unit">km</span></p>
+      <p class="trip-name" data-stop-name aria-hidden="true">{stops[0].name}</p>
+      <ol class="trip-stops">
+        {stops.map((stop, index) => <li><button type="button" data-go={index} aria-label={stop.name} title={stop.name}></button></li>)}
+      </ol>
+    </nav>
+  </main>
+
+  <section class="arrival" id="arrival" aria-labelledby="arrival-title">
+    <h2 id="arrival-title">End of the road, for now.</h2>
+    <p>This journey is still being built. The finished portfolio, with every project, is on the main site.</p>
+    <ul>
+      <li><a href={`mailto:${contact.email}`}>{contact.email}</a></li>
+      <li><a href={contact.github} target="_blank" rel="noreferrer">GitHub</a></li>
+      <li><a href={contact.linkedin} target="_blank" rel="noreferrer">LinkedIn</a></li>
+      <li><a href="/">The main site</a></li>
+    </ul>
+  </section>
+
+  <dialog class="kiosk" id="kiosk-hvac" aria-label="Comfort, calculated" data-lenis-prevent><button type="button" class="kiosk-close" data-kiosk-close>Close</button><div class="instrument-wrap"><HvacSimulator /></div></dialog>
+  <dialog class="kiosk" id="kiosk-stale-lab" aria-label="When fresh data goes stale" data-lenis-prevent><button type="button" class="kiosk-close" data-kiosk-close>Close</button><div class="instrument-wrap"><StaleStateLab /></div></dialog>
+  <dialog class="kiosk" id="kiosk-hash-chain" aria-label="Change one record" data-lenis-prevent><button type="button" class="kiosk-close" data-kiosk-close>Close</button><div class="instrument-wrap"><BlackBoxDemo /></div></dialog>
+  <dialog class="kiosk kiosk-wide" id="kiosk-snake-lab" aria-label="Train a policy yourself" data-lenis-prevent><button type="button" class="kiosk-close" data-kiosk-close>Close</button><div class="instrument-wrap"><SnakeRewardLab /></div></dialog>
+  <dialog class="kiosk" id="kiosk-signature" aria-label="Sign it, then tamper with it" data-lenis-prevent><button type="button" class="kiosk-close" data-kiosk-close>Close</button><SignatureKiosk /></dialog>
+  <dialog class="kiosk" id="kiosk-poisson" aria-label="Expected goals in, outcomes out" data-lenis-prevent><button type="button" class="kiosk-close" data-kiosk-close>Close</button><PoissonExplorer /></dialog>
+  <dialog class="kiosk" id="kiosk-motor-bus" aria-label="Plan the arm bus" data-lenis-prevent><button type="button" class="kiosk-close" data-kiosk-close>Close</button><MotorBusKiosk /></dialog>
+  <dialog class="kiosk kiosk-wide" id="kiosk-rover-sim" aria-label="Drop an obstacle" data-lenis-prevent><button type="button" class="kiosk-close" data-kiosk-close>Close</button><RoverSonarSim /></dialog>
+</JourneyLayout>
+
+<script>
+  import { startJourney } from '../scripts/journey/main';
+  import { wireKiosks } from '../scripts/journey/controls';
+
+  // Without WebGL the cards simply stack as a readable page.
+  const root = document.querySelector<HTMLElement>('[data-journey]');
+  if (root) {
+    try {
+      startJourney(root);
+    } catch (error) {
+      console.error(error);
+      root.classList.add('is-static');
+      root.querySelectorAll<HTMLElement>('[data-card]').forEach((card) => { card.inert = false; });
+      // The kiosks are plain HTML demos and work without the 3D scene.
+      wireKiosks(document, () => undefined);
+    }
+  }
+</script>

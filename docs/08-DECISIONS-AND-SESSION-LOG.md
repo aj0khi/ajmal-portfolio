@@ -75,3 +75,41 @@
 - **Placards:** each fits on one screen; problem, system, decision, screenshots and skills moved to a dossier drawer per room. Added an outlined room numeral, a gilt progress thread, film grain, and an entrance scroll cue.
 - **Verification:** `npm run check` 0 errors, warnings or hints; `npm run build` passes (Three.js stays a separate chunk loaded only on wide landscape screens). Playwright (Chromium, SwiftShader) at 1440×900, 768×1024 and iPhone 13 showed no page errors and no horizontal overflow, and confirmed one wheel tick per room, entry from and return to the archive, keyboard steps, mid-sweep composition, and that phones request no Three.js.
 
+## 2026-11-26 — Journey Phase 0: the feel test
+
+- **Built at `/journey/`** (unlinked; the museum on `/` is untouched), per docs/09-JOURNEY-PLAN.md: a grey-box world with four stops (home, campus, launch pad, the Moon), the real scroll engine, cards, the trip meter, and the whole launch storyboard.
+- **Scroll engine:** native scroll, Lenis smoothing, one GSAP timeline scrubbed by ScrollTrigger. A custom directional snap: one deliberate wheel tick, swipe or arrow key travels one stop either way (including the entire flight from the pad to the Moon); a tiny nudge while parked stays put. The gesture start is read in the capture phase, before Lenis applies the delta.
+- **Scenes:** Earth (terrain, winding road, house, campus, pad, a ridge that hides the rocket until the bend, cloud deck), space (Earth's limb with an atmosphere glow, the Moon, a curved transfer with a flip to burn engine-first), and the Moon (cratered south-pole site, low sun, Earth in the sky). Two hidden cuts: a white-out in the cloud deck and a match on the Moon's grey surface.
+- **Composition:** the scene slides aside for each card with `camera.setViewOffset`, so framings stay aimed at their subject. A negative frame delta on the first frame once blew this up; the frame clock is now clamped.
+- **Verification:** `npm run check` clean; production build passes with the dev-only debug hook stripped. Playwright (Chromium, SwiftShader) at 1440×900, 1280×800, 768×1024 and iPhone 13: no page errors; wheel, keys, trip-meter clicks and touch each land on the expected stop; the no-JS page shows every card; hidden cards are inert; the current stop is announced. Real-device feel on the owner's phone is still to be checked.
+- **Over budget:** world JS is about 246 KB gzipped (Three.js 185 KB + journey 62 KB) against the plan's 230 KB; to trim in Phase 5.
+
+## 2026-11-26 — Journey Phase 1: the whole route
+
+- **Feedback from Phase 0:** the scroll felt right, but the launch played too fast to see. The flight now has 7.5 screens of scroll and an 8-second glide per gesture (it was capped at 3.6 seconds). Each stop now sets its own glide time in `src/data/journey.ts`, scaled by how much of the drive is left; trip-meter jumps across several stops stay short.
+- **Route (14 stops):** home (title), Chinook Clean, HVAC Express, the thread (three road signs), the Societies gate, WayBionic, BlackBox, the arcade lounge (Teach to Game, Aircade, Proofly), Soccer Intelligence, the rover team garage, the Mars yard, the launch pad (roadmap), SouthPoint on the Moon, and the next wing (contact) at the end of the Moon's paving. This settles the open question from the plan: the garage and the Mars yard stay separate stops.
+- **Chapters:** the street (pre-dawn), the foothills under a Chinook-arch dawn with the Rockies on the western horizon, campus (morning), the badlands as the Mars analog (noon, terraced coulees, hoodoos), and the prairie pad (dusk). Terrain colour and relief come from the chapter; ridges sit inside bends so each stop appears as the road rounds it.
+- **Architecture:** `world/route.ts` (roads measured in metres, fast nearest-road lookup, chapters, land heights), `world/sites.ts` (what stands at each stop, placed by stop metres), `world/earth.ts` (assembly), and the director now handles Earth drives, the flight, and a Moon drive. Framings gained `toward`, aiming part-way at a stop's site so the card's slide-aside never pushes it off screen.
+- **Cards:** every card's text comes from the project records and profile data. Phones hide the "My part" line and list details to keep the scene visible.
+- **Review fixes:** the flight's linear clock was on the wrong segment; a tap on touch screens could travel two stops; arrow keys stopped after clicking a dot; particles were undersized on high-DPI screens; scrollbar drags could trigger a snap; a failed world build left scroll handlers on the fallback page; plus the `.js` class now lands before first paint, rendering pauses under the page below, and a reduced-motion change reloads.
+- **Verification:** `npm run check` clean; production build passes with the dev hook stripped. Playwright: every stop at 1280×800 and 390×844, drives and flight beats; one wheel tick, key, swipe or tap per stop; no-JS page readable; hidden cards inert. Building the Earth takes about 0.56 s on this machine; a candidate for a worker in Phase 5. World JS is now about 252 KB gzipped (journey 67 KB + Three.js 185 KB) against the 230 KB budget.
+
+## 2026-11-26 — Journey Phase 2: something to do at every stop
+
+- **Owner feedback:** the "Compressors." sign was hard to read. Each road sign's board is now sized to its word, and the three signs sit further along so the stop's framing holds all of them. Phones are parked until everything else is built.
+- **Interactions (card controls drive the scene):**
+  - Home: the rover's camera mast follows the cursor.
+  - Chinook Clean: hold to spray; a surface cleaner washes the driveway row by row, under a trailer work light. "Dirty it again" resets it. A demo pass runs until the visitor takes over.
+  - HVAC Express: a thermostat slider spins the rooftop condenser fan (labelled as an illustration); kiosk "Comfort, calculated".
+  - WayBionic: four joint sliders drive the team's real URDF arm (limits from the URDF); kiosk "When fresh data goes stale".
+  - BlackBox: "Tamper with record 4" runs the hash chain above the recorder; kiosk "Change one record".
+  - Arcade lounge: a snake learning on a table; kiosks "Train a policy yourself" and "Sign it, then tamper with it".
+  - Soccer: two expected-goals sliders redraw the scoreboard's win, draw and loss chances (Poisson, uncalibrated); kiosk "Expected goals in, outcomes out".
+  - Garage: the three-motor CAN bus with data pulses; kiosk "Plan the arm bus".
+  - Mars yard: the high-school rover steering around pillars by sonar; kiosk "Drop an obstacle".
+  - SouthPoint: a slider swings the low south-pole sun and every crater shadow with it.
+  - The next wing: "Email me" also sends a transmission, rings travelling from the dish to Earth.
+- **Reuse:** the museum's sculptures (URDF arm, hash chain, snake board, motor bus, sonar rover) and all eight kiosk components are reused as-is. Kiosk styles moved from `site.css` to a shared `src/styles/kiosks.css`, and the journey maps the museum's colour names onto its own palette.
+- **Review fixes:** kiosk exit animation (missing easing variable), dark text on the teal kiosk badges, kiosks wired in the no-WebGL fallback with scene-only controls hidden, tall cards scroll inside themselves on short screens, right-click can't stick the spray on, the rover's wheels and heading no longer snap at the Moon stop, 24 px trip-meter targets, card text rises 22 px (within the motion rule).
+- **Verification:** `npm run check` clean; production build passes with the dev hook stripped. Playwright confirmed each control's effect in the scene (mast, arm joints, scoreboard, sun and shadows, cleaning, tamper, transmission), kiosk open, scroll-lock and animated close, the no-WebGL fallback, and taps, swipes, keys and wheel ticks per stop. The software renderer runs this scene at about 2 frames per second, so frame rate on real hardware is unmeasured; a lighter phone tier and a loading poster remain Phase 5.
+
