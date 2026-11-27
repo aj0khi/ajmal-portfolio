@@ -10,6 +10,7 @@ import { createRover } from './actors/rover';
 import { createEarth } from './world/earth';
 import type { Road, RoadFrame } from './world/route';
 import { createMoon, createSpace } from './world/space';
+import type { Look } from './post';
 import { clamp, easeIn, easeInOut, easeOut, lerp, range, smoothstep } from './util';
 
 const UP = new THREE.Vector3(0, 1, 0);
@@ -17,7 +18,7 @@ const LAUNCH = FLIGHT - 1;
 
 // `still` is prefers-reduced-motion: no camera shake, body bob or plume flicker.
 export function createDirector(still: boolean) {
-  const earth = createEarth();
+  const earth = createEarth(still);
   const space = createSpace();
   const moon = createMoon(space.textures);
   const rover = createRover();
@@ -45,7 +46,7 @@ export function createDirector(still: boolean) {
   const e = new THREE.Vector3(); const g = new THREE.Vector3(); const h = new THREE.Vector3(); const k = new THREE.Vector3();
   const flat = new THREE.Vector3(); const nozzle = new THREE.Vector3(); const retro = new THREE.Quaternion();
   const roadFrame: RoadFrame = { position: new THREE.Vector3(), forward: new THREE.Vector3(), right: new THREE.Vector3() };
-  const blended: Framing = { yaw: 0, pitch: 0, distance: 0, lift: 0, ahead: 0, toward: 0 };
+  const blended: Framing = { yaw: 0, pitch: 0, distance: 0, lift: 0, ahead: 0, toward: 0, fov: 42 };
   const motion = still ? 0 : 1;
 
   // A camera pose orbiting the rover: blend framings by their numbers (not positions), so a
@@ -70,7 +71,9 @@ export function createDirector(still: boolean) {
 
   const place = (object: THREE.Object3D, scene: THREE.Scene) => { if (object.parent !== scene) scene.add(object); };
   const shake = (time: number, amount: number) => a.set(Math.sin(time * 47.3) + Math.sin(time * 23.1), Math.sin(time * 39.7) + Math.sin(time * 17.9), Math.sin(time * 31.3)).multiplyScalar(amount * motion);
-  const result = { scene: earth.scene, fov: 42, flash: 0, km: 0 };
+  // `look` and `tilt` steer the high tier's post-processing: which scene's bloom to use, and
+  // how strongly the model-landscape blur applies (full on Earth, none in space).
+  const result = { scene: earth.scene, fov: 42, flash: 0, km: 0, look: 'earth' as Look, tilt: 1 };
   const groundKm = (m: number) => m * odometer.perMetre;
   const padKm = groundKm(metres(stops[LAUNCH], earth.road));
 
@@ -92,6 +95,8 @@ export function createDirector(still: boolean) {
     const onMoon = from.world === 'moon';
     result.flash = 0;
     result.fov = 42;
+    result.look = 'earth';
+    result.tilt = 1;
     rover.object.visible = true;
     rover.object.scale.setScalar(1);
 
@@ -103,6 +108,9 @@ export function createDirector(still: boolean) {
       rover.object.lookAt(c.copy(here.position).add(here.forward));
       place(rover.object, earth.scene);
       orbit(here, blend([[leaving(f), from.framing], [1 - leaving(f) - arriving(f), follow], [arriving(f), to.framing]]), camPos, camLook);
+      result.fov = blended.fov;
+      // The miniature blur deepens while driving and eases off when parked at a stop.
+      result.tilt = lerp(0.45, 1, Math.sin(f * Math.PI));
       skyTime = lerp(from.sky, to.sky, f);
       rocketLit = seg >= LAUNCH - 1 ? smoothstep(0.6, 1, f) : 0;
       result.scene = earth.scene;
@@ -128,6 +136,8 @@ export function createDirector(still: boolean) {
       rover.update(6 + ROLLOUT + m, time, 0.6, Math.sin(f * Math.PI) * motion);
       result.fov = 44;
       result.scene = moon.scene;
+      result.look = 'moon';
+      result.tilt = 0.5;
       result.km = odometer.moon + groundKm(m);
       moon.update(time);
     } else if (f < flight.toSpace) {
@@ -177,6 +187,7 @@ export function createDirector(still: boolean) {
 
       altitude = smoothstep(0, flight.cloudDeck, height);
       result.fov = lerp(42, 56, smoothstep(0, 0.5, ascent));
+      result.tilt = lerp(0.45, 1, settle) * (1 - smoothstep(0, 0.35, ascent));
       result.flash = smoothstep(flight.cloudsIn, flight.toSpace, f);
       result.scene = earth.scene;
       result.km = padKm + (odometer.orbit - padKm) * climb;
@@ -208,6 +219,8 @@ export function createDirector(still: boolean) {
       result.fov = lerp(56, 46, s);
       result.flash = 1 - smoothstep(flight.toSpace, flight.cloudsOut, f);
       result.scene = space.scene;
+      result.look = 'space';
+      result.tilt = 0;
       result.km = odometer.orbit + (odometer.moon - 400 - odometer.orbit) * along;
       space.update(time);
     } else {
@@ -237,6 +250,8 @@ export function createDirector(still: boolean) {
       camPos.add(shake(time, thrust * (1 - m) * 0.15));
       result.fov = lerp(46, 44, descend);
       result.scene = moon.scene;
+      result.look = 'moon';
+      result.tilt = 0.5 * smoothstep(0.3, 1, out);
       result.km = odometer.moon - 400 + 400 * Math.max(m, out);
       nozzle.copy(rocket.object.position);
       dust.update(dt, height < 45 ? thrust * 260 : 0, nozzle, 0.5, 22);
@@ -271,5 +286,5 @@ export function createDirector(still: boolean) {
     else earth.control(id, key, value);
   };
 
-  return { frame, control, smoke, dust, rover };
+  return { frame, control, smoke, dust, rover, scenes: [earth.scene, space.scene, moon.scene] };
 }

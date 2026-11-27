@@ -7,10 +7,25 @@ import { makeRoad } from './route';
 
 const SUN_DIRECTION = new THREE.Vector3(1, 0.28, 0.35).normalize();
 
-function makeEarth(radius: number, textures: ReturnType<typeof earthTextures>) {
+// NASA's public-domain maps (see CREDITS.md). The procedural textures stand in until each one
+// arrives, so a slow or failed download only costs detail, never the scene.
+const loader = new THREE.TextureLoader();
+function photoMap(url: string, apply: (texture: THREE.Texture) => void) {
+  loader.load(url, (texture) => {
+    texture.colorSpace = THREE.SRGBColorSpace;
+    texture.anisotropy = 8;
+    apply(texture);
+  }, undefined, () => undefined);
+}
+
+function makeEarth(radius: number, textures: ReturnType<typeof earthTextures>, photo: string) {
   const group = new THREE.Group();
-  const surface = new THREE.Mesh(new THREE.SphereGeometry(radius, 96, 64), new THREE.MeshStandardMaterial({ map: textures.map, roughness: 0.85, metalness: 0 }));
-  const clouds = new THREE.Mesh(new THREE.SphereGeometry(radius * 1.008, 96, 64), new THREE.MeshStandardMaterial({ map: textures.cloudMap, transparent: true, depthWrite: false, roughness: 1 }));
+  const material = new THREE.MeshStandardMaterial({ map: textures.map, roughness: 0.85, metalness: 0 });
+  const cloudMaterial = new THREE.MeshStandardMaterial({ map: textures.cloudMap, transparent: true, depthWrite: false, roughness: 1 });
+  // Over the real map the drawn clouds only need to be a thin veil.
+  photoMap(photo, (texture) => { material.map = texture; cloudMaterial.opacity = 0.45; });
+  const surface = new THREE.Mesh(new THREE.SphereGeometry(radius, 96, 64), material);
+  const clouds = new THREE.Mesh(new THREE.SphereGeometry(radius * 1.008, 96, 64), cloudMaterial);
   group.add(surface, clouds, atmosphere(radius * 1.035, '#5fa8ff', 3.4, 1.6));
   return { group, spin: (time: number) => { surface.rotation.y = time * 0.004; clouds.rotation.y = time * 0.0055; } };
 }
@@ -28,15 +43,21 @@ export function createSpace() {
   scene.add(glare);
 
   const textures = earthTextures();
-  const earth = makeEarth(620, textures);
+  const earth = makeEarth(620, textures, '/journey/earth-2048.webp');
   earth.group.position.set(0, -720, 300);
   earth.group.rotation.z = 0.35;
   scene.add(earth.group);
 
   const moonMap = craterTexture();
-  const moon = new THREE.Mesh(new THREE.SphereGeometry(160, 128, 96), new THREE.MeshStandardMaterial({ map: moonMap, bumpMap: moonMap, bumpScale: 3, roughness: 1, metalness: 0 }));
+  const moonMaterial = new THREE.MeshStandardMaterial({ map: moonMap, bumpMap: moonMap, bumpScale: 3, roughness: 1, metalness: 0 });
+  // The real Moon, from LRO: its own albedo doubles as a bump map, which is close enough at
+  // this distance (maria are low and dark, highlands bright and rough).
+  photoMap('/journey/moon-2048.webp', (texture) => { moonMaterial.map = moonMaterial.bumpMap = texture; moonMaterial.bumpScale = 1.6; });
+  const moon = new THREE.Mesh(new THREE.SphereGeometry(160, 128, 96), moonMaterial);
   moon.position.set(0, 60, -1650);
-  moon.rotation.x = 0.8;
+  // The familiar near side faces the arriving rocket, tipped so the south pole, where it
+  // lands, leans toward the camera.
+  moon.rotation.set(-0.35, -Math.PI / 2, 0);
   scene.add(moon);
 
   // The transfer arc: a bulge to the side, so the rocket never flies a straight line.
@@ -96,7 +117,7 @@ export function createMoon(textures: ReturnType<typeof earthTextures>) {
   sun.shadow.bias = -0.0005;
   scene.add(sun, new THREE.HemisphereLight(0x3a4a7a, 0x0a0a0c, 0.35));
 
-  const earth = makeEarth(26, textures);
+  const earth = makeEarth(26, textures, '/journey/earth-512.webp');
   earth.group.position.set(-150, 92, -430);
   scene.add(earth.group);
 

@@ -4,9 +4,12 @@
 // Everything is placed by stop metres, so moving a stop in journey.ts moves its site with it.
 import * as THREE from 'three';
 import { stops, type StopId } from '../../../data/journey';
-import { hashChain, motorBus, roverLoop, snakeBoard, waybionicArm, type Sculpture } from '../../museum/sculptures';
+import { hashChain, motorBus, roverLoop, snakeBoard, waybionicArm, type Sculpture } from '../models/sculptures';
 import { seeded } from '../util';
-import { earthRoad, type Flat } from './route';
+import { bannerPole, banners } from './banners';
+import { calgaryTower, glassLibrary, olympicOval, saddledome, skyline } from './calgary';
+import { earthRoad, river, type Flat } from './route';
+import { brick, concrete, shingles, siding } from './textures';
 
 // A stop's live parts: `update` runs while the stop is near (`active` 0..1, 1 = parked here);
 // `control` takes the card's sliders and buttons.
@@ -72,17 +75,23 @@ function signTexture(text: string, colors: { board: string; ink: string }, size:
   return texture;
 }
 
-export function buildSites(scene: THREE.Scene) {
+export function buildSites(scene: THREE.Scene, still: boolean) {
+  // Things that keep running wherever the rover is (a lit torch is seen from several stops).
+  const always: ((time: number, dt: number) => void)[] = [];
   const flats: Flat[] = [];
   const interactions: Partial<Record<StopId, Interaction>> = {};
   const windowGlow = material('#2a2a30', { emissive: '#ffc77a', emissiveIntensity: 1 });
 
   // ---------- The street ----------
-  const house = (metres: number, side: number, siding: string, along = 0) => {
+  const house = (metres: number, side: number, colour: string, along = 0) => {
     const { group, at } = site(metres, side, along);
-    group.add(box(9, 4.6, 8, siding, 0, 2.3));
+    const lap = siding(colour);
+    lap.repeat.set(2, 1);
+    group.add(box(9, 4.6, 8, material('#ffffff', { map: lap }), 0, 2.3));
     const roofShape = new THREE.Shape([new THREE.Vector2(-5.2, 0), new THREE.Vector2(5.2, 0), new THREE.Vector2(0, 3.2)]);
-    const roof = new THREE.Mesh(new THREE.ExtrudeGeometry(roofShape, { depth: 9, bevelEnabled: false }), material('#34353d', { roughness: 0.85 }));
+    const tiles = shingles();
+    tiles.repeat.set(0.45, 0.45);
+    const roof = new THREE.Mesh(new THREE.ExtrudeGeometry(roofShape, { depth: 9, bevelEnabled: false }), material('#ffffff', { map: tiles, roughness: 0.9 }));
     roof.position.set(0, 4.6, -4.5);
     roof.castShadow = true;
     group.add(roof);
@@ -96,7 +105,7 @@ export function buildSites(scene: THREE.Scene) {
   house(metresOf('home'), -12, '#d9ccb2');
   house(54, 13, '#c9b49a');
   house(66, -13, '#b9c2c4');
-  house(128, 13, '#d3c7a4');
+  house(112, -13, '#d3c7a4'); // clear of the Bow's bank
 
   // Chinook Clean: a neighbour's driveway, half washed, with the pressure-washer trailer.
   {
@@ -211,18 +220,53 @@ export function buildSites(scene: THREE.Scene) {
     };
     const van = new THREE.Group();
     van.add(box(2.2, 2.3, 5.2, '#f1efe9', 0, 1.55));
-    van.add(box(2.24, 0.9, 1.4, '#2a2d35', 0, 2.1, 1.9));
+    van.add(box(2.24, 0.9, 1.44, '#2a2d35', 0, 2.1, 1.92)); // the windscreen stands proud of the body, so the faces never fight
     [-1.7, 1.7].forEach((z) => [-1.12, 1.12].forEach((x) => { const wheel = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.42, 0.3, 14), material('#1e1f23')); wheel.rotation.z = Math.PI / 2; wheel.position.set(x, 0.42, z); van.add(wheel); }));
     van.position.set(2.2, 0, 9.4);
     hvac.add(van);
   }
 
-  // ---------- The foothills: three road signs at the crest ----------
+  // ---------- Downtown: the skyline, the Calgary Tower, and the three road signs ----------
+  {
+    // Scaled to sit with the model city's towers, and set just past the Saddledome: from the
+    // road-sign stop it rises behind the signs, from the soccer stop it stands beside the dome.
+    const tower = calgaryTower(still);
+    tower.group.scale.setScalar(0.55);
+    tower.group.position.copy(earthRoad.beside(metresOf('thread') + 150, 60));
+    scene.add(tower.group);
+    flats.push({ at: tower.group.position.clone(), radius: 18 });
+    // The torch starts dark; the stop's button lights it, and a second press puts it out.
+    let lit = false;
+    interactions.thread = {
+      control: (key) => { if (key === 'torch') { lit = !lit; tower.light(lit); } },
+      update: () => undefined
+    };
+    always.push(tower.update);
+    // Downtown towers: two rows set back from the road, leaving the Calgary Tower its own gap.
+    const random = seeded(53);
+    const domeSpot = earthRoad.beside(metresOf('soccer') + 36, 82);
+    const pitchSpot = earthRoad.beside(metresOf('soccer'), 32);
+    const spots: { x: number; z: number; height: number; width: number; depth: number }[] = [];
+    for (let metres = 160; metres < 255; metres += 9) {
+      [-1, 1].forEach((side) => {
+        if (random() < 0.3) return;
+        const at = earthRoad.beside(metres, side * (34 + random() * 70));
+        // Keep clear of the Calgary Tower, the Saddledome and the pitch.
+        if (at.distanceTo(tower.group.position) < 26 || at.distanceTo(domeSpot) < 62 || at.distanceTo(pitchSpot) < 34 || river.distance(at.x, at.z) < 28) return;
+        spots.push({ x: at.x, z: at.z, height: 22 + random() ** 2 * 90, width: 12 + random() * 10, depth: 12 + random() * 10 });
+      });
+    }
+    const city = skyline(spots);
+    scene.add(city.group);
+    spots.forEach((spot) => flats.push({ at: new THREE.Vector3(spot.x, 0, spot.z), radius: Math.max(spot.width, spot.depth) * 0.8 }));
+  }
+  // The three road signs alternate sides of the road, so none hides behind the one before it.
   ['Compressors.', 'Nozzles.', 'Joints.'].forEach((word, i) => {
-    const metres = metresOf('thread') + 14 + i * 13;
+    const metres = metresOf('thread') + 14 + i * 14;
+    const side = i % 2 ? -5.5 : 5.5;
     const width = Math.max(4.6, word.length * 0.46);
-    const { group, at } = site(metres, 5.5);
-    const behind = earthRoad.beside(metres - 25, 5.5); // faces oncoming traffic
+    const { group, at } = site(metres, side);
+    const behind = earthRoad.beside(metres - 25, side); // faces oncoming traffic
     group.lookAt(behind.x, 0, behind.z);
     [-1, 1].forEach((x) => group.add(box(0.14, 3.4, 0.14, '#6d6f74', x * (width / 2 - 0.7), 1.7)));
     const board = new THREE.Mesh(new THREE.BoxGeometry(width, 1.75, 0.12), [
@@ -240,22 +284,41 @@ export function buildSites(scene: THREE.Scene) {
   // The gate: brick pillars, a lintel over the road, and club banners on the approach.
   {
     const { group, at } = site(metresOf('societies') + 16, 0);
-    [-5.2, 5.2].forEach((x) => group.add(box(1.6, 8, 1.6, '#8f4436', x, 4)));
-    group.add(box(12, 1.2, 1.4, '#8f4436', 0, 8.4));
-    group.add(box(7, 0.9, 0.2, '#e8dfc9', 0, 8.4, 0.72));
+    const brickwork = brick('#8f4436');
+    brickwork.repeat.set(1, 4);
+    const pillar = material('#ffffff', { map: brickwork });
+    [-5.2, 5.2].forEach((x) => group.add(box(1.6, 8, 1.6, pillar, x, 4)));
+    const lintel = brick('#8f4436');
+    lintel.repeat.set(4, 0.6);
+    group.add(box(12, 1.2, 1.4, material('#ffffff', { map: lintel }), 0, 8.4));
+    const name = new THREE.Mesh(new THREE.PlaneGeometry(9, 1), material('#ffffff', { map: signTexture('University of Calgary', { board: '#e8dfc9', ink: '#8f2f24' }, [1024, 114]), roughness: 0.6 }));
+    name.position.set(0, 8.4, 0.72);
+    group.add(name);
     scene.add(group);
     flats.push({ at, radius: 26 });
-    const colors = ['#9a2b2b', '#d9a84a', '#1f3b5a', '#9a2b2b', '#d9a84a', '#2f5a3c'];
-    colors.forEach((color, i) => {
-      const side = i % 2 ? 1 : -1;
-      const pole = site(metresOf('societies') - 6 + Math.floor(i / 2) * 7, side * 4.3);
-      pole.group.add(box(0.16, 6.5, 0.16, '#3a3a40', 0, 3.25));
-      const flag = new THREE.Mesh(new THREE.PlaneGeometry(1.2, 2.6), material(color, { side: THREE.DoubleSide }));
-      flag.position.set(0.7, 4.6, 0);
-      flag.rotation.y = Math.PI / 2;
-      pole.group.add(flag);
+    // The library, glass panes in campus colours, beside the gate.
+    const library = glassLibrary();
+    const libraryAt = earthRoad.beside(metresOf('societies') + 4, -30);
+    library.position.copy(libraryAt);
+    library.lookAt(earthRoad.beside(metresOf('societies') + 4, 0).setY(0));
+    scene.add(library);
+    flats.push({ at: libraryAt, radius: 24 });
+    // A banner for every team, hackathon and business, two to a pole, on four poles lining the
+    // approach to the gate. The poles alternate sides of the road, and on each side alternate
+    // close and set back, so looking up the road each pair peeks out beside the last. Every
+    // pole turns its banners toward the stop's camera.
+    const viewpoint = earthRoad.beside(metresOf('societies') - 18, 4);
+    const poles = Array.from({ length: Math.ceil(banners.length / 2) }, (_, k) => {
+      const pole = bannerPole(banners.slice(k * 2, k * 2 + 2));
+      const left = k % 2 === 0;
+      const close = k % 4 === 0 || k % 4 === 3;
+      const metres = metresOf('societies') - 2 + k * 4.5;
+      pole.group.position.copy(earthRoad.beside(metres, (left ? -1 : 1) * (close ? 5 : 8)));
+      pole.group.lookAt(viewpoint.x, 0, viewpoint.z);
       scene.add(pole.group);
+      return pole;
     });
+    interactions.societies = { update: (time) => { if (!still) poles.forEach((pole) => pole.update(time)); } };
   }
   const campusBuilding = (metres: number, side: number, w: number, h: number, d: number, color: string, along = 0) => {
     const { group, at } = site(metres, side, along);
@@ -266,7 +329,10 @@ export function buildSites(scene: THREE.Scene) {
   };
   // WayBionic: a concrete lab with a lit window wall, and the arm on a bench out front.
   {
-    const lab = campusBuilding(metresOf('waybionic'), -21, 24, 10, 14, '#a9a49a');
+    const lab = campusBuilding(metresOf('waybionic'), -21, 24, 10, 14, '#ffffff');
+    const formwork = concrete();
+    formwork.repeat.set(6, 2);
+    (lab.children[0] as THREE.Mesh).material = material('#ffffff', { map: formwork });
     const glass = new THREE.Mesh(new THREE.BoxGeometry(14, 5, 0.1), material('#1a2230', { emissive: '#bcd6ff', emissiveIntensity: 0.35, roughness: 0.2, metalness: 0.4 }));
     glass.position.set(-2, 3.6, 0.06);
     lab.add(glass);
@@ -327,6 +393,12 @@ export function buildSites(scene: THREE.Scene) {
   }
   // Soccer Intelligence: a pitch with goals and a scoreboard.
   {
+    const dome = saddledome();
+    const domeAt = earthRoad.beside(metresOf('soccer') + 36, 82);
+    dome.position.copy(domeAt);
+    dome.lookAt(earthRoad.beside(metresOf('soccer') + 36, 0).setY(0));
+    scene.add(dome);
+    flats.push({ at: domeAt, radius: 56 });
     const { group, at } = site(metresOf('soccer'), 32);
     const canvas = document.createElement('canvas');
     canvas.width = 512; canvas.height = 340;
@@ -393,6 +465,17 @@ export function buildSites(scene: THREE.Scene) {
     flats.push({ at, radius: 30 });
   }
 
+  // The Olympic Oval, built for the 1988 Winter Games, on campus behind the lounge.
+  {
+    const { group, at } = site(metresOf('lounge') + 6, -82);
+    group.add(olympicOval());
+    const sign = new THREE.Mesh(new THREE.PlaneGeometry(14, 1.6), material('#ffffff', { map: signTexture('Olympic Oval', { board: '#e8dfc9', ink: '#1f3b5a' }, [1024, 118]), roughness: 0.6 }));
+    sign.position.set(0, 3.6, 18.12);
+    group.add(sign);
+    scene.add(group);
+    flats.push({ at, radius: 48 });
+  }
+
   // ---------- The badlands ----------
   // The rover team garage: a shed with the door rolled up, three motors on the bench inside.
   {
@@ -457,6 +540,7 @@ export function buildSites(scene: THREE.Scene) {
   return {
     flats,
     interactions,
+    tick(time: number, dt: number) { always.forEach((run) => run(time, dt)); },
     update(lamps: number) {
       windowGlow.emissiveIntensity = 0.05 + lamps * 1.6;
     }

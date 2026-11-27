@@ -115,6 +115,8 @@ export function createSmoke(count: number, smokeColor: number, fireColor: number
         float a = texture2D(uMap, gl_PointCoord).a * vAlpha;
         if (a < 0.01) discard;
         gl_FragColor = vec4(mix(uSmoke, uFire, vHeat), a);
+        #include <tonemapping_fragment>
+        #include <colorspace_fragment>
       }`,
     transparent: true,
     depthWrite: false

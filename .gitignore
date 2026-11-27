@@ -11,3 +11,6 @@ AjmalOS_Complete_Agent_Pack/
 
 # Windows download metadata
 *:Zone.Identifier
+
+# CadQuery outputs (regenerate with ~/cad-env/bin/python cad/rover.py)
+cad/out/

@@ -62,7 +62,9 @@ button { font: inherit; color: inherit; }
 @media (hover: hover) and (pointer: fine) { .j-bar-links a:hover { background-size: 100% 1px; } }
 
 /* ---------- The stage ---------- */
-.j-stage { position: fixed; inset: 0; z-index: 0; height: 100vh; height: 100lvh; overflow: hidden; background: var(--asphalt); }
+.j-stage { position: fixed; inset: 0; z-index: 0; height: 100vh; height: 100lvh; overflow: hidden; background: var(--asphalt) url('/journey/stills/poster.webp') 50% 50% / cover no-repeat; }
+/* The poster is a photograph of the first stop, so the live scene fades in over its own image. */
+@media (orientation: portrait) { .j-stage { background-image: url('/journey/stills/poster-tall.webp'); } }
 .j-canvas { display: block; width: 100%; height: 100%; opacity: 0; transition: opacity 1.4s var(--ease-out); }
 .journey.is-live .j-canvas { opacity: 1; }
 /* The scrim darkens the side of the scene the card sits on, only while a card is showing. */
@@ -77,6 +79,9 @@ button { font: inherit; color: inherit; }
    fixed, scroll-driven layout only switches on in `.js .journey:not(.is-static)`, below. */
 .j-cards { display: grid; gap: 5rem; padding: 7rem var(--gutter) 4rem; }
 .j-card { max-width: 40rem; }
+/* Without the live scene, each stop leads with a photograph of it. */
+.j-still { display: block; width: 100%; height: auto; margin-bottom: 1.75rem; background: var(--asphalt-2); border: 1px solid var(--line); border-radius: 2px; }
+.js .journey:not(.is-static) .j-still { display: none; }
 .j-stage, .j-track, .trip, .j-cue { display: none; }
 
 .js .journey:not(.is-static) .j-stage, .js .journey:not(.is-static) .j-track { display: block; }
@@ -93,7 +98,10 @@ button { font: inherit; color: inherit; }
 }
 .j-place { font: 500 0.85rem/1.4 var(--sans); color: var(--sodium); }
 .j-title { margin-top: 0.7rem; font: 800 clamp(3.4rem, 6.4vw, 6.75rem)/0.88 var(--display); letter-spacing: -0.005em; text-wrap: balance; }
-.j-card-title .j-title { font-size: clamp(4.5rem, 10vw, 10.5rem); line-height: 0.84; }
+/* The title card is wider so the headline never meets the card's edge (cards scroll on short
+   screens, which would clip anything hanging past it). */
+.js .journey:not(.is-static) .j-card-title { width: min(46rem, 52vw); }
+.j-card-title .j-title { font-size: clamp(4.2rem, 8.6vw, 9.5rem); line-height: 0.84; }
 .j-lede { max-width: 31rem; margin-top: 1.4rem; font-size: clamp(1.02rem, 1.25vw, 1.15rem); line-height: 1.6; color: #e4ded1; }
 .j-facts { display: grid; gap: 0.9rem; max-width: 31rem; margin-top: 1.6rem; }
 .j-facts li { display: grid; gap: 0.15rem; padding-left: 1rem; border-left: 1px solid var(--line); font-size: 0.95rem; line-height: 1.5; color: var(--chalk-dim); }
@@ -188,3 +196,8 @@ html:has(dialog[open]) { overflow: hidden; }
   .j-cue i::after { animation: none; }
   .j-canvas, .j-mark, .j-btn { transition: none; }
 }
+
+/* ---------- 404 ---------- */
+.lost { display: grid; align-content: center; justify-items: start; gap: 1.2rem; min-height: 100svh; padding: 6rem var(--gutter); }
+.lost .j-title { max-width: 12ch; margin-top: 0; }
+.lost .j-lede { margin: 0 0 0.6rem; }

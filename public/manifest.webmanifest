@@ -3,9 +3,9 @@
   "short_name": "Ajmal Khidri",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0a1322",
-  "theme_color": "#0a1322",
-  "description": "Robotics software, web infrastructure, and real businesses.",
+  "background_color": "#0b0e15",
+  "theme_color": "#0b0e15",
+  "description": "Ride from a Calgary driveway to the Moon: robotics software, web infrastructure and real businesses.",
   "icons": [
     {
       "src": "/favicon.svg",

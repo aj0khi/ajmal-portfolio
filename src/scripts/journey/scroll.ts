@@ -52,8 +52,11 @@ export function createScroll(track: HTMLElement, reduced: boolean) {
     const toPx = (time: number) => trigger.start + (time / total) * (trigger.end - trigger.start);
     marks = stops.map((stop) => ({ arrive: toPx(timeline.labels[stop.id]), leave: toPx(timeline.labels[`${stop.id}:end`]) }));
   };
-  measure();
   ScrollTrigger.addEventListener('refresh', measure);
+  // The world loads after the page has, so ScrollTrigger's own refresh on `load` has already
+  // passed: refresh now, or the trigger's start and end (and every stop mark) read as zero.
+  ScrollTrigger.refresh();
+  measure();
 
   const position = () => lenis?.targetScroll ?? scrollY;
   let direction = 1;

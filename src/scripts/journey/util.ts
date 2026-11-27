@@ -142,6 +142,8 @@ export function atmosphere(radius: number, color: THREE.ColorRepresentation, pow
       void main() {
         float rim = pow(1.0 - max(dot(vNormal, vView), 0.0), uPower);
         gl_FragColor = vec4(uColor * rim * uStrength, rim);
+        #include <tonemapping_fragment>
+        #include <colorspace_fragment>
       }`,
     transparent: true, depthWrite: false, blending: THREE.AdditiveBlending
   });

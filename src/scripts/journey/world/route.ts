@@ -3,7 +3,7 @@
 // trees and props. The Earth road also decides the landscape: which chapter (biome) each
 // place belongs to, how hilly it is, and where ridges hide the next stop.
 import * as THREE from 'three';
-import { fbm, smoothstep } from '../util';
+import { fbm, lerp, smoothstep } from '../util';
 
 export type RoadFrame = { position: THREE.Vector3; forward: THREE.Vector3; right: THREE.Vector3 };
 const UP = new THREE.Vector3(0, 1, 0);
@@ -61,7 +61,7 @@ export const earthRoad = makeRoad([
 // Chapters by metres along the road. Each blends into the next over `blend` metres.
 export const biomes = [
   { name: 'street', from: 0, grass: '#5d7744', dry: '#8c8a55', amplitude: 16 },
-  { name: 'foothills', from: 150, grass: '#7a7a48', dry: '#a8935c', amplitude: 70 },
+  { name: 'downtown', from: 150, grass: '#66765a', dry: '#8d8f78', amplitude: 5 },
   { name: 'campus', from: 270, grass: '#527a3e', dry: '#7a8a50', amplitude: 12 },
   { name: 'badlands', from: 515, grass: '#b2673f', dry: '#d3a072', amplitude: 46 },
   { name: 'prairie', from: 690, grass: '#a8935a', dry: '#c4ad6c', amplitude: 14 }
@@ -76,13 +76,40 @@ export const biomeWeights = (metres: number) => biomes.map((biome, i) => {
   return entered * (1 - left);
 });
 
+// The Bow River: it meanders across the whole board and crosses the road once, on the way
+// into downtown. Described as z = centre(x), which is enough for a river that runs crosswise.
+const CROSSING = 146;
+const meander = (x: number) => Math.sin(x * 0.011 + 1.3) * 26 + Math.sin(x * 0.029 + 0.4) * 9;
+const slope = (x: number) => 0.011 * 26 * Math.cos(x * 0.011 + 1.3) + 0.029 * 9 * Math.cos(x * 0.029 + 0.4);
+const crossingAt = earthRoad.frameAt(earthRoad.u(CROSSING)).position;
+const riverZ0 = crossingAt.z - meander(crossingAt.x);
+export const river = {
+  crossing: CROSSING,
+  width: 20,
+  depth: 3.4,
+  water: -1.3,
+  centre: (x: number) => riverZ0 + meander(x),
+  slope,
+  /** Distance from the river's centre line (close to exact while the bends stay gentle). */
+  distance: (x: number, z: number) => Math.abs(z - riverZ0 - meander(x)) / Math.sqrt(1 + slope(x) ** 2)
+};
+
 export interface Flat { at: THREE.Vector3; radius: number }
 export interface Ridge { at: THREE.Vector3; radius: number; height: number }
 
 // Hills rise only away from the road and the sites; ridges sit inside bends so the road
 // curls around them and the next stop stays hidden until you round it.
 export function createLand(flats: Flat[], ridges: Ridge[], board: { centre: THREE.Vector3; width: number; depth: number }) {
+  // The river cuts its channel through everything, the road included: the road crosses on a
+  // bridge, so the land under it is carved too.
+  const BANK = 7;
   const heightAt = (x: number, z: number) => {
+    const land = groundAt(x, z);
+    const fromRiver = river.distance(x, z);
+    if (fromRiver > river.width / 2 + BANK) return land;
+    return lerp(-river.depth, land, smoothstep(river.width / 2 - 3, river.width / 2 + BANK, fromRiver));
+  };
+  const groundAt = (x: number, z: number) => {
     const { distance, metres } = earthRoad.nearest(x, z);
     let mask = smoothstep(ROAD_WIDTH + 2, 22, distance);
     for (const flat of flats) mask *= smoothstep(flat.radius * 0.75, flat.radius * 1.3, Math.hypot(x - flat.at.x, z - flat.at.z));

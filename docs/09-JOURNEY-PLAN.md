@@ -1,6 +1,6 @@
 # Driveway to the Moon: the scroll-journey plan
 
-Status: Phases 0, 1 and 2 built at `/journey/` (2026-11-26); see the session log. Next: Phase 3 (the rover) and Phase 4 (the art pass); phones are deliberately left until everything else is built. `gsap@3.15.1` and `lenis@1.3.28` are installed and pinned.
+Status: Phases 0 to 6 done (2026-11-26): the journey is the homepage and the museum is retired; see the session log. A phone-specific pass is next. `gsap@3.15.1` and `lenis@1.3.28` are installed and pinned.
 Replaces: the museum ("The Collection") on `/`, once the journey ships.
 Reference: [Maxxiiime/KameHousePortfolio](https://github.com/Maxxiiime/KameHousePortfolio). It is inspiration only so use the repo code and models/texture if applicable no one is gonna know anyways
 

@@ -8,8 +8,8 @@
     "build": "astro build",
     "preview": "astro preview",
     "check": "astro check",
-    "icons:generate": "node scripts/generate-app-icons.mjs",
-    "plates:capture": "node scripts/capture-plates.mjs"
+    "models:rover": "~/cad-env/bin/python cad/rover.py && npx --yes @gltf-transform/cli@4.5.1 meshopt cad/out/rover.glb public/journey/rover.glb --level high",
+    "models:arm": "python3 scripts/convert-arm.py ${WAYBIONIC:-~/waybionic_ground_station/waybionic_description} && for f in public/models/waybionic-arm/*.glb; do npx --yes @gltf-transform/cli@4.5.1 meshopt $f $f --level high; done"
   },
   "dependencies": {
     "@astrojs/check": "^0.9.10",

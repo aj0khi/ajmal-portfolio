@@ -57,6 +57,10 @@ export function createSky(scene: THREE.Scene) {
           float sun = max(dot(dir, uSunDir), 0.0);
           color += uSunColor * (pow(sun, 6.0) * 0.28 + pow(sun, 900.0) * 2.0) * (1.0 - lid * uArchStrength * 0.8);
           gl_FragColor = vec4(color, 1.0);
+          // Tone-map and encode like the built-in materials, so the sky matches the fogged land
+          // and looks the same with or without the post-processing pass.
+          #include <tonemapping_fragment>
+          #include <colorspace_fragment>
         }`
     })
   );

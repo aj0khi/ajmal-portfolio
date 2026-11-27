@@ -1,5 +1,5 @@
 /* Kiosks: the interactive demos (stale data, hash chain, Snake lab, HVAC, rover sim, Poisson,
-   arm bus, signatures) and the lightbox, shared by the museum (/) and the journey (/journey/).
+   arm bus, signatures) and the lightbox, used by the journey's stops.
    Colours come from custom properties each page defines: --night, --frost, --tag, --data... */
 /* Kiosks and lightbox */
 .kiosk, .lightbox {
