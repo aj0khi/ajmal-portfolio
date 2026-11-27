@@ -154,3 +154,9 @@
 - **Road signs:** "Compressors.", "Nozzles." and "Joints." now alternate sides of the road so none hides behind the one before.
 - **Hosting:** Hostinger builds from `main` (Astro preset, `npm run build`, output `dist`, Node 22); the live site matched the last push exactly, so the missing changes were simply unpushed work.
 
+## 2026-11-26 — Cards without scrollbars, and the phone pass
+
+- **Owner report:** scrollbars appeared in the middle of the screen. Cause: every card briefly overflowed by the 22 px its text rises while fading in, so a scrollbar flashed at the card's edge, and the tallest cards (Soccer, WayBionic, the arcade, the launch pad, SouthPoint) overflowed on laptop-height screens. Cards now hide their scrollbar, have room for the rise, and on landscape screens up to 980 px tall use a more compact type scale with the detail lines hidden, so every card fits at 1280×600 through 1920×950. A card that still runs long scrolls and fades out at its bottom edge.
+- **Phones:** cards sit in roughly the bottom half: smaller titles, the lede held to four lines, notes hidden, sliders three across. The scene shifts up by half the live card's height (measured, not guessed), using the same breakpoint as the CSS. Stops can now carry a `tall` framing for phones and portrait tablets; the road signs, Soccer Lab, WayBionic and the arcade use one to keep the rover and the site above the card.
+- **Small fix:** slider readouts no longer show "-0°".
+

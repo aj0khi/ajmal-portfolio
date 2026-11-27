@@ -26,6 +26,9 @@ export interface JourneyStop {
   dwell: number; // screens of scroll parked here, where the stop is live
   glide: number; // seconds one gesture takes to drive here from the previous stop
   framing: Framing;
+  /** Changes to `framing` on tall screens (phones, portrait tablets), where the card covers
+   *  the bottom of the frame: usually a lower aim, so the rover sits higher in the picture. */
+  tall?: Partial<Framing>;
   sky: number; // time of day: 0 pre-dawn, 1 Chinook dawn, 2 morning, 3 noon, 4 dusk
 }
 
@@ -41,13 +44,13 @@ export const stops: JourneyStop[] = [
   { id: 'chinook', name: 'Chinook Clean', world: 'earth', at: 40, drive: 1, dwell: 0.8, glide: 1.5, framing: left(12, 0.6, 0.5, -6), sky: 0.25 },
   { id: 'hvac', name: 'HVAC Express', world: 'earth', at: 92, drive: 1.2, dwell: 0.8, glide: 1.7, framing: right(19, 4.5, 0.2, 3, 2), sky: 0.7 },
   // Downtown: the road signs with the Calgary Tower behind them, then the Saddledome.
-  { id: 'thread', name: 'The thread', world: 'earth', at: 190, drive: 1.4, dwell: 0.8, glide: 2, framing: { yaw: -0.5, pitch: 0.05, distance: 14, lift: 11, ahead: 60, toward: 20, fov: 52 }, sky: 1.15 },
-  { id: 'soccer', name: 'Soccer Lab', world: 'earth', at: 245, drive: 1.1, dwell: 0.8, glide: 1.6, framing: right(30, 6, 0.3, 14, 26), sky: 1.5 },
+  { id: 'thread', name: 'The thread', world: 'earth', at: 190, drive: 1.4, dwell: 0.8, glide: 2, framing: { yaw: -0.5, pitch: 0.05, distance: 14, lift: 11, ahead: 60, toward: 20, fov: 52 }, tall: { fov: 64, lift: 14, toward: 26 }, sky: 1.15 },
+  { id: 'soccer', name: 'Soccer Lab', world: 'earth', at: 245, drive: 1.1, dwell: 0.8, glide: 1.6, framing: right(30, 6, 0.3, 14, 26), tall: { lift: 0, ahead: 6, toward: 14, pitch: 0.4 }, sky: 1.5 },
   // Campus: the University of Calgary.
   { id: 'societies', name: 'Societies', world: 'earth', at: 305, drive: 1.2, dwell: 0.8, glide: 1.8, framing: { yaw: 0.22, pitch: 0.14, distance: 19, lift: 4, ahead: 12, toward: 0, fov: 42 }, sky: 1.9 },
-  { id: 'waybionic', name: 'WayBionic', world: 'earth', at: 352, drive: 1.1, dwell: 0.8, glide: 1.6, framing: left(24, 4, 0.2, -12), sky: 2.05 },
+  { id: 'waybionic', name: 'WayBionic', world: 'earth', at: 352, drive: 1.1, dwell: 0.8, glide: 1.6, framing: left(24, 4, 0.2, -12), tall: { lift: 1 }, sky: 2.05 },
   { id: 'blackbox', name: 'BlackBox', world: 'earth', at: 390, drive: 1, dwell: 0.8, glide: 1.5, framing: right(14, 1.8, 0.25, 2, 8), sky: 2.15 },
-  { id: 'lounge', name: 'Arcade', world: 'earth', at: 432, drive: 1, dwell: 0.8, glide: 1.5, framing: left(22, 3, 0.18, -12), sky: 2.3 },
+  { id: 'lounge', name: 'Arcade', world: 'earth', at: 432, drive: 1, dwell: 0.8, glide: 1.5, framing: left(22, 3, 0.18, -12), tall: { lift: 1 }, sky: 2.3 },
   { id: 'garage', name: 'Rover garage', world: 'earth', at: 560, drive: 1.4, dwell: 0.8, glide: 2, framing: left(20, 2.6, 0.16, -11), sky: 2.9 },
   { id: 'mars', name: 'Mars yard', world: 'earth', at: 640, drive: 1.3, dwell: 0.8, glide: 1.9, framing: right(22, 3, 0.26, 4, 14), sky: 3.3 },
   { id: 'launch', name: 'Launch pad', world: 'earth', at: -14, drive: 1.5, dwell: 0.9, glide: 2.1, framing: { yaw: 2.2, pitch: 0.1, distance: 75, lift: 16, ahead: 14, toward: 0, fov: 42 }, sky: 4 },

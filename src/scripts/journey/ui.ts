@@ -20,7 +20,12 @@ export function createUi(root: HTMLElement, scroll: JourneyScroll) {
   // Every card starts hidden and unreachable; update() opens the one the rover is parked at.
   cards.forEach((card) => { if (card) card.inert = true; });
   // A card taller than the screen scrolls inside itself; only those keep the wheel from Lenis.
-  const measureCards = () => cards.forEach((card) => card?.toggleAttribute('data-lenis-prevent', card.scrollHeight > card.clientHeight + 1));
+  // Card heights are kept too: on tall screens the scene shifts up by about half the card.
+  let heights: number[] = [];
+  const measureCards = () => {
+    cards.forEach((card) => card?.toggleAttribute('data-lenis-prevent', card.scrollHeight > card.clientHeight + 1));
+    heights = cards.map((card) => card?.offsetHeight ?? 0);
+  };
   measureCards();
   addEventListener('resize', measureCards);
   stopButtons.forEach((button) => button.addEventListener('click', () => scroll.goToStop(Number(button.dataset.go))));
@@ -29,15 +34,16 @@ export function createUi(root: HTMLElement, scroll: JourneyScroll) {
   let shownStop = -1;
   let lastKm = '';
   return {
-    // Returns how present the current card is, so the scene can make room for it.
+    // Returns how present the current card is and how tall it is, so the scene can make room.
     update(flashAmount: number, kilometres: number) {
       const time = scroll.timeline.time();
       let presence = 0;
+      let height = 0;
       cards.forEach((card, i) => {
         const [arrive, leave] = scroll.dwellTimes[i];
         const away = Math.max(0, arrive - time, time - leave);
         const show = 1 - smoothstep(0.06, 0.5, away);
-        presence = Math.max(presence, show);
+        if (show > presence) { presence = show; height = heights[i] ?? 0; }
         if (i === 0) cue?.style.setProperty('--show', show.toFixed(3));
         if (!card) return;
         card.style.setProperty('--show', show.toFixed(3));
@@ -55,7 +61,7 @@ export function createUi(root: HTMLElement, scroll: JourneyScroll) {
         stopButtons.forEach((button, i) => { if (i === stop) button.setAttribute('aria-current', 'step'); else button.removeAttribute('aria-current'); });
         if (stopName) stopName.textContent = stops[stop].name;
       }
-      return presence;
+      return { presence, height };
     }
   };
 }

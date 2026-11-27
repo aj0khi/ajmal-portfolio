@@ -99,6 +99,8 @@ export function startJourney(root: HTMLElement) {
 
   let last = performance.now();
   let shift = 0;
+  let cardHeight = 0;
+  const stacked = matchMedia('(max-width: 899px), (orientation: portrait)');
   let focus = 0.45;
   const subject = new THREE.Vector3();
   const frame = (now: number) => {
@@ -117,13 +119,16 @@ export function startJourney(root: HTMLElement) {
       shown = p;
     }
     const out = director.frame(p, now / 1000, dt, camera, pointer);
-    const presence = ui.update(out.flash, out.km);
+    const card = ui.update(out.flash, out.km);
     // Make room for the card without re-aiming the camera: shift the projection itself,
-    // right on wide screens (card on the left), up on tall ones (card at the bottom).
-    shift += (presence - shift) * (1 - Math.exp(-dt * 6));
+    // right on wide screens (card on the left), up on tall ones (card along the bottom), by
+    // enough to centre the scene in the space the card leaves. Same breakpoint as the CSS.
+    const ease = 1 - Math.exp(-dt * 6);
+    shift += (card.presence - shift) * ease;
+    if (card.height > 0) cardHeight += (card.height - cardHeight) * ease;
     camera.fov = out.fov;
-    if (width / height >= 0.9) camera.setViewOffset(width, height, -0.17 * width * shift, 0, width, height);
-    else camera.setViewOffset(width, height, 0, 0.27 * height * shift, width, height);
+    if (!stacked.matches) camera.setViewOffset(width, height, -0.17 * width * shift, 0, width, height);
+    else camera.setViewOffset(width, height, 0, Math.min(0.32 * height, 0.5 * cardHeight) * shift, width, height);
     camera.updateProjectionMatrix();
     // Smoke particles are sized in world units: pixels per unit at distance 1.
     // gl_PointSize is in drawing-buffer pixels, so include the pixel ratio.

@@ -88,7 +88,12 @@ button { font: inherit; color: inherit; }
 .js .journey:not(.is-static) .trip { display: grid; }
 .js .journey:not(.is-static) .j-cue { display: grid; }
 .js .journey:not(.is-static) .j-cards { position: fixed; inset: 0; z-index: 10; display: block; padding: 0; pointer-events: none; }
-.js .journey:not(.is-static) .j-card { position: absolute; top: 50%; left: var(--gutter); width: min(34rem, 40vw); max-width: none; max-height: calc(100svh - 9rem); overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; translate: 0 -50%; }
+.js .journey:not(.is-static) .j-card { position: absolute; top: 50%; left: var(--gutter); width: min(34rem, 40vw); max-width: none; max-height: calc(100svh - 9rem); padding-bottom: 24px; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; translate: 0 -50%; }
+/* No scrollbar floating mid-screen: a card that is genuinely taller than the screen still
+   scrolls (wheel, touch, keys), and fades out at the bottom edge to say there's more. The
+   bottom padding gives the 22 px text rise room, so a card never overflows while it animates. */
+.js .journey:not(.is-static) .j-card::-webkit-scrollbar { display: none; }
+.js .journey:not(.is-static) .j-card[data-lenis-prevent] { -webkit-mask-image: linear-gradient(180deg, #000 calc(100% - 3rem), transparent); mask-image: linear-gradient(180deg, #000 calc(100% - 3rem), transparent); }
 .js .journey:not(.is-static) .j-card.is-live { pointer-events: auto; }
 /* One number per card, --show (0..1), staggers every child by its own --i. Scrolling back
    plays it in reverse because it is a function of position, not a one-shot animation. */
@@ -111,7 +116,7 @@ button { font: inherit; color: inherit; }
 /* Stop controls: sliders with amber thumbs, one red thing to press, quiet chips for the kiosks. */
 .j-controls { display: grid; gap: 0.75rem; max-width: 31rem; margin-top: 1.4rem; }
 .j-control-row { display: flex; flex-wrap: wrap; gap: 0.6rem; }
-.j-slider-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem 1.2rem; }
+.j-slider-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr)); gap: 0.5rem 1.2rem; }
 .j-slider { display: grid; gap: 0.3rem; font-size: 0.82rem; color: var(--chalk-dim); }
 .j-slider span { display: flex; justify-content: space-between; gap: 0.5rem; }
 .j-slider b { font: 500 0.82rem var(--mono); font-variant-numeric: tabular-nums; color: var(--sodium); }
@@ -169,21 +174,40 @@ html:has(dialog[open]) { overflow: hidden; }
 .arrival ul { display: flex; flex-wrap: wrap; gap: 0.75rem 2rem; }
 .arrival a { text-underline-offset: 4px; text-decoration-color: rgba(242, 165, 65, 0.5); }
 
+/* ---------- Short laptop screens: the same card, more compact, so it fits without scrolling ---------- */
+@media (min-width: 900px) and (orientation: landscape) and (max-height: 980px) {
+  .j-title { font-size: clamp(2.6rem, 7.4vh, 5.6rem); }
+  .j-card-title .j-title { font-size: clamp(3.4rem, 11vh, 8rem); }
+  .j-lede { margin-top: 0.9rem; font-size: 1rem; line-height: 1.5; }
+  .j-facts { gap: 0.45rem; margin-top: 1rem; }
+  .js .journey:not(.is-static) .j-facts span, .js .journey:not(.is-static) .j-part { display: none; }
+  .j-controls { gap: 0.55rem; margin-top: 1rem; }
+  .j-slider-grid { gap: 0.3rem 1.2rem; }
+  .j-hold, .j-chip { min-height: 2.4rem; padding: 0.45rem 1rem; }
+}
+
 /* ---------- Phones: the card sits at the bottom, the scene above it ---------- */
 @media (max-width: 899px), (orientation: portrait) {
   .j-bar-links a:first-child { display: none; }
   .j-scrim { background: linear-gradient(0deg, rgba(7, 9, 14, 0.94) 0%, rgba(7, 9, 14, 0.78) 34%, rgba(7, 9, 14, 0) 60%); }
   .js .journey:not(.is-static) .j-card { top: auto; bottom: max(1.5rem, env(safe-area-inset-bottom)); left: 1.25rem; right: 1.25rem; width: auto; translate: none; }
-  .j-title { font-size: clamp(2.6rem, 12vw, 4.2rem); }
-  .j-card-title .j-title { font-size: clamp(3.6rem, 17vw, 6rem); }
-  .j-lede { margin-top: 0.9rem; font-size: 0.98rem; line-height: 1.5; }
+  .j-title { font-size: clamp(2.2rem, 10vw, 3.4rem); }
+  .j-card-title .j-title { font-size: clamp(3.1rem, 14.5vw, 4.8rem); }
+  .j-lede { margin-top: 0.7rem; font-size: 0.95rem; line-height: 1.48; }
+  /* The scene is half the story on a phone, so the card stays in the bottom half or so: the
+     lede is held to four lines, notes wait for a wider screen, and controls pack tighter. */
+  .js .journey:not(.is-static) .j-lede { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 4; line-clamp: 4; overflow: hidden; }
+  .js .journey:not(.is-static) .j-note { display: none; }
+  .j-controls { gap: 0.5rem; margin-top: 0.85rem; }
+  .j-slider-grid { grid-template-columns: repeat(auto-fit, minmax(6.6rem, 1fr)); gap: 0.15rem 0.9rem; }
+  .j-slider input[type='range'] { height: 1.4rem; }
   /* Phones keep each card short enough to leave the scene visible: the lede and names stay,
      the longer detail lines wait for a wider screen. */
   .j-facts { gap: 0.35rem; margin-top: 0.9rem; }
   .j-facts li { font-size: 0.88rem; line-height: 1.4; }
   .js .journey:not(.is-static) .j-facts span, .js .journey:not(.is-static) .j-part { display: none; }
-  .js .journey:not(.is-static) .j-card { max-height: calc(100svh - 10rem); }
-  .j-actions { margin-top: 1.3rem; }
+  .js .journey:not(.is-static) .j-card { max-height: min(62svh, calc(100svh - 10rem)); }
+  .j-actions { margin-top: 0.9rem; }
   .js .journey:not(.is-static) .j-cue { display: none; }
   .trip { top: 4.4rem; bottom: auto; right: 1.25rem; gap: 0.6rem; }
   .trip-km { font-size: 1.05rem; }

@@ -53,6 +53,9 @@ export function createDirector(still: boolean) {
   // change of framing sweeps the camera around the rover instead of through it. Tall screens
   // see less sideways, so every framing stands further back there.
   let reach = 1;
+  let tall = false;
+  // A stop's framing, with its tall-screen adjustments applied on phones and portrait tablets.
+  const framingOf = (stop: (typeof stops)[number]): Framing => (tall && stop.tall ? { ...stop.framing, ...stop.tall } : stop.framing);
   const orbit = (frame: RoadFrame, f: Framing, outPos: THREE.Vector3, outLook: THREE.Vector3) => {
     const distance = f.distance * reach;
     flat.copy(frame.forward).multiplyScalar(-Math.cos(f.yaw)).addScaledVector(frame.right, Math.sin(f.yaw));
@@ -85,7 +88,10 @@ export function createDirector(still: boolean) {
   // `pointer` is the cursor in -1..1 screen space (null when there's no hover pointer).
   const frame = (p: number, time: number, dt: number, camera: THREE.PerspectiveCamera, pointer: { x: number; y: number } | null) => {
     position = p;
-    reach = camera.aspect < 0.9 ? 1.45 : 1;
+    // Tall screens see less sideways, so every framing stands further back there, and some
+    // stops re-aim (see `tall` in the stop data) to keep the rover above the card.
+    tall = camera.aspect < 0.9;
+    reach = tall ? 1.45 : 1;
     const seg = Math.min(stops.length - 2, Math.floor(p));
     const f = clamp(p - seg);
     const from = stops[seg]; const to = stops[seg + 1];
@@ -107,7 +113,7 @@ export function createDirector(still: boolean) {
       rover.object.position.copy(here.position);
       rover.object.lookAt(c.copy(here.position).add(here.forward));
       place(rover.object, earth.scene);
-      orbit(here, blend([[leaving(f), from.framing], [1 - leaving(f) - arriving(f), follow], [arriving(f), to.framing]]), camPos, camLook);
+      orbit(here, blend([[leaving(f), framingOf(from)], [1 - leaving(f) - arriving(f), follow], [arriving(f), framingOf(to)]]), camPos, camLook);
       result.fov = blended.fov;
       // The miniature blur deepens while driving and eases off when parked at a stop.
       result.tilt = lerp(0.45, 1, Math.sin(f * Math.PI));
@@ -126,7 +132,7 @@ export function createDirector(still: boolean) {
       rover.object.lookAt(c.copy(here.position).add(here.forward));
       place(rover.object, moon.scene);
       // The landing pose is a fixed shot, so blend it by position into the rover rig.
-      orbit(here, blend([[1 - arriving(f), follow], [arriving(f), to.framing]]), camPos, camLook);
+      orbit(here, blend([[1 - arriving(f), follow], [arriving(f), framingOf(to)]]), camPos, camLook);
       const settle = leaving(f);
       camPos.lerp(landedPose.position, settle);
       camLook.lerp(landedPose.look, settle);
@@ -167,7 +173,7 @@ export function createDirector(still: boolean) {
 
       // Camera: the launch framing, then wide on the pad, then chasing the climb from below,
       // then looking down the plume at a shrinking map as the clouds close in.
-      orbit(parked, stops[LAUNCH].framing, a, b);
+      orbit(parked, framingOf(stops[LAUNCH]), a, b);
       const pad = earth.pad;
       const back = toRoad;
       const side = e.crossVectors(back, UP).normalize();

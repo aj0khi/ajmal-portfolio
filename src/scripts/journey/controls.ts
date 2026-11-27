@@ -19,7 +19,9 @@ export function wireControls(root: HTMLElement, send: Send) {
         if (!readout) return;
         const scale = Number(readout.dataset.scale ?? 1);
         const value = Number(element.value) * scale;
-        readout.textContent = `${value.toFixed(scale !== 1 ? 0 : Number(element.step) < 1 ? 1 : 0)}${readout.dataset.unit ?? ''}`;
+        const shown = value.toFixed(scale !== 1 ? 0 : Number(element.step) < 1 ? 1 : 0);
+        // A small negative angle rounds to "-0"; show it as 0.
+        readout.textContent = `${Number(shown) === 0 ? shown.replace('-', '') : shown}${readout.dataset.unit ?? ''}`;
       };
       element.addEventListener('input', () => { send(stop, key, Number(element.value)); show(); });
       show();
